@@ -1,6 +1,8 @@
-#import "./layout/ba.typ": *
+#import "../layout/ba.typ": *
 
 == Framework
+
+#todo("Overview diagramm")
 
 Die Generation wird in drei Stufen aufgeteilt. 
 1. "Composer" Ein Graphischer Editor indem ein Nutzer eine Generations Regeln und Abhängigkeiten einstellen kann. 
@@ -15,7 +17,7 @@ Hier für habe ich Node Graph System genutzt.
 3. "Collapser" Stellt die aktuelle Welt da. 
 Nimmt ein neues "Template" und  ändert alles was nötig ist damit die Welt dem neuen "Template" entspricht.
 
-#todo("Sollte ich die Stufen nochmal umbenennen? Gerade collapser ergibt nicht so viel sinn.")
+#question("Sollte ich die Stufen nochmal umbenennen? Gerade collapser ergibt nicht so viel sinn.")
 
 === Composer 
 

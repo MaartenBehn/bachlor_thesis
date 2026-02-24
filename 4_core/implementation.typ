@@ -1,7 +1,8 @@
-#import "./layout/ba.typ": *
+#import "../layout/ba.typ": *
 
 == Implementation 
 
+#question("Wie viel will ich überhaupt auf sowas eingehen?")
 
 === Stabiele Listen
 Alle Graphen sind mit stabilen Listen implementiert.
@@ -43,4 +44,16 @@ Erst wenn diese voll sind wird ein Array auf dem Stack alloziert.
 Da alle Werte müssen als Liste behandelt werden, da ein Knoten immer von mehreren Knoten für ein Input abhängt.
 Jedoch enthält diese Listen meist doch nur ein Element. 
 Small Vectoren erlauben für diese Fälle die Stack allozieren zu sparen und bieten bessere Cache Lokalität. 
- 
+
+
+=== Output Datenstruktur
+==== Direkt CSG Rendering 
+
+==== Voxel sampeling 
+#todo("Sollte ich auf die Implementation und Datenstruktur ein gehen? Warscheinlich nicht.")
+
+- Minimale Änderungen im CSG führen zu nur minimaler Neuerrechnung des Voxel DAGs 
+
+==== Meshing 
+
+- Minimale Änderungen im CSG führen zu nur minimaler Neuerrechnung des Meshes

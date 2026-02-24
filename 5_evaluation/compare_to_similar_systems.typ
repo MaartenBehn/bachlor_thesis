@@ -1,3 +1,4 @@
+#import "../layout/ba.typ": *
 
 == Bewertung und Vergleich zu andere Systemen
 

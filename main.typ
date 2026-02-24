@@ -1,9 +1,6 @@
 #import "./layout/ba.typ": *
 
-#set document(title: [
-  A Fluid Dynamic Model for
-  Glacier Flow
-])
+#set document(title: [Lazy prozedurale Weltgenerierung])
 
 #show: scrartcl.with(
   title: "Lazy prozedurale Weltgenerierung",
@@ -18,78 +15,56 @@
 
 = Einleitung
 
-#include "./introduktion/goal.typ"
+#include "./1_introduktion/goal.typ"
 
-#include "./introduktion/strukture.typ"
+#include "./1_introduktion/strukture.typ"
 
 = Stand der Technik
 
 == Prozedurale Generation <prozedurale_generation>
 
-#include "./state_of_art/noise.typ"
+#include "./2_state_of_art/noise.typ"
 
-#include "./state_of_art/model_synthesis.typ" 
+#todo("L-Systems")
 
-#include "./state_of_art/graph_grammers.typ"
+#include "./2_state_of_art/model_synthesis.typ"
 
-#include "./state_of_art/ai_based_procedual_generation.typ"
+#include "./2_state_of_art/graph_grammers.typ"
 
-#include "./state_of_art/lazy_recompute.typ"
+#include "./2_state_of_art/ai_based_procedual_generation.typ"
+
+#include "./2_state_of_art/lazy_recompute.typ"
 
 = Theoretische Grundlagen 
 
-#include "./theory/lazy_loading.typ"
+#include "./3_theory/lazy_loading.typ"
 
-#include "./theory/graphs.typ"
+#include "./3_theory/graphs.typ"
 
-- Graph grammers
-- Rust features
-- Stabiele Listen
-- L-Systems
-- CSG
-- Geometry Nodes
+#todo("CSG")
+#todo("Geometry Nodes")
 
-
-#include "./theory/dependencies.typ"
+#include "./3_theory/dependencies.typ"
 
 = Meine Arbeit
 
-#include "./idea.typ"
+#include "./4_core/idea.typ"
 
-#include "./framework.typ"
+#include "./4_core/framework.typ"
 
-#include "./why_rust.typ"
+#include "./4_core/why_rust.typ"
 
-#include "./implementation.typ"
+#include "./4_core/implementation.typ"
 
-== Zeigen dass es Funktioniert 
-- minimal änderungen führen zu minimaler arbeit.
+#include "./4_core/result.typ"
 
-== Nutzungs Beispiele
-- Welt editor 
-- Infitie World Generation
-- LOD systems 
+== Bewertung
 
-== Visulation 
+#include "./5_evaluation/compare_to_similar_systems.typ" 
 
-=== Direkt CSG Rendering 
-
-=== Voxel sampeling 
-#todo("Sollte ich auf die Implementation und Datenstruktur ein gehen? Warscheinlich nicht.")
-
-- Minimale Änderungen im CSG führen zu nur minimaler Neuerrechnung des Voxel DAGs 
-
-=== Meshing 
-
-- Minimale Änderungen im CSG führen zu nur minimaler Neuerrechnung des Meshes
-
-
-#include "./evaluation.typ" 
-
-#include "./future_work.typ"
+#include "./5_evaluation/future_work.typ"
 
 #bibliography("citations.bib")
-
 
 #idea("Text")
 #todo("Text")

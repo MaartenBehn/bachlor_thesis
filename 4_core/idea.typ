@@ -1,4 +1,4 @@
-#import "./layout/ba.typ": *
+#import "../layout/ba.typ": *
 
 == Kern Idee
 

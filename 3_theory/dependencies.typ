@@ -45,6 +45,8 @@ Jedoch da die Kern-Beschränkungen meist nur indirekt zugesichert werden, kann e
 
 == Systeme, die alle Abhängigkeiten sicherstellen. 
 
+#note("Das ist sehr wichtig")
+
 === Linear Programming 
 
 #todo("Erklärung")
