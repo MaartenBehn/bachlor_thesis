@@ -4,41 +4,27 @@
 
 #todo("Overview diagramm")
 
-Die Generation wird in drei Stufen aufgeteilt. 
-1. "Composer" Ein Graphischer Editor indem ein Nutzer eine Generations Regeln und Abhängigkeiten einstellen kann. 
-Hier für habe ich Node Graph System genutzt. 
+Mein generations System besteht aus drei Bestandteilen. 
+1. Ein Graphischer Editor indem ein Nutzer einen Abhängigkeits-Graph erstellen und bearbeiten kann. 
 
-#todo("Warum? 
-- Mann kann leicht dafür sorgen dass die Konfiguartion valid ist. 
-- Abhängigkeiten leichter erkennbar")
+2. Das Template ist eine Datenstruktur die vom Editor erstellt wird und den Abhängigkeits-Graph sowie Informationen wie dieser generiert und zwischen gespeichert werden soll enthält.  
 
-2. "Template" Eine Datenstruktur die alle Abhängigkeiten darstellt.  
+3. Der Generator vergleicht das aktuelle Template mit dem neuen Template und generiert die Bestandteile der Welt neu die nicht dem neuen Template entsprechen.
 
-3. "Collapser" Stellt die aktuelle Welt da. 
-Nimmt ein neues "Template" und  ändert alles was nötig ist damit die Welt dem neuen "Template" entspricht.
+== Composer 
 
-#question("Sollte ich die Stufen nochmal umbenennen? Gerade collapser ergibt nicht so viel sinn.")
+== Template 
 
-=== Composer 
+Das Template $:= (G_"ab", G_"ch")$ besteht aus dem Abhängigkeits-Graph $G_"ab"$ und einem "cache" Graphen $G_"ch"$. 
 
-=== Template 
+$G_"ab"$ ist ein Graph der die zu generierende Welt als rekursive Formel an Operationen beschreibt. 
 
-Das Template besteht aus zwei Graphen. 
+Die ein gehenden Nachbarn $N^-_G_"ab"$ errechnen die Eingangswerte für eine Operation und die 
+ausgehenden Nachbarn $N^+_G_"ab"$ sind alle Operationen die das Ergebnis benötigen. 
 
-$"Template" := (G_"val", G_"dep")$
+#todo("Beispiel?")
 
-$G_"val"$ ist ein Graph der die zu generierende Welt als Mathematische Formel beschreibt. 
-Es gilt folgende Datentypen: 
-- Zahlen 
-- Positionen 
-- Volumen (als CSG implementiert)
-- Eine Menge Positionen die nach einer Regel definiert sind
-
-#todo("Ist Datentypen wirklich das beste Wort oder lieber Wert?")
-
-Für Positions Mengen habe ich Gitter und pseudo zufällige Verteilung implementiert.
-
-Datentypen sind meist durch andere Datentypen definiert z.B. 
+/*Datentypen sind meist durch andere Datentypen definiert z.B. 
 ist eine 3D Position durch 3 Zahlen definiert. 
 
 Ein $v in V(G_"val")$ hat folgende Eigenschaften: 
@@ -46,31 +32,66 @@ Ein $v in V(G_"val")$ hat folgende Eigenschaften:
 $N^-_G_"val" (v) := "Werte die für die Errechnung genutzt werden."$
 
 $N^+_G_"val" (v) := "Werte indem es für die Errechnung genutzt wird."$
+*/
 
+$G_"ch"$ enthält einen Knoten für jeden Knoten in $G_"ab"$ der Zwischengespeichert werden soll. 
+Dies ist eine Untermenge aller Knoten in $G_"ab"$. 
 
+$V(G_"ch") subset V(G_"ab")$
 
-Der zweite Bestandteil des Templates ist der Abhängigkeits-Graph $G_"dep"$. 
+Bei der Entscheidung wie groß diese Untermenge sein soll muss zwischen dem "Overhead" durch zwischengespeicherung und der Zeitersparniss durch wiederverwendung der Ergebnisse abgewägt werden. 
 
-Einer Untermenge der Werte $v_"val" in V(G_"val")$ ist ein Knoten $v_"dep" in V(G_"dep")$ zugeordnet, beschrieben durch die Funktion 
-$"val"(v_"dep")$.
+Die ein gehenden Nachbarn $N^-_G_"ch"$ sind alle caches von dem der Knoten abhängt. 
+Man findet diese indem man den Baum der Abhängigkeiten in $G_"ab"$ über alle Verzweigungen rekursiv durchsucht bis man auf jeden Weg einen auf einen Knoten in $G_"ch"$ stößt.
 
-Bei der generation Welt wird nicht nur das finale Ergebnisse sondern auch die Werte der $v_"dep"$ gespeichert.
-So kann bei einer Regeländerung weithin valide Werte wiederverwendet werden.
-Dies macht die "lazyness" meines Ansatzes aus. 
-
-Bei der Entscheidung wie vielen Werten ein $v_"dep"$ zu geordnet wird muss zwischen dem "Overhead" und der Zeitersparniss durch wiederverwendung des Wertes abgewägt werden. 
-
-Im meiner Implementierung speichere ich alle Positions Mengen Werte zwischen. 
-
-Die Knoten im Abhängigkeits-Graph speichern von welchen andern Knoten sie abhängen $N^-_G_"dep" (v)$,
-also alle Knoten in $G_"dep"$ dessen Werte zur Errechnung genutzt werden.
-
-#todo("Wie sage ich das es nur die nächsten sind?")
+#todo("Algorithmus angeben? eigentlich ist das nicht wichtig.")
 
 #todo("Grafik von Datentypen und Abhängigkeits-Graph")
 
+=== Level
 
-=== Collapser
+Wenn der $G_"ab"$ ein directed acyclic Graph (DAG) ist dann kann jedem Knoten $v in G_"ab"$ ein Level $l(v)$ zugeordnet werden.
+Dies ist definiert als:
+$
+  l(v) > l(v_i) quad forall v_i in N^-_G_"ab" (v)
+$
+Also das Level eines Knoten ist immer größer als das Level aller Knoten von den er abhängt.
+
+Um den $G_"ab"$ zu errechnen werden die Knoten der Level aufsteigend errechnet.  
+Die Rheinfolge innerhalb eines Levels ist nicht relevant. 
+
+== Einen Prozeduralen Algorithmus als Template darstellen
+
+Bis zu diesem Abschnitt habe ich das Template sehr allgemein beschrieben. 
+
+Um mit dem Template eine Prozedurale Welt zu generieren haben ich mich entschieden, dass das Template final eine Volumen als 
+constructive solid Geometry CSG errechnet.
+
+Diese CSG setzt sich durch union und remove Operationen auf primitiven Geometrien wie Kugeln und Boxen zusammen. 
+
+Daher sind die Operationen die ich implementiert habe: 
+- CSG Union und Remove
+- Kugel aus Position und Durchmesser
+- Box aus Position und Seitenlänge
+- Alle Positionen auf einem Gitter die innerhalb eines Volumen sind.
+- Eine Menge an zufälligen Positionen innerhalb eines Volumen. siehe: genauer dazu
+- Addition, Subtraktion, Multiplikation und Division von Positionen und Zahlen
+- etc.
+
+=== Ergebnis Mengen
+
+Operationen im Abhängigkeits-Graph $G_"ab"$ können auch Mengen an Werten erzeugen. 
+In meiner implementation ist das die beiden Operationen die ein Gitter und zufällige Positionen in einem Volumen errechnen. 
+
+Nun kann es sein, dass die weiteren Operationen pro Element in dieser Menge ausgeführt werden sollen. 
+Dies ist der Bestandteil von prozeduraler Generation der es möglich immer feinere Details zu generieren.
+Zu Beispiel errechnet man eine Menge an Positionen an den Apfelbäume stehen sollen 
+und dann generiert man pro Baum die Positionen der Äpfel.
+
+
+
+
+== Generator
 
 Der Collapser enthält einen Graphen der den errechneten Template entspricht.
 Dazu eine Queue an Aufträgen der noch zu erzeugenden und errechnenden Knoten. Diese Listen sind nach Level der Knoten sortiert. 
@@ -134,7 +155,7 @@ Daher sind alle Operationen zum errechnen der Formel als Operationen auf Listen 
 #todo("Beispiel")
 
 
-=== Abhängigkeits Kreise und Levels
+=== Abhängigkeits Kreise
 Das Template kann Abhängigkeits Kreise enthalten. 
 Um trotzdem eine valide Lösung errechnen zu können muss es für jeden Knoten $v_"val"$ einen validen Null Wert geben. 
 

@@ -10,7 +10,7 @@
   authors: array,
   supervisors: array,
   preface: none,
-  pageMargins: (left: 19%, top: 10%, right: 19%, bottom: 9%),
+  pageMargins: (left: 15%, top: 10%, right: 15%, bottom: 9%),
   cols: 1,
   showOutline: false,
   numberingPattern: "1",
@@ -71,7 +71,7 @@
           link("mailto:" + str(authors.email))
         }
       ][][][
-        *Gutachter*innen*
+        *Prüfer*
       ][
         #supervisors.join("\n")
       ]

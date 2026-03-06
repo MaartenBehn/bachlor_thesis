@@ -1,16 +1,16 @@
 #import "./layout/ba.typ": *
 
-#set document(title: [Lazy prozedurale Weltgenerierung])
+#set document(title: [Minimale Neuberechnung Abhängigkeits-Graph basierter Regeln zur prozeduralen Welten-Generation])
 
 #show: scrartcl.with(
-  title: "Lazy prozedurale Weltgenerierung",
+  title: "Minimale Neuberechnung Abhängigkeits-Graph basierter Regeln zur prozeduralen Welten-Generation",
   authors: (
     (
       name: "Maarten Behn",
       email: "maarten.behn@uni-bremen.de"
     )
   ),
-  supervisors: ("Name 1", "Name 2", "Name 3")
+  supervisors: ("Prof. Dr. Gabriel Zachmann", "Prof. Dr. Nico Hochgeschwender")
 )
 
 = Einleitung
@@ -50,6 +50,8 @@
 
 #include "./4_core/idea.typ"
 
+#include "./4_core/dependency-graph.typ"
+
 #include "./4_core/framework.typ"
 
 #include "./4_core/why_rust.typ"
@@ -58,7 +60,7 @@
 
 #include "./4_core/result.typ"
 
-== Bewertung
+= Bewertung
 
 #include "./5_evaluation/compare_to_similar_systems.typ" 
 
