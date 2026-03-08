@@ -1,4 +1,5 @@
 #import "../layout/ba.typ": *
+#import "@preview/cetz:0.4.2": canvas, draw, tree
 
 == Framework
 
@@ -60,7 +61,7 @@ Also das Level eines Knoten ist immer größer als das Level aller Knoten von de
 Um den $G_"ab"$ zu errechnen werden die Knoten der Level aufsteigend errechnet.  
 Die Rheinfolge innerhalb eines Levels ist nicht relevant. 
 
-== Einen Prozeduralen Algorithmus als Template darstellen
+=== Einen Prozeduralen Algorithmus als Template darstellen
 
 Bis zu diesem Abschnitt habe ich das Template sehr allgemein beschrieben. 
 
@@ -78,7 +79,7 @@ Daher sind die Operationen die ich implementiert habe:
 - Addition, Subtraktion, Multiplikation und Division von Positionen und Zahlen
 - etc.
 
-=== Ergebnis Mengen
+=== Generation eines Templates <generation_of_template>
 
 Operationen im Abhängigkeits-Graph $G_"ab"$ können auch Mengen an Werten erzeugen. 
 In meiner implementation ist das die beiden Operationen die ein Gitter und zufällige Positionen in einem Volumen errechnen. 
@@ -88,72 +89,85 @@ Dies ist der Bestandteil von prozeduraler Generation der es möglich immer feine
 Zu Beispiel errechnet man eine Menge an Positionen an den Apfelbäume stehen sollen 
 und dann generiert man pro Baum die Positionen der Äpfel.
 
+Dies ergibt einen klaren Unterschied in der Laufzeit von Algorithmen auf dem Template zu Algorithmen auf der generierten Welt. 
+Die Menge an Knoten im Abhängigkeits-Graph und so auch den cache Graph skaliert mit der Menge an Operationen des Generationsalgorithums.
+Wohin die Menge der Elemente in der Welt mit dem Größen der Mengen an rechneten Werten skaliert.
+In anderen Worten alle Knoten im Template zu iterieren ist relativ schnell möglich wohin gegen die Laufzeit alle Elemente in der Welt zu iterieren exponentiell steigen kann. 
 
-
+Daher arbeiten alle Algorithmen im meinen System immer nur auf den Knoten des Templates. 
+Sie nutzen die Abhängigkeiten im Template um heraus zu finden wie die Welt neu generiert werden muss. 
 
 == Generator
 
-Der Collapser enthält einen Graphen der den errechneten Template entspricht.
-Dazu eine Queue an Aufträgen der noch zu erzeugenden und errechnenden Knoten. Diese Listen sind nach Level der Knoten sortiert. 
-Der Collapser führt die Aufträge der Queue iterativ aus bis es keine Aufträge mehr gibt.
-
-==== Formale Definition
-
-$"Collapser" := (G_"col", Q)$
-
-Ein $v in V(G_"col")$ hat folgende Eigenschaften: 
-
-$N^-_G_"col" (v) := "Collapser Knoten die zur Errechnung benötigt werden."$
-
-$t(v) := "Der Template Knoten der dem Collapser Knoten entspricht."$
-
-$"created"(v) := "Der Knoten der diesen Knoten erzeugt hat."$
-
-$v_i in N^-_G_"col" (v) quad "data"(v, v_i) := "Der Wert des ahängigen Knoten der diesem Knoten zu geordnet ist."$
-
-
-$Q$ ist die Queue in Aufträgen 
-Jeder Auftrag $q in Q$ hat ein Level $l(q)$. 
-Dieses entspricht bei Erzeugungs-Aufträgen dem Level des zeugenden Knoten 
-und bei Errechnungs-Aufträgen das Level des des zu errechnen Knoten.
-
-$"pop"(Q) := min_(q in Q) (l(q))$
-
-
-==== Erzeugungs Aufträge 
-Erzeugungs Aufträge enthalten den Index eines Knoten im Collapser Graph und den Index eines Erzeugungs-Eintrag in dessen Template-Knoten.
-Dieser Erzeugungs-Eintrag definiert entweder dass es genau $n$ Knoten geben soll, oder die Zahl vom Datentypen abhängt.
-
-Darauf wird die vorhandene Menge an Kindern mit der gewünschten Menge verglichen und bei Ungleichheit neue Kinder Knoten erzeugt / gelöscht. 
-
-#todo("Algorithmus")
-
-==== Wenn ein Knoten erzeugt wird 
-Wenn ein Knoten erzeugt werden die Knoten von dem er im Template abhängt im Collapser-Graph gesucht.
-Hierfür werden die vorerrechneten relativen Schritte verwendet die wie eine Weganweisung dienen um den Collapser-Graph von dem neu erzeugten Knoten zu sein Abhängigkeiten zu gelangen.  
-
-#todo("Algorithmus")
-
-==== Wenn ein Knoten gelöscht wird
-Wenn ein Knoten gelöscht wird werden rekursiv alle Knoten gelöscht die von ihm abhängen. 
-
-#todo("Algorithmus")
-
-
-=== Errechnungs Aufträge 
-Errechnungs Aufträge errechnen den Wert von einem Knoten neu. 
-
-Dabei wird die der DAG der die Formel des Wert beschreibt rekursiv gelöst.
-
-Wenn die Formel Hooks zu anderen Template Knoten enthält werden die entsprechenden Knoten in der Liste der Abhängigen Knoten des "Collapser" Knoten gesucht und die Werte zu Errechnung der Formel genutzt. 
-
-Grundlegende Eigenschaft des Systems ist das es mehrere Knoten im Collapser für einen Knoten im Template geben kann.
-Und so einen für eine Hook eine Liste an Werten gefunden wird. 
-
-Daher sind alle Operationen zum errechnen der Formel als Operationen auf Listen geschrieben.
+Der Generator enthält einen Graphen $G_"gen"$ der den cache Graphen $G_"ch"$ im Template entspricht.
+Jedoch wo $G_"ch"$ nur einen Knoten pro Operation enthält, enthält $G_"gen"$ einen Knoten pro Ergebnis welches errechnet werden muss. 
 
 #todo("Beispiel")
 
+Dazu hält der Generator $:= (G_"gen", Q)$ eine Queue $Q$ die zwei Arten Aufträge auf $G_"gen"$ nach ihren Level sortiert.    
+$
+"pop"(Q) := min_(q in Q) (l(q))
+$
+
+Errechnungs-Aufträge errechnen den das Ergebnis eines Knoten in $G_"gen"$ und Kind-Update-Aufträge 
+erzeugen oder löschen Kinder sodass sie dem Template entsprechen.
+
+=== Abhängigkeite Werte im Generator Graph finden
+
+Um einen Knoten in $G_"gen"$ zu errechnen benötigt man die Ergebnisse der Knoten in $G_"gen"$ von den dieser Knoten abhängt. 
+Wie ich in @generation_of_template erklärt habe ist es Laufzeittechnisch nicht möglich diese mit z.B. einer Tiefensuche zu suchen.
+
+Stattdessen wird für jeden Template Knoten $v in V(G_"ch")$ einer der Knoten von den er abhängt $N^-_G_"ch" (v)$ als Erstellungs-Knoten $v_c in V(G_"ch")$ im Template markiert $v_c = "create"(v)$.    
+
+Um nun für einen Knoten $v_"gen" in V(G_"gen")$ alle anderen Knoten zu finden von er abhängt $N^-_G_"gen" (v_g)$. 
+Werden im Template die relativen Schritte vom Erstellungs-Knoten zu den anderen Abhängigen Knoten gespeichert. 
+
+Diese relativen Schritte nutzen nur Knoten die ein kleineres Level haben als $v_"gen"$. 
+Da im Generator Knoten im Level aufsteigend erstellt werden, ist so sichergestellt das alle relativen Wegen existieren.
+Die relativen Wege sind als Baum implementiert sodass per Tiefen-Suche alle anderen $N^-_G_"gen" (v_g)$ gefunden werden können.  
+
+Für einen Knoten im Template kann es mehrere Knoten im Generator geben, daher können pro Abhängigkeit eines cache Knoten 
+auch meherere Knoten im Generator gefunden werden.
+
+/*
+#canvas({
+  import draw: *
+  let encircle(i) = {
+    std.box(baseline: 2pt, std.circle(stroke: .5pt, radius: .5em, std.move(dx: -.35em, dy: -.45em, [#i])))
+  }
+
+  set-style(content: (padding: 0.5em))
+  tree.tree(
+    ([Erstellungs-Knoten], (
+        [Hoch in #encircle($2$)],
+        ([Expression #encircle($1$)], `Int(1)`),
+        `Plus`,
+        ([Expression #encircle($2$)], `Int(2)`),
+      ),
+      `Lt`,
+      ([Expression #encircle($4$)], `Int(4)`),
+    ),
+    direction: "up",
+  )
+})
+*/
+
+#todo("Exmaple relative Wege Datenstruktur")
+
+=== Kind-Update-Aufträge 
+Kind-Update-Aufträge enthalten den Index des Erstellungs-Knoten und den Index eines Erstellungs-Eintrag in dessen Template-Knoten.
+Dieser Erstellungs-Eintrag definiert entweder dass es genau $n$ Knoten geben soll, oder die Menge vom Datentypen abhängt z.B. einen pro Position in Positions Menge. 
+Darauf wird die vorhandene Menge an Kindern mit der gewünschten Menge verglichen und bei Ungleichheit neue Kinder Knoten erzeugt oder gelöscht. 
+
+Wenn eine neuer Knoten erzeugt wird werden mit dem Baum an relativen Schritten die Indexe von allen abhängige Knoten gesucht und im Knoten gespeichert.
+
+=== Errechnungs Aufträge 
+Errechnungs Aufträge errechnen den Wert von einem Knoten $v_"gen" in V(G_"gen")$ neu. 
+Dabei wird der Knoten im Abhängigkeits-Graph rekursiv errechnet.
+
+Wenn ein der Algorithmus auf einen Knoten $v_"ab" in V(G_"ab")$ stößt, welcher ein cache Knoten hat $v_"ab" in V(G_"ch")$ werden die Werte der jeweiligen abhängigen Knoten von $v_"gen"$ verwendet. 
+
+#todo("Beispiel")
 
 === Abhängigkeits Kreise
 Das Template kann Abhängigkeits Kreise enthalten. 
@@ -174,15 +188,7 @@ Hat ein Knoten geschnittene Abhängigkeiten werden diese zu Errechnung genutzt w
 Jeder Knoten der Null Werte für seine geschnittenen Abhängigkeiten nutzt wird nochmal errechnet, sobald alle Knoten einmal errechnet wurden.  
 Dies wird so lange wiederholt bis keine Null Werte mehr verwendet worden sind.
 
-=== Vorrechnete Schritte zu Abhängigkeiten
-
-Um zu vermeiden, dass im Collapser alle Knoten durchsucht werden müssen um die abhängigen Knoten zu finden, 
-werden speichert jeder Knoten im Abhängigkeits-Graph die relativen Schritte zu den Knoten von den er abhängig ist. 
-
-Um nun die alle abhängigen Knoten im Collapser Graph zu finden können diese Relativen Schritte wie eine Wegbeschreibung genutzt werden.
-
-#todo("Vielleicht ein Beispiel")
-
+/*
 ==== Implementierung 
 
 In der Implementierung wird zwischen geschnittenen und nicht geschnittenen Abhängigkeiten unterschieden.
@@ -194,5 +200,5 @@ Wenn ein neuer Knoten im Collapser erzeugt wird, wird der Baum genutzt um alle a
 
 Geschnittene Abhängigkeiten werden als Weg an Schritten gespeichert und erst gesucht, wenn deren Wert benötigt wird, 
 Geschnittene Abhängigkeiten haben ein höheres Level als der Knoten selbst und existieren zur Zeit des Knoten wahrscheinlich noch nicht.
-
+*/
 
