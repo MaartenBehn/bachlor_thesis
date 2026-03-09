@@ -8,5 +8,11 @@ Um dies zu lösen müsste ein anderer Ansatz zur Lösung von Abhängigkeits-Krei
 
 Arbeiten in Richtung closely connected Components in Verbindung könnten hier eine Lösung sein.
 
+== Andere Datenstrukturen
 
-== Ein system nutzen was nicht auf CSG basiert um danach nicht ein Mesh oder Voxel model errechnen zu müssen? 
+Wie schon in @output_datastructure beschrieben eignen sich CSGs nicht zum direkten rendering.
+Die Umwandlung zu einem Mesh mit "marching cubes" ist aufwendig und mehr wesentlich mehr Leistung benötigen, als die Generation selbst.
+Somit besteht weiterhin die Forschungsfrage in wie weit minimale Neuberechnung von prozeduralen Meshen möglich ist.
+
+
+

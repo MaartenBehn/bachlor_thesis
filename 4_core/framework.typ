@@ -1,6 +1,10 @@
 #import "../layout/ba.typ": *
 #import "@preview/cetz:0.4.2": canvas, draw, tree
 
+#import "@preview/algorithmic:1.0.7"
+#import algorithmic: style-algorithm, algorithm-figure
+#show: style-algorithm
+
 == Framework
 
 #todo("Overview diagramm")
@@ -66,7 +70,7 @@ Die Rheinfolge innerhalb eines Levels ist nicht relevant.
 Bis zu diesem Abschnitt habe ich das Template sehr allgemein beschrieben. 
 
 Um mit dem Template eine Prozedurale Welt zu generieren haben ich mich entschieden, dass das Template final eine Volumen als 
-constructive solid Geometry CSG errechnet.
+"constructive solid geometry" (CSG) errechnet.
 
 Diese CSG setzt sich durch union und remove Operationen auf primitiven Geometrien wie Kugeln und Boxen zusammen. 
 
@@ -128,6 +132,53 @@ Die relativen Wege sind als Baum implementiert sodass per Tiefen-Suche alle ande
 
 Für einen Knoten im Template kann es mehrere Knoten im Generator geben, daher können pro Abhängigkeit eines cache Knoten 
 auch meherere Knoten im Generator gefunden werden.
+
+#algorithm-figure(
+  "Finde abhänige Knoten in " + $G_"gen"$,
+  vstroke: .5pt + luma(200),
+  {
+  import algorithmic: *
+
+  Procedure("FindDeps", ($"Template" := (G_"ab", G_"ch", L_"relative trees")$, $G_"gen"$, $v_"gen creates"$, $v_"ch"$), {
+    Assign($T$, $L_"relative trees" [v_"ch"]$)
+    Assign($D$, $nothing$)
+    Assign($Q$, $nothing$)
+    Line[*push*($Q$ , $(v_"root" in T, v_"gen creates")$)] 
+    LineBreak
+
+    While($Q != nothing$, {
+      Assign($(v_"step", v_"gen")$, [*pop*($Q$)])
+      LineBreak
+
+      For($v_"child step" in N^+_T (v_"step")$, {
+
+        LineBreak
+        InlineIf([*leaf*($v_"child step"$)], { 
+          Line[*push*($D$ , $s$)] 
+        })
+        LineBreak
+        
+        If([*up*($v_"child step"$)], {
+          For($v in N^-_G_"gen" (v_"gen")$, {
+              LineBreak
+              Line[*push*($Q, (v_"child step", v)$)] 
+          })
+        })
+        Else({
+          For($v in N^+_G_"gen" (v_"gen")$, {
+              LineBreak
+              Line[*push*($Q, (v_"child step", v)$)] 
+          })
+        })
+
+
+      })
+    })
+    Return($D$)
+  },
+  )
+}
+)
 
 /*
 #canvas({

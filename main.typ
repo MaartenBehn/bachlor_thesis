@@ -54,8 +54,6 @@
 
 #include "./4_core/framework.typ"
 
-#include "./4_core/why_rust.typ"
-
 #include "./4_core/implementation.typ"
 
 #include "./4_core/result.typ"

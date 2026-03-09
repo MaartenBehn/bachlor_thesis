@@ -2,7 +2,9 @@
 
 == Implementation 
 
-#question("Wie viel will ich überhaupt auf sowas eingehen?")
+Für die Beispiel Implementation habe ich Rust als Sprache gewählt, 
+da sie erlaubt speichersicheren low level code zu schreiben um die Laufzeit von Algorithm effektiv zu verbessern 
+und ein in Gegensatz zu C++ ein umfassenden leicht zu nutzenden Package-Manager hat.  
 
 === Stabiele Listen
 Alle Graphen sind mit stabilen Listen implementiert.
@@ -49,15 +51,11 @@ Da alle Werte müssen als Liste behandelt werden, da ein Knoten immer von mehrer
 Jedoch enthält diese Listen meist doch nur ein Element. 
 Small Vectoren erlauben für diese Fälle die Stack allozieren zu sparen und bieten bessere Cache Lokalität. 
 
+=== Output Datenstruktur <output_datastructure>
 
-=== Output Datenstruktur
-==== Direkt CSG Rendering 
+Das Kernconzept, einen sehr großen Graphen der eine prozeduralen Algorithmus darstellt, zu bearbeiten, indem man die Abhängigkeiten in einem vergleichbar kleinen Template nutzt, enthält keine konkreten Anahmen über die Art der Geometrie. 
+In meiner Implementation habe ich CSG genutzt, da es einer sehr allgemeine Form ist, Volumen darzustellen und diese leicht zu bearbeiten sind.
 
-==== Voxel sampeling 
-#todo("Sollte ich auf die Implementation und Datenstruktur ein gehen? Warscheinlich nicht.")
+Gerade CSGs mit vielen Knoten sind jedoch nicht performant zu rendern. 
+Deshalb können die CSGs in meiner Implementation entweder als Sparse Voxel DAGs oder mit marching cubes gesampled werden. 
 
-- Minimale Änderungen im CSG führen zu nur minimaler Neuerrechnung des Voxel DAGs 
-
-==== Meshing 
-
-- Minimale Änderungen im CSG führen zu nur minimaler Neuerrechnung des Meshes
