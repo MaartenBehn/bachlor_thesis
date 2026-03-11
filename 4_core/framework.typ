@@ -104,13 +104,16 @@ Sie nutzen die Abhängigkeiten im Template um heraus zu finden wie die Welt neu 
 == Generator
 
 Der Generator enthält einen Graphen $G_"gen"$ der den cache Graphen $G_"ch"$ im Template entspricht.
+Jeder Knoten $v_"gen" in V(G_"gen")$ speichert welchem Knoten $v_"ch" in V(G_"ch")$ er entspricht $v_"ch" = $ *cache*$(v_"gen")$.
+Dazu hat ein Knoten $v_"gen" in V(G_"gen")$ das Level des entschieden Template Knoten $l(v_"gen") = l($*cache*$(v_"gen"))$.
+
 Jedoch wo $G_"ch"$ nur einen Knoten pro Operation enthält, enthält $G_"gen"$ einen Knoten pro Ergebnis welches errechnet werden muss. 
 
 #todo("Beispiel")
 
-Dazu hält der Generator $:= (G_"gen", Q)$ eine Queue $Q$ die zwei Arten Aufträge auf $G_"gen"$ nach ihren Level sortiert.    
+Dazu hält der Generator $:= (G_"gen", Q_"tasks")$ eine Queue $Q_"tasks"$ die zwei Arten Aufträge auf $G_"gen"$ nach ihren Level sortiert.    
 $
-"pop"(Q) := min_(q in Q) (l(q))
+"pop"(Q_"tasks") := min_(q in Q_"tasks") (l(q))
 $
 
 Errechnungs-Aufträge errechnen den das Ergebnis eines Knoten in $G_"gen"$ und Kind-Update-Aufträge 
@@ -121,64 +124,74 @@ erzeugen oder löschen Kinder sodass sie dem Template entsprechen.
 Um einen Knoten in $G_"gen"$ zu errechnen benötigt man die Ergebnisse der Knoten in $G_"gen"$ von den dieser Knoten abhängt. 
 Wie ich in @generation_of_template erklärt habe ist es Laufzeittechnisch nicht möglich diese mit z.B. einer Tiefensuche zu suchen.
 
-Stattdessen wird für jeden Template Knoten $v in V(G_"ch")$ einer der Knoten von den er abhängt $N^-_G_"ch" (v)$ als Erstellungs-Knoten $v_c in V(G_"ch")$ im Template markiert $v_c = "create"(v)$.    
+Stattdessen wird für jeden Template Knoten $v in V(G_"ch")$ einer der Knoten von den er abhängt $N^-_G_"ch" (v)$ als Erstellungs-Knoten $v_c in V(G_"ch")$ im Template markiert $v_c = $*create*$(v)$.    
 
-Um nun für einen Knoten $v_"gen" in V(G_"gen")$ alle anderen Knoten zu finden von er abhängt $N^-_G_"gen" (v_g)$. 
-Werden im Template die relativen Schritte vom Erstellungs-Knoten zu den anderen Abhängigen Knoten gespeichert. 
+Um nun für einen Knoten $v_"gen" in V(G_"gen")$ alle anderen Knoten zu finden von er abhängt $N^-_G_"gen" (v_"gen")$, 
+werden die relative Schritte in $G_"ch"$ vom Erstellungs-Knoten $v_c$ zu den anderen Abhängigen Knoten als Baum gespeichert 
+$T_"rel" (v_"gen")$.
+
+Ein relativer Schritt $v_"step"$ gibt entweder an das man 
+von einem Knoten $v in V(G_"ch")$ hoch (*up*($v_"step"$) = True) in einen Knoten $v_"up" in V(G_"ch")$ 
+von dem $v$ abhängt ($v_"up" in N^-_G_"ch" (v)$) 
+oder runter (*up*($v_"step"$) = False) in einen Knoten $v_"down" in V(G_"ch")$ 
+der von $v$ abhängt ($v_"down" in N^+_G_"ch" (v)$) gehen soll. 
+
+Da ein Knoten $v in V(g_"ch")$ mehr als einen eingehenden oder ausgehenden Nachbarn haben kann speichert ein relativer Schritt auch
+in welchen Nachbarn gegangen werden soll (*cache*($v_"step"$)) und dazu ob dieser Nachbar eine Abhängigkeit für $v_"gen"$ ist (*deps*($v_"step"$) = True).
+
+Jeder relative Schritt $v_"step"$ gibt speichert auch in welche der Nachbar Knoten gegangen werden soll. 
 
 Diese relativen Schritte nutzen nur Knoten die ein kleineres Level haben als $v_"gen"$. 
 Da im Generator Knoten im Level aufsteigend erstellt werden, ist so sichergestellt das alle relativen Wegen existieren.
-Die relativen Wege sind als Baum implementiert sodass per Tiefen-Suche alle anderen $N^-_G_"gen" (v_g)$ gefunden werden können.  
 
 Für einen Knoten im Template kann es mehrere Knoten im Generator geben, daher können pro Abhängigkeit eines cache Knoten 
-auch meherere Knoten im Generator gefunden werden.
+auch mehrere Knoten im Generator gefunden werden.
 
-#algorithm-figure(
-  "Finde abhänige Knoten in " + $G_"gen"$,
-  vstroke: .5pt + luma(200),
-  {
-  import algorithmic: *
+#block(
+  breakable: false,
+  algorithm-figure(
+    "Finde abhänige Knoten in " + $G_"gen"$,
+    vstroke: .5pt + luma(200),
+    {
+    import algorithmic: *
 
-  Procedure("FindDeps", ($"Template" := (G_"ab", G_"ch", L_"relative trees")$, $G_"gen"$, $v_"gen creates"$, $v_"ch"$), {
-    Assign($T$, $L_"relative trees" [v_"ch"]$)
-    Assign($D$, $nothing$)
-    Assign($Q$, $nothing$)
-    Line[*push*($Q$ , $(v_"root" in T, v_"gen creates")$)] 
-    LineBreak
-
-    While($Q != nothing$, {
-      Assign($(v_"step", v_"gen")$, [*pop*($Q$)])
+    Procedure("FindDeps", ($v_"gen"$, $v_"gen creates"$), {
+      Assign($T$, $T_"rel" (v_"gen")$)
+      Assign($D$, $nothing$)
+      Assign($Q$, $nothing$)
+      Line[*push*($Q$ , $(v_"root" in T, v_"gen creates")$)] 
       LineBreak
 
-      For($v_"child step" in N^+_T (v_"step")$, {
-
+      While($Q != nothing$, {
+        Assign($(v_"step", v_"gen")$, [*pop*($Q$)])
         LineBreak
-        InlineIf([*leaf*($v_"child step"$)], { 
-          Line[*push*($D$ , $s$)] 
+
+        If([*deps*($v_"step"$)], { 
+          Line[*push*($D$ , $v_"gen"$)] 
         })
         LineBreak
-        
-        If([*up*($v_"child step"$)], {
-          For($v in N^-_G_"gen" (v_"gen")$, {
-              LineBreak
+
+        For($v_"child step" in N^+_T (v_"step")$, {
+
+          
+          Assign($N$, IfElseInline([*up*($v_"child step"$)], $N^-_G_"gen" (v_"gen")$, $N^+_G_"gen" (v_"gen")$))
+          LineBreak
+
+          For($v in N$, {
+            If([*cache*($v_"child step"$) = *cache*($v$)], {
               Line[*push*($Q, (v_"child step", v)$)] 
+            })
           })
-        })
-        Else({
-          For($v in N^+_G_"gen" (v_"gen")$, {
-              LineBreak
-              Line[*push*($Q, (v_"child step", v)$)] 
-          })
-        })
 
 
+        })
       })
+      Return($D$)
     })
-    Return($D$)
-  },
-  )
-}
-)
+  }))
+
+
+#todo("Beispiel Zeichung")
 
 /*
 #canvas({
@@ -203,14 +216,94 @@ auch meherere Knoten im Generator gefunden werden.
 })
 */
 
-#todo("Exmaple relative Wege Datenstruktur")
 
 === Kind-Update-Aufträge 
-Kind-Update-Aufträge enthalten den Index des Erstellungs-Knoten und den Index eines Erstellungs-Eintrag in dessen Template-Knoten.
-Dieser Erstellungs-Eintrag definiert entweder dass es genau $n$ Knoten geben soll, oder die Menge vom Datentypen abhängt z.B. einen pro Position in Positions Menge. 
+Kind-Update-Aufträge enthalten den Index des Erstellungs-Knoten und den Index eines Erstellungs-Eintrag $E_"create" (v_"ch")$ in dessen Template-Knoten.
+Dieser Erstellungs-Eintrag definiert wie viele Kinder es geben soll *num*$(v_"ch", v_"gen creates")$. 
+Dies sind entweder es genau $n$ pro Erstellungs-Knoten oder, oder hängen von dem Wert des Erstellungs-Knoten $v_"gen creates"$ ab 
+wie z.B. einer Positions Menge.
+Dazu gibt *valid*$(v_"gen", v_"gen creates")$ an ob ein Kind $v_"gen"$ noch für den Erstellungs-Knoten $v_"gen creates"$ noch valide ist. 
+z.B. ob eine Position noch in der Menge an Positionen ist. 
+
 Darauf wird die vorhandene Menge an Kindern mit der gewünschten Menge verglichen und bei Ungleichheit neue Kinder Knoten erzeugt oder gelöscht. 
 
 Wenn eine neuer Knoten erzeugt wird werden mit dem Baum an relativen Schritten die Indexe von allen abhängige Knoten gesucht und im Knoten gespeichert.
+#block(
+  breakable: false,
+  algorithm-figure(
+    "Kinder updaten",
+    vstroke: .5pt + luma(200),
+    {
+    import algorithmic: *
+    let create = Call.with("Create")
+    let delete = Call.with("Delete")
+    let findDeps = Call.with("FindDeps")
+    let addtask = Call.with("AddTask")
+
+    Procedure("UpdateChild", ($v_"gen"$, $v_"ch child"$), {
+      LineBreak
+      Assign($C$, ${v in N^+_G_"gen" (v_"gen") | "cache"(v) = v_"ch child"}$)
+
+      LineBreak
+      Assign($C_"to delete"$, ${v in C | not "valid"(v, v_"gen") }$)
+
+      LineBreak
+      For($v in C_"to delete"$, {
+        LineBreak
+        Line(delete(($v$)))
+      })
+
+      LineBreak
+      Assign($n$, [*num*($v_"ch child", v_"gen"$)])
+      Assign($i$, $0$)
+
+      For($i < n - |C \\ C_"to delete"|$, {
+        LineBreak
+        Line(create(($v_"ch child"$, $v_"gen"$)))
+      })
+    })
+    LineBreak
+
+    Procedure("Create", ($v_"ch"$, $v_"gen creates"$), {
+      
+      Line([*push*($V(G_"gen"), v_"new"$)])
+      LineBreak
+      
+      Assign([*cache*($v_"new"$)], $v_"ch"$)
+      LineBreak
+
+      Assign($D$, findDeps(($v_"new"$, $v_"gen creates"$)))
+      LineBreak
+
+      Assign($N^-_G_"gen" (v_"new")$, $D$)  
+      LineBreak
+
+      For($v in D$, {
+        Line([*push*($N^+_G_"gen" (v)$, $v_"new"$)])
+      })
+      LineBreak
+      
+      Line([*pushCalculate*($Q_"task"$, $v_"new"$)])
+    })
+    LineBreak
+
+    Procedure("Delete", ($v_"gen"$), {
+      LineBreak
+        
+      For($v in N^-_G_"gen" (v_"gen")$, {
+        LineBreak
+        Line([*remove*($N^+_G_"gen" (v)$, $v_"gen"$)])
+      })
+        LineBreak
+
+      For($v in N^+_G_"gen" (v_"gen")$, {
+        LineBreak
+        Line(delete(($v$)))
+      })
+      
+      Line([*remove*($V(G_"gen")$, $v_"gen"$)])
+    })
+  }))
 
 === Errechnungs Aufträge 
 Errechnungs Aufträge errechnen den Wert von einem Knoten $v_"gen" in V(G_"gen")$ neu. 
