@@ -1,35 +1,17 @@
 
-=== Lazy Model Systhesis 
+=== Minimale Neuberechnung mit Model Systhesis 
 
-- Meine Erste Idee 
+Ein möglicher Ansatz zur partiellen Neuberechnung prozedural generierter Welten könnte auf Verfahren der Example-based Model Synthesis aufbauen. Die grundlegende Idee wäre zunächst eine vollständige Welt mit dem Model-Synthesis-Algorithmus zu generieren. Wenn sich anschließend die zugrunde liegenden Regeln ändern, könnte versucht werden, nur die Teile der Welt zu verändern, die den neuen Regeln nicht mehr entsprechen.
 
-- Man generiert ein valide Welt mit dem mit Model Systhesis 
+Ein naheliegender Ansatz wäre, alle Felder zu identifizieren, deren aktuelle Werte gegen die neuen Regeln verstoßen. Für diese Felder müssten anschließend wieder mehrere mögliche Werte zugelassen werden, sodass der Model-Synthesis-Algorithmus erneut eine konsistente Lösung finden kann.
 
-- Nun ändern sich die Regeln 
+Dabei stellt sich jedoch ein grundlegendes Problem: Wenn einem Feld neue mögliche Werte hinzugefügt werden, sind diese zunächst nicht notwendigerweise mit den aktuellen Werten der Nachbarfelder kompatibel. Damit die lokalen Regeln wieder erfüllt sind, müssten auch den Nachbarfeldern zusätzliche mögliche Werte hinzugefügt werden. Dieser Prozess kann sich wiederum auf deren Nachbarn ausbreiten und so weiter.
 
-- Man geht über alle Felder welche nicht valide Regeln haben. 
+Würde man dieses Verfahren naiv implementieren, indem für alle betroffenen Nachbarn wieder sämtliche möglichen Werte zugelassen werden, entstünde im Extremfall erneut ein vollständig unentschiedenes Gitter. In diesem Fall würde der Algorithmus effektiv wieder bei einem normalen Model-Synthesis-Prozess beginnen, wodurch kein Vorteil gegenüber einer vollständigen Neugenerierung entsteht.
 
-- Nun müsste man in der Idee von Model-Systhesis wieder andere Werte zu diesen Feldern hinzufügen 
+Um dennoch einen Nutzen aus diesem Ansatz zu ziehen, müsste eine möglichst kleine Menge an Feldern gefunden werden, deren Wertebereiche erweitert werden, sodass anschließend wieder eine konsistente Lösung existiert. Diese Menge sollte idealerweise minimal sein, damit möglichst große Teile der bestehenden Welt unverändert bleiben können. Gleichzeitig müsste der Aufwand zur Bestimmung dieser Menge deutlich geringer sein als eine komplette Neugenerierung der Welt.
 
-- Aber welche? Alle? 
+Eine theoretische Möglichkeit bestünde darin, den Raum der möglichen Werteerweiterungen systematisch zu durchsuchen. Beispielsweise könnte eine Breitensuche über den Graphen der möglichen Wertkombinationen durchgeführt werden, um eine minimale Menge an Änderungen zu finden, die wieder zu einer gültigen Konfiguration führt. Allerdings wächst dieser Suchraum sehr schnell und führt sowohl in Bezug auf Laufzeit als auch Speicherverbrauch zu erheblichen Komplexitätsproblemen.
 
-- Das Hauptproblem: Die neu Hinzugefügten Werte sind erstmal auch nicht valide. Zu den Nachbarn müssten auch Werte hinzugefügt werden, damit sie valide sind. 
-
-- Das Problem gilt dann aber auch wieder für die Nachbarn. Und so weiter 
-
-- Wenn man einfach für alle Nachbarn alle Werte hinzufügt, hat man wieder das Komplett unentschiedene Feld normalen Model-Systhesis Algorithmus das bietet kein Vorteil. 
-
-- Also müsste man ein Menge an Feldern finden den man jeweils wieder Werte pro Feld hinzufügt, wo alle Regel eingehalten werden, damit mann dann wieder Model-Systhesis laufen lassen kann. 
-
-- Diese Menge müsste möglichst minimal sein. 
-
-- Vorallem sollte die Laufzeit-komplexität zum errechnen dieser Menge kleiner sein als Model-Systhesis selbst. 
-
-- Die einzige Idee die mir eingefallen ist um dies zu lösen: 
-  - Eine Breiten suche über ein Graph aller möglichen Werte die wir hinzufügen können. Um die erste valide Menge zu finden. 
-  - Das ist schrecklich was laufzeit und auch space Komplexität angeht.
-
-- Der Vorteil von Model-Systhesis ist das in jedem Schritt alle Kombinationen an Werten eine valide Lösung ist. 
-- Aber diese Menge zu suchen ist sehr schwer. 
-
+Der Vorteil des ursprünglichen Model-Synthesis-Algorithmus liegt darin, dass zu jedem Zeitpunkt alle noch möglichen Kombinationen eine valide Lösung darstellen. Das Finden einer minimalen Erweiterung dieser Mengen, die nach einer Regeländerung wieder eine gültige Lösung ermöglicht, ist jedoch deutlich schwieriger als die ursprüngliche Generierung selbst. 
 
