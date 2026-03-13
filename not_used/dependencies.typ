@@ -47,14 +47,6 @@ Jedoch da die Kern-Beschränkungen meist nur indirekt zugesichert werden, kann e
 
 #note("Das ist sehr wichtig")
 
-=== Linear Programming 
-
-#todo("Erklärung")
-
-=== Model Synthesis
-
-#todo("Erklärung")
-
 === Problem 
 
 - Zu schlechte Laufzeit Komplexität 

@@ -41,10 +41,9 @@
 
 #include "./3_theory/graphs.typ"
 
-#todo("CSG")
-#todo("Geometry Nodes")
+#include "./3_theory/csg.typ"
 
-#include "./3_theory/dependencies.typ"
+#include "./3_theory/graphical_programing.typ"
 
 = Meine Arbeit
 
