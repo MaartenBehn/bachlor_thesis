@@ -21,19 +21,13 @@
 
 = Stand der Technik
 
-== Prozedurale Generation <prozedurale_generation>
-
 #include "./2_state_of_art/noise.typ"
-
-#todo("L-Systems")
 
 #include "./2_state_of_art/model_synthesis.typ"
 
 #include "./2_state_of_art/graph_grammers.typ"
 
 #include "./2_state_of_art/ai_based_procedual_generation.typ"
-
-#include "./2_state_of_art/lazy_recompute.typ"
 
 = Theoretische Grundlagen 
 

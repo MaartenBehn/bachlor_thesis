@@ -16,7 +16,23 @@ Mein generations System besteht aus drei Bestandteilen.
 
 3. Der Generator vergleicht das aktuelle Template mit dem neuen Template und generiert die Bestandteile der Welt neu die nicht dem neuen Template entsprechen.
 
-== Composer 
+== Composer
+
+Zur interaktiven definition des Abhängigkeits-Graph wird ein Grafische-Programmierungs-Editor vergleichbar zu Unreal Templates, Blender Geometry Nodes oder Unity Shader Graph genutzt. 
+
+Der Nutzer kann Knoten erstellen die einer Operation entsprechen und frei auf einer unendlichen Fläche angeordnet werden können. 
+Diese Operationen haben auf der linken Seite eine Liste an Input Variabeln und an der Rechten Seite eine Liste an Ergebnissen. 
+
+#todo("Bild von Node")
+
+Die Variabeln und Ergebnisse sind farbig nach ihrem Datentyp kodiert und können mit Linien verbunden werden. 
+Die Symbolsiert, das ein Ergebnis als Variabele für eine andere Operation verwendet werden soll. 
+
+So können komplexe Algorithm über Knoten Verbindungen von links nach rechts dargestellt werden, 
+parallele Stränge werden übereinander angeordnet. 
+Die fördert eine Darstellung die komplexe Abhängigkeiten übersichtlich darstellen kann.  
+
+#todo("Bild von meheren Knoten")
 
 == Template 
 

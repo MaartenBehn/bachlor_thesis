@@ -1,5 +1,5 @@
 
-=== Noise & Zufälligkeit <noise_based_generation>
+== Noise & Zufälligkeit <noise_based_generation>
 
 Ein sehr verbreiteter Ansatz zur prozeduralen Generierung von Welten basiert auf der Verwendung von Noise-Algorithmen. Typischerweise werden hierfür kontinuierliche Noise-Algorithmen wie Perlin-Noise oder Simplex-Noise verwendet. Daher wird die Struktur der generierten Welt nicht durch explizite Regeln beschrieben, sondern ergibt sich aus einer überlagerung meherer Noise Funktionen mit unterschiedlichen Frequenzen und Amplituden.
 
