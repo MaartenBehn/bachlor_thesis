@@ -15,4 +15,8 @@ Die Umwandlung zu einem Mesh mit "marching cubes" ist aufwendig und mehr wesentl
 Somit besteht weiterhin die Forschungsfrage in wie weit minimale Neuberechnung von prozeduralen Meshen möglich ist.
 
 
+== Nutzerfreundlichkeit
+
+- Nutzerfreundlichkeit durch Experten Interviews oder Studien bewerten.
+
 

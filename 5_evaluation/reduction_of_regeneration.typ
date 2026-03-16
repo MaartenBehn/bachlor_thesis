@@ -1,0 +1,2 @@
+
+== Reduktion der Neuberechnungszeit

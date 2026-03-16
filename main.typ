@@ -53,7 +53,15 @@
 
 = Bewertung
 
-#include "./5_evaluation/compare_to_similar_systems.typ" 
+#include "./5_evaluation/how_to_compare.typ"
+
+#include "./5_evaluation/reduction_of_regeneration.typ"
+
+#include "./5_evaluation/overhead.typ"
+
+#include "./5_evaluation/usability.typ"
+
+#include "./5_evaluation/extensibility.typ"
 
 #include "./5_evaluation/future_work.typ"
 
