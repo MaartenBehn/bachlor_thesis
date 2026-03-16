@@ -13,6 +13,7 @@
   supervisors: ("Prof. Dr. Gabriel Zachmann", "Prof. Dr. Nico Hochgeschwender")
 )
 
+
 = Einleitung
 
 #include "./1_introduktion/goal.typ"
@@ -67,6 +68,8 @@
 
 #bibliography("citations.bib")
 
+#include "./layout/eigenständigkeit.typ"
+
 #idea("Text")
 #todo("Text")
 #itodo("Text")
@@ -75,4 +78,6 @@
 #numberedBlock($
   A = pi
 $)
+
+
 
