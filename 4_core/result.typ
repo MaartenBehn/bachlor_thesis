@@ -1,15 +1,13 @@
 #import "../layout/ba.typ": *
 
-== Minimales Beispiel 
-in welchem lazy generation einen klaren Vorteil hat.
+== Beispiele 
 
-#todo("Diagram")
+- Eine Große Menge an Bäumen wo die Baumkrone geändert wird und daher nur das finale Volumen neu errechnet werden muss.
 
-== Nutzungs Beispiele 
-#todo("Bilder")
+- Eine Chunk System
 
-- Welt editor 
-- Infitie World Generation
 - LOD systems 
 
+- Cut von Positions Menge
 
+- Komplexe Welt

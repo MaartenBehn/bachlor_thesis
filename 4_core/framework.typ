@@ -65,7 +65,7 @@ Bei der Entscheidung wie groß diese Untermenge sein soll muss zwischen dem "Ove
 Die ein gehenden Nachbarn $N^-_G_"ch"$ sind alle caches von dem der Knoten abhängt. 
 Man findet diese indem man den Baum der Abhängigkeiten in $G_"ab"$ über alle Verzweigungen rekursiv durchsucht bis man auf jeden Weg einen auf einen Knoten in $G_"ch"$ stößt.
 
-#todo("Algorithmus angeben? eigentlich ist das nicht wichtig.")
+#todo("Algorithmus angeben? Eigentlich ist das nicht wichtig.")
 
 #todo("Grafik von Datentypen und Abhängigkeits-Graph")
 

@@ -7,7 +7,7 @@
   authors: (
     (
       name: "Maarten Behn",
-      email: "maarten.behn@uni-bremen.de"
+      email: "behn@uni-bremen.de"
     )
   ),
   supervisors: ("Prof. Dr. Gabriel Zachmann", "Prof. Dr. Nico Hochgeschwender")
@@ -18,7 +18,7 @@
 
 #include "./1_introduktion/goal.typ"
 
-#include "./1_introduktion/strukture.typ"
+#outline(depth: 2)
 
 = Stand der Technik
 
@@ -42,8 +42,6 @@
 
 = Meine Arbeit
 
-#include "./4_core/idea.typ"
-
 #include "./4_core/dependency-graph.typ"
 
 #include "./4_core/framework.typ"
@@ -66,18 +64,11 @@
 
 #include "./5_evaluation/future_work.typ"
 
+#show bibliography: set heading(numbering: "1")
 #bibliography("citations.bib")
 
 #include "./layout/eigenständigkeit.typ"
 
-#idea("Text")
-#todo("Text")
-#itodo("Text")
-#question("Text")
-
-#numberedBlock($
-  A = pi
-$)
-
+#include "./layout/ai_disclaimer.typ"
 
 

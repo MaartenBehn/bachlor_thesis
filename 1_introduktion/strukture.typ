@@ -1,3 +1,0 @@
-
-== Aufbau der Arbeit
-

@@ -1,19 +1,17 @@
 #import "../layout/ba.typ": *
 
-Prozedurale Welten werden mit Algorithmen generiert. 
-Dabei werden werden erst grobe Eigenschaften generiert und diese dann mit immer feiner werdenden Details ausgeschmückt.
-Wenn der Generations Algorithmus in irgendeiner form angepasst wird kann es sein das eine vorher generierte Welt nicht mehr dem 
-aktuellen Algorithmus entspricht.
-Die Rechenzeit eines prozeduralen Algorithmus steigt mit der Menge an Details die generiert wird.
-Bei komplexen Algorithmen die viele Details generieren, 
-kann die lange Neugenerationszeit einer Welt beim iterativen entwickeln von generations Algorithmen stören. 
+Prozedurale Generierung ist ein etabliertes Verfahren zur automatischen Erstellung komplexer virtueller Welten, das insbesondere in der Spieleentwicklung, Simulation und Computergrafik Anwendung findet.
+Dabei werden zunächst grobe Strukturen erzeugt, die anschließend schrittweise durch immer feinere Details ergänzt werden. 
+Wird der Generationsalgorithmus in irgendeiner Form angepasst, kann es vorkommen, dass eine bereits erzeugte Welt nicht mehr dem aktuellen Stand des Algorithmus entspricht.
 
-== Ziel der Arbeit <goal>
+Die Rechenzeit eines prozeduralen Generationsalgorithmus steigt mit der Menge der erzeugten Details. 
+Insbesondere bei komplexen Algorithmen kann die vollständige Neugenerierung einer Welt sehr zeitaufwendig sein. 
+Dies stellt ein Problem dar, da in der Praxis Generationsalgorithmen häufig iterativ entwickelt und angepasst werden. 
+Lange Neugenerationszeiten können diesen Entwicklungsprozess erheblich verlangsamen.
 
-Ziel dieser Arbeit ist zu erforschen in wie weit die Neugenerationszeit einer prozeduralen Welt verschnellert werden kann, 
-wenn nur die Aspekte der Welt neugeneriert werden die nicht mehr den neuen Algorithmus entspricht.
-Dazu habe ich ein System entwickelt in welchem der generations Algorithmus als Abhängigkeits-Graph dargestellt wird. 
-Bei einer Neugeneration können zwischen Ergebnisse für Abschnitte des Abhängigkeits-Graph, welche sich nicht veränder haben wiederverwendet werden.  
+Ziel dieser Arbeit ist es zu untersuchen, inwieweit sich die Neugenerationszeit einer prozeduralen Welt reduzieren lässt, 
+wenn nur diejenigen Teile der Welt neu berechnet werden, die durch Änderungen am Generationsalgorithmus ungültig geworden sind.
 
-
+Dazu wird ein System vorgestellt, welches einen Generationsalgorithmus als Abhängigkeitsgraph dargestellt. 
+Dieses verwendet Zwischenergebnisse für diejenigen Teile des Graphen, die sich nicht geändert haben, wieder.
 

@@ -11,6 +11,8 @@ Dabei besteht der Input-Datensatz aus einer Gitter Struktur, wo jede Celle im Gi
 Nun wird eine Liste aller Nachbar Kombinationen erstellt die im Input Input-Datensatz vorkommen. 
 Diese Liste beschreibt die Regeln nachdem ein neues Modell erzeugt wird. 
 
+#todo("Als Algo schreiben oder Orignial einfügen")
+
 Generations Algorithmus:
 1. Dabei werden dem Gitter des neuen Modells in jeder Zelle alle Werte zugeordnet. 
 2. Wähle die Zelle mit den wenigsten Werten aus und entferne alle bis auf einen. 

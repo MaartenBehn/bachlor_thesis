@@ -1,4 +1,6 @@
 
+
+
 #let count = 3
 #let start = 1
 #let fill_text(dx: relative, dy: relative, body) = place(alignment.top, dy: dy, dx: dx, body)
@@ -17,18 +19,21 @@
 }, {
   fill_text(dy: 6.56cm, dx: -0.45cm, [X])
 })
+
 #[
   // this depends on you needs, you may omit parts of this
   // we reset the styles for the pages here to ensure we don't draw
   // over the included pages
-  #set page(numbering: none, footer: none, header: none, )
+  #set page(footer: none, header: none, )
   #for p in range(start, count + 1) {
+    if p == start {
+      show heading: none
+      heading[Eigenständigkeitserklärungen]
+    }
+
     // using `page` to ensure each included page is it's own page
     // in the final document
     // using `page.background` to ensure we use the margins too
     page(background: image("../assets/eigenständigkeit_" + str(p) + ".svg"), filled_out.at(p - start))
   }
 ]
-// reset our page counter to ensure they don't interfere with it
-// this depends on your document, you may omit this
-#counter(page).update(n => n - count)
