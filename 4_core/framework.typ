@@ -16,7 +16,7 @@ Mein generations System besteht aus drei Bestandteilen.
 
 3. Der Generator vergleicht das aktuelle Template mit dem neuen Template und generiert die Bestandteile der Welt neu die nicht dem neuen Template entsprechen.
 
-== Composer
+== Graphischer Editor
 
 Zur interaktiven definition des Abhängigkeits-Graph wird ein Grafische-Programmierungs-Editor vergleichbar zu Unreal Templates, Blender Geometry Nodes oder Unity Shader Graph genutzt. 
 
@@ -56,16 +56,12 @@ $N^+_G_"val" (v) := "Werte indem es für die Errechnung genutzt wird."$
 */
 
 $G_"ch"$ enthält einen Knoten für jeden Knoten in $G_"ab"$ der Zwischengespeichert werden soll. 
-Dies ist eine Untermenge aller Knoten in $G_"ab"$. 
-
-$V(G_"ch") subset V(G_"ab")$
+Dies ist eine Untermenge aller Knoten in $G_"ab"$. $V(G_"ch") subset V(G_"ab")$
 
 Bei der Entscheidung wie groß diese Untermenge sein soll muss zwischen dem "Overhead" durch zwischengespeicherung und der Zeitersparniss durch wiederverwendung der Ergebnisse abgewägt werden. 
 
 Die ein gehenden Nachbarn $N^-_G_"ch"$ sind alle caches von dem der Knoten abhängt. 
 Man findet diese indem man den Baum der Abhängigkeiten in $G_"ab"$ über alle Verzweigungen rekursiv durchsucht bis man auf jeden Weg einen auf einen Knoten in $G_"ch"$ stößt.
-
-#todo("Algorithmus angeben? Eigentlich ist das nicht wichtig.")
 
 #todo("Grafik von Datentypen und Abhängigkeits-Graph")
 
@@ -85,7 +81,7 @@ Die Rheinfolge innerhalb eines Levels ist nicht relevant.
 
 Bis zu diesem Abschnitt habe ich das Template sehr allgemein beschrieben. 
 
-Um mit dem Template eine Prozedurale Welt zu generieren haben ich mich entschieden, dass das Template final eine Volumen als 
+Um mit dem Template eine Prozedurale Welt zu generieren haben ich mich entschieden, dass das Template final ein Volumen als 
 "constructive solid geometry" (CSG) errechnet.
 
 Diese CSG setzt sich durch union und remove Operationen auf primitiven Geometrien wie Kugeln und Boxen zusammen. 
@@ -102,7 +98,7 @@ Daher sind die Operationen die ich implementiert habe:
 === Generation eines Templates <generation_of_template>
 
 Operationen im Abhängigkeits-Graph $G_"ab"$ können auch Mengen an Werten erzeugen. 
-In meiner implementation ist das die beiden Operationen die ein Gitter und zufällige Positionen in einem Volumen errechnen. 
+In meiner implementation sind dies die beiden Operationen die ein Gitter und zufällige Positionen in einem Volumen errechnen. 
 
 Nun kann es sein, dass die weiteren Operationen pro Element in dieser Menge ausgeführt werden sollen. 
 Dies ist der Bestandteil von prozeduraler Generation der es möglich immer feinere Details zu generieren.
@@ -121,13 +117,13 @@ Sie nutzen die Abhängigkeiten im Template um heraus zu finden wie die Welt neu 
 
 Der Generator enthält einen Graphen $G_"gen"$ der den cache Graphen $G_"ch"$ im Template entspricht.
 Jeder Knoten $v_"gen" in V(G_"gen")$ speichert welchem Knoten $v_"ch" in V(G_"ch")$ er entspricht $v_"ch" = $ *cache*$(v_"gen")$.
-Dazu hat ein Knoten $v_"gen" in V(G_"gen")$ das Level des entschieden Template Knoten $l(v_"gen") = l($*cache*$(v_"gen"))$.
+Dazu hat ein Knoten $v_"gen" in V(G_"gen")$ das Level seines "cache" Template Knoten $l(v_"gen") = l($*cache*$(v_"gen"))$.
 
 Jedoch wo $G_"ch"$ nur einen Knoten pro Operation enthält, enthält $G_"gen"$ einen Knoten pro Ergebnis welches errechnet werden muss. 
 
 #todo("Beispiel")
 
-Dazu hält der Generator $:= (G_"gen", Q_"tasks")$ eine Queue $Q_"tasks"$ die zwei Arten Aufträge auf $G_"gen"$ nach ihren Level sortiert.    
+Dazu hält der Generator $:= (G_"gen", Q_"tasks")$ eine Queue $Q_"tasks"$ die zwei Arten Aufträgen auf $G_"gen"$ nach ihren Level sortiert.    
 $
 "pop"(Q_"tasks") := min_(q in Q_"tasks") (l(q))
 $

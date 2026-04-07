@@ -1,3 +1,6 @@
+# State of the Art
+
+## Paul Merrell
 @inproceedings{model_synthesis,
   author = {Merrell, Paul},
   title = {Example-based model synthesis},
@@ -34,7 +37,7 @@
   series = {FDG '23}
 }
 
-
+## AI
 @misc{terraindiffusion,
   title={Terrain Diffusion: A Diffusion-Based Successor to Perlin Noise in Infinite, Real-Time Terrain Generation}, 
   author={Alexander Goslin},
@@ -102,9 +105,10 @@
   number={},
   pages={143-150},
   keywords={Dimensionality reduction;Data compression;Games;Generators;Behavioral sciences;Reliability},
-  doi={10.1109/CoG51982.2022.9893615}}
+  doi={10.1109/CoG51982.2022.9893615}
+}
 
-
+# Theory
 @book{modern_graph_theory,
   title     = "Modern Graph Theory",
   author    = "Béla Bollobás",
@@ -132,5 +136,85 @@
    publisher={Elsevier BV},
    author={Wassermann, Benjamin and Kollmannsberger, Stefan and Bog, Tino and Rank, Ernst},
    year={2017},
-   month=oct, pages={1703–1726} }
+   month=oct, pages={1703–1726} 
+}
 
+## Marching Cubes 
+@article{marching_cubes,
+  author = {Lorensen, William E. and Cline, Harvey E.},
+  title = {Marching cubes: A high resolution 3D surface construction algorithm},
+  year = {1987},
+  issue_date = {July 1987},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {21},
+  number = {4},
+  issn = {0097-8930},
+  url = {https://doi.org/10.1145/37402.37422},
+  doi = {10.1145/37402.37422},
+  abstract = {We present a new algorithm, called marching cubes, that creates triangle models of constant density surfaces from 3D medical data. Using a divide-and-conquer approach to generate inter-slice connectivity, we create a case table that defines triangle topology. The algorithm processes the 3D medical data in scan-line order and calculates triangle vertices using linear interpolation. We find the gradient of the original data, normalize it, and use it as a basis for shading the models. The detail in images produced from the generated surface models is the result of maintaining the inter-slice connectivity, surface data, and gradient information present in the original 3D data. Results from computed tomography (CT), magnetic resonance (MR), and single-photon emission computed tomography (SPECT) illustrate the quality and functionality of marching cubes. We also discuss improvements that decrease processing time and add solid modeling capabilities.},
+  journal = {SIGGRAPH Comput. Graph.},
+  month = aug,
+  pages = {163–169},
+  numpages = {7}
+}
+
+## Slotmap
+@misc{slotmap_crate,
+  title        = {slotmap: A Rust library for stable keys and values},
+  author       = {Orson Peters},
+  year         = {2019},
+  url = {https://crates.io/crates/slotmap},
+  note         = {Accessed: 2026-04-07}
+}
+
+## SmallVec
+@misc{smallvec_crate,
+  title        = {smallvec: A vector that can store a small number of elements inline},
+  author       = {Servo Project Developers},
+  year         = {2018},
+  url = {https://crates.io/crates/smallvec},
+  note         = {Accessed: 2026-04-07}
+}
+
+## Channels
+@article{channels_theory,
+  title   = {Communicating Sequential Processes},
+  author  = {Hoare, C. A. R.},
+  journal = {Communications of the ACM},
+  volume  = {21},
+  number  = {8},
+  pages   = {666--677},
+  year    = {1978},
+  doi     = {10.1145/359576.359585}
+}
+
+@misc{async_channel,
+  title        = {async-channel: Async multi-producer multi-consumer channel},
+  author       = {smol-rs developers},
+  year         = {2024},
+  url          = {https://docs.rs/async-channel},
+  note         = {Rust crate used by smol for fast message-passing channels}
+}
+
+## Voxel Rendering
+@article{dda,
+  author = {Amanatides, John and Woo, Andrew},
+  year = {1987},
+  month = {08},
+  pages = {},
+  title = {A Fast Voxel Traversal Algorithm for Ray Tracing},
+  volume = {87},
+  journal = {Proceedings of EuroGraphics}
+}
+
+@article{nvidia_octree,
+  author  = {Samuli Laine and Tero Karras},
+  title   = {Efficient Sparse Voxel Octrees},
+  journal = {IEEE Transactions on Visualization and Computer Graphics},
+  volume  = {17},
+  number  = {8},
+  pages   = {1048--1059},
+  year    = {2011},
+  doi     = {10.1109/TVCG.2010.240}
+}

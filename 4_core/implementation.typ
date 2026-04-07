@@ -25,14 +25,13 @@ Die oberen 32Bit des Indexes werden genutzt um Versionsnummer zu speichern.
 Somit können in einer stabilen List $2^32$ Elemente gespeichert werden.
 
 Stabiele Listen erlauben Graphen effizient als Listen darzustellen, indem in den Knoten die Indexe der anderen Knoten gespeichert werden zu den Kanten existieren. Stabiele listen sind dabei wesentlich schneller als HashMaps.
+@slotmap_crate
 
-#todo("Quelle")
 
 === Multi Threading
 
 Der Collapser sowie die Sampeling Operationen werden in asynchronous Workern ausgeführt. 
-Zur Kommunikation werden Channel verwendet. 
-#todo("Quelle")
+Zur Kommunikation werden Channel verwendet. @channels_theory & @async_channel
 
 Der Composer läuft im Render Thread und errechnet bei jeder Änderung das aktuelle Template. 
 Dieses Template wird über ein Channel zum Collapser gesendet. Wenn der Channel noch ein altes Template enthält werden die Änderungen Notizen des alten Template zum neuen hinzugefügt und das Template wird ersetzt. 
@@ -49,7 +48,8 @@ Erst wenn diese voll sind wird ein Array auf dem Stack alloziert.
 
 Da alle Werte müssen als Liste behandelt werden, da ein Knoten immer von mehreren Knoten für ein Input abhängt.
 Jedoch enthält diese Listen meist doch nur ein Element. 
-Small Vectoren erlauben für diese Fälle die Stack allozieren zu sparen und bieten bessere Cache Lokalität. 
+Small Vectoren erlauben für diese Fälle die Stack allozieren zu sparen und bieten bessere Cache Lokalität.
+@smallvec_crate
 
 === Output Datenstruktur <output_datastructure>
 
@@ -57,5 +57,13 @@ Das Kernconzept, einen sehr großen Graphen der eine prozeduralen Algorithmus da
 In meiner Implementation habe ich CSG genutzt, da es einer sehr allgemeine Form ist, Volumen darzustellen und diese leicht zu bearbeiten sind.
 
 Gerade CSGs mit vielen Knoten sind jedoch nicht performant zu rendern. 
-Deshalb können die CSGs in meiner Implementation entweder als Sparse Voxel DAGs oder mit marching cubes gesampled werden. 
+Deshalb können die CSGs in meiner Implementation entweder als Sparse Voxel DAGs oder mit marching cubes gesampled werden.
+
+Voxel Datenstrukturen können relativ effizient mit ray marching geraytraced werden. 
+@dda @nvidia_octree
+
+Mit Hilfe von marching cubes kann ein CSG als Mesh approximiert werden. 
+@marching_cubes
+
+
 
