@@ -22,6 +22,8 @@
 
 = Stand der Technik
 
+#include "./2_state_of_art/intro.typ"
+
 #include "./2_state_of_art/noise.typ"
 
 #include "./2_state_of_art/model_synthesis.typ"
@@ -30,7 +32,11 @@
 
 #include "./2_state_of_art/ai_based_procedual_generation.typ"
 
+#include "./2_state_of_art/houdini_and_blender.typ"
+
 = Theoretische Grundlagen 
+
+#include "./3_theory/intro.typ"
 
 #include "./3_theory/lazy_loading.typ"
 
@@ -40,7 +46,9 @@
 
 #include "./3_theory/graphical_programing.typ"
 
-= Meine Arbeit
+= Mein Lösungsansatz
+
+#include "./4_core/intro.typ"
 
 #include "./4_core/dependency-graph.typ"
 

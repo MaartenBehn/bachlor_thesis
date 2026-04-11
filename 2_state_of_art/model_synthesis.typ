@@ -2,23 +2,19 @@
 
 == Example based Model Synthesis 
 
-Eine spannende Arbeit im Bereich "constraint based generation" ist Paul Merrels "Example-based Model Synthesis".
+Eine bekannte Arbeit im Bereich der constraint-basierten Generation ist Paul Merrels "Example-based Model Synthesis".
 @model_synthesis
 
-Die Idee des Algorithmus ist aus einem kleinen Input-Datensatz eine größere Struktur zu erzeugen die lokal den gleichen Regeln folgt. 
+Die Grundidee besteht darin, aus einem kleinen Eingabedatensatz eine größere Struktur zu erzeugen, die lokal denselben Regeln folgt.
 
-Dabei besteht der Input-Datensatz aus einer Gitter Struktur, wo jede Celle im Gitter ein Wert zu geordnet wird. 
-Nun wird eine Liste aller Nachbar Kombinationen erstellt die im Input Input-Datensatz vorkommen. 
-Diese Liste beschreibt die Regeln nachdem ein neues Modell erzeugt wird. 
+Der Eingabedatensatz besteht aus einer Gitterstruktur, bei der jeder Zelle ein Wert zugeordnet ist. Aus diesem Gitter wird eine Liste aller Nachbarkombinationen erstellt, die im Eingabedatensatz vorkommen. 
 
-#todo("Als Algo schreiben oder Orignial einfügen")
-
-Generations Algorithmus:
-1. Dabei werden dem Gitter des neuen Modells in jeder Zelle alle Werte zugeordnet. 
-2. Wähle die Zelle mit den wenigsten Werten aus und entferne alle bis auf einen. 
-3. Entferne alle Werte aus den Nachbar Zellen für die eine Regel nicht mehr erfüllt ist.
-4. Wiederhole 3. für jede Nachbar Zelle bei der Werte entfernt wurden. 
-5. Wiederhole 2. bis alle Zellen nur noch einen Wert enthalten.
+Diese Liste beschreibt die Regeln, nach denen ein neues Modell erzeugt wird. 
+Der Generationsalgorithmus läuft dabei wie folgt ab: Zunächst werden allen Zellen des neuen Gitters sämtliche möglichen Werte zugeordnet.
+Dann wird die Zelle mit den wenigsten verbleibenden Möglichkeiten ausgewählt und auf einen einzelnen Wert festgelegt. 
+Anschließend werden aus den Nachbarzellen alle Werte entfernt, für die keine gültige Regel mehr existiert. 
+Dieser Bereinigungsschritt wird rekursiv auf alle betroffenen Nachbarn ausgeweitet. 
+Der Vorgang wiederholt sich, bis jede Zelle genau einen Wert enthält.
 
 === Minimale Neuberechnung mit Model Systhesis 
 

@@ -18,5 +18,5 @@ Populäre Programme in den Grafische-Programmierung verwendet wird, sind Unity S
 
 #figure(
   image("./../assets/Shader Graph.png", width: 100%),
-  caption: [ Der grafische Editor von Unity Shader Graph ],
+  caption: [ Des grafischen Editor von Unity Shader Graph ],
 )

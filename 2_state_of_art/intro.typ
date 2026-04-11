@@ -1,0 +1,5 @@
+Dieses Kapitel gibt einen Überblick über bestehende Ansätze zur prozeduralen Generierung virtueller Welten und bewertet sie im Hinblick auf das zentrale Ziel dieser Arbeit: die minimale Neuberechnung nach Änderungen am Generationsalgorithmus.
+Dazu werden zunächst klassische Verfahren wie Noise-basierte Methoden und L-Systems betrachtet, die in der Praxis weit verbreitet sind, jedoch kaum Möglichkeiten zur gezielten Teilneuberechnung bieten. 
+Anschließend werden constraint-basierte Ansätze wie Example-based Model Synthesis und Graph-basierte Modellsynthese untersucht, die durch ihre explizite Regelstruktur prinzipiell besser für eine solche Analyse geeignet sind. 
+Darüber hinaus werden KI-basierte Verfahren diskutiert und begründet, warum diese für das Ziel der minimalen Neuberechnung nicht geeignet sind. 
+Abschließend werden kommerzielle Werkzeuge wie Houdini und Blender Geometry Nodes betrachtet, die konzeptuell ähnliche Ansätze verfolgen, jedoch für einen anderen Einsatzkontext ausgelegt sind.

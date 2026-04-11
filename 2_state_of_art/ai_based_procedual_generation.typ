@@ -18,6 +18,10 @@ Ein Nachteil ist jedoch, dass das Verhalten des Systems stark vom Trainingsdaten
 @terraindiffusion
 
 === Minimale Neuberechnung
-Bei KI-basierten Ansätzen zur prozeduralen Generierung ist nicht explizit nachvollziehbar, welche Teile der Eingabe und des Modells zu welchen Teilen des erzeugten Ergebnisses führen.
-Wenn sich die Generationsregeln oder Eingaben ändern, kann daher nicht einfach bestimmt werden, welche Teile der bereits generierten Welt weiterhin gültig sind. Daher eignen sich KI-Ansätzen für meine Arbeit nicht. 
+KI-basierte Ansätze teilen ein grundlegendes Problem: 
+Die internen Repräsentationen neuronaler Modelle sind nicht interpretierbar. 
+Es ist daher nicht nachvollziehbar, welche Teile der Eingabe oder welche Gewichte des Modells zu welchen Teilen des generierten Ergebnisses beitragen. 
+Ändert sich ein Parameter oder eine Eingabe, gibt es keine Möglichkeit, daraus abzuleiten, welche Teile einer bereits generierten Welt noch gültig sind. 
+Eine minimale Neuberechnung setzt jedoch genau dieses Wissen voraus. 
+Aus diesem Grund werden KI-basierte Ansätze in dieser Arbeit nicht weiter betrachtet.
 
