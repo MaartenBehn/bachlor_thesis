@@ -7,7 +7,10 @@
 
 == Framework
 
-#todo("Overview diagramm")
+#figure(
+  image("../assets/overview_diagramm.png", width: 100%),
+  caption: [Überblick über Editor, Abhängigkeits-Graph, dessen cache und der Welt.],
+) <fig-overview_diagramm>
 
 Mein generations System besteht aus drei Bestandteilen. 
 1. Ein Graphischer Editor indem ein Nutzer einen Abhängigkeits-Graph erstellen und bearbeiten kann. 
