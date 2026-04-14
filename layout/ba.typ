@@ -1,6 +1,7 @@
 #import "./notes.typ": *
 #import "./theorems.typ": *
-#import "utils.typ": *
+#import "./utils.typ": *
+#import "./images.typ": *
 
 #let scrartcl(
   doc,

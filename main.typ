@@ -13,6 +13,7 @@
   supervisors: ("Prof. Dr. Gabriel Zachmann", "Prof. Dr. Nico Hochgeschwender")
 )
 
+#let show_images = false;
 
 = Einleitung
 

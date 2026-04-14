@@ -1,3 +1,4 @@
+#import "../layout/ba.typ": *
 
 == Grafische-Programmierung
 
@@ -16,7 +17,4 @@ Dies kann massive Leistungsvorteile haben.
 
 Populäre Programme in den Grafische-Programmierung verwendet wird, sind Unity Shader Graphs, Unreal Engine Templates und Blender Geometry Nodes. 
 
-#figure(
-  image("./../assets/Shader Graph.png", width: 100%),
-  caption: [ Des grafischen Editor von Unity Shader Graph ],
-)
+#ba_image("./../assets/Shader Graph.png", 100%, [ Der grafischen Editor von Unity Shader Graph ])

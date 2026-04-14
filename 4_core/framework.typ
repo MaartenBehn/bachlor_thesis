@@ -7,10 +7,7 @@
 
 == Framework
 
-#figure(
-  image("../assets/overview_diagramm.png", width: 100%),
-  caption: [Überblick über Editor, Abhängigkeits-Graph, dessen cache und der Welt.],
-) <fig-overview_diagramm>
+#ba_image("../assets/overview_diagramm.png", 100%, [Überblick über Editor, Abhängigkeits-Graph, dessen cache und der Welt. #itodo("Sauber zeichnen")])
 
 Mein generations System besteht aus drei Bestandteilen. 
 1. Ein Graphischer Editor indem ein Nutzer einen Abhängigkeits-Graph erstellen und bearbeiten kann. 
@@ -26,7 +23,8 @@ Zur interaktiven definition des Abhängigkeits-Graph wird ein Grafische-Programm
 Der Nutzer kann Knoten erstellen die einer Operation entsprechen und frei auf einer unendlichen Fläche angeordnet werden können. 
 Diese Operationen haben auf der linken Seite eine Liste an Input Variabeln und an der Rechten Seite eine Liste an Ergebnissen. 
 
-#todo("Bild von Node")
+#ba_image("../assets/sphere.png", 80%, [Node um ein Kugel Volumen zu definieren. #itodo("Hintergrund")])
+
 
 Die Variabeln und Ergebnisse sind farbig nach ihrem Datentyp kodiert und können mit Linien verbunden werden. 
 Die Symbolsiert, das ein Ergebnis als Variabele für eine andere Operation verwendet werden soll. 
@@ -35,7 +33,7 @@ So können komplexe Algorithm über Knoten Verbindungen von links nach rechts da
 parallele Stränge werden übereinander angeordnet. 
 Die fördert eine Darstellung die komplexe Abhängigkeiten übersichtlich darstellen kann.  
 
-#todo("Bild von meheren Knoten")
+#ba_image("../assets/nodes.png", 80%, [Eine Kugel dessen Größe seiner X Position entspricht. #itodo("Hintergrund")])
 
 == Template 
 
