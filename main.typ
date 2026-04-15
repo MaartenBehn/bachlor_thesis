@@ -59,9 +59,11 @@
 
 #include "./4_core/result.typ"
 
-= Bewertung
+= Analyse
 
 #include "./5_evaluation/how_to_compare.typ"
+
+#include "./5_evaluation/theoretical_runtime.typ"
 
 #include "./5_evaluation/reduction_of_regeneration.typ"
 

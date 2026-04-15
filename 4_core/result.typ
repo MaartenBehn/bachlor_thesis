@@ -17,6 +17,8 @@ Wenn nun die Form oder Größe der Baumkrone geändert wird betrifft diese Ände
   caption: [Trees],
 ) <fig-trees>
 
+#todo("Update Image")
+
 === Extern kontrollierte Variable
 
 Knoten im Abhängigkeitsgraphen können nicht nur von anderen berechneten Knoten abhängen, sondern auch von extern kontrollierten Variablen. 
