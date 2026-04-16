@@ -10,7 +10,7 @@ Eingereicht von
 
 Maarten Behn
 
-maarten.behn@uni-bremen.de
+behn@uni-bremen.de
 
 Prüfer
 
@@ -23,46 +23,105 @@ Uni Bremen
 
 SoSe 2026
 
-14. March 2026
+15. April 2026
 
 1 Einleitung
 
-Prozedurale  Welten  werden  mit  Algorithmen  generiert.  Dabei  werden  werden  erst 
-grobe  Eigenschaften  generiert  und  diese  dann  mit  immer  feiner  werdenden  Details 
-ausgeschmückt. Wenn der Generations Algorithmus in irgendeiner form angepasst wird 
-kann  es  sein  das  eine  vorher  generierte  Welt  nicht  mehr  dem  aktuellen  Algorithmus 
-entspricht.  Die  Rechenzeit  eines  prozeduralen  Algorithmus  steigt  mit  der  Menge  an 
-Details  die  generiert  wird.  Bei  komplexen  Algorithmen  die  viele  Details  generieren, 
-kann die lange Neugenerationszeit einer Welt beim iterativen entwickeln von generations 
-Algorithmen stören.
+Prozedurale  Generierung  ist  ein  etabliertes  Verfahren  zur  automatischen  Erstellung 
+komplexer virtueller Welten, das insbesondere in der Spieleentwicklung, Simulation und 
+Computergrafik Anwendung findet. Dabei werden zunächst grobe Strukturen erzeugt, 
+die  anschließend  schrittweise  durch  immer  feinere  Details  ergänzt  werden.  Wird  der 
+Generationsalgorithmus in irgendeiner Form angepasst, kann es vorkommen, dass eine 
+bereits erzeugte Welt nicht mehr dem aktuellen Stand des Algorithmus entspricht.
 
-1.1 Ziel der Arbeit
+Die  Rechenzeit  eines  prozeduralen  Generationsalgorithmus  steigt  mit  der  Menge  der 
+erzeugten  Details.  Insbesondere  bei  komplexen  Algorithmen  kann  die  vollständige 
+Neugenerierung einer Welt sehr zeitaufwendig sein. Dies stellt ein Problem dar, da in der 
+Praxis Generationsalgorithmen häufig iterativ entwickelt und angepasst werden. Lange 
+Neugenerationszeiten können diesen Entwicklungsprozess erheblich verlangsamen.
 
-Ziel dieser Arbeit ist zu erforschen in wie weit die Neugenerationszeit einer prozeduralen 
-Welt verschnellert werden kann, wenn nur die Aspekte der Welt neugeneriert werden 
-die nicht mehr den neuen Algorithmus entspricht. Dazu habe ich ein System entwickelt 
-in welchem der generations Algorithmus als Abhängigkeits-Graph dargestellt wird. Bei 
-einer  Neugeneration  können  zwischen  Ergebnisse  für  Abschnitte  des  Abhängigkeits-
-Graph, welche sich nicht veränder haben wiederverwendet werden.
+Ziel  dieser  Arbeit  ist  es  zu  untersuchen,  inwieweit  sich  die  Neugenerationszeit  einer 
+prozeduralen Welt reduzieren lässt, wenn nur diejenigen Teile der Welt neu berechnet 
+werden, die durch Änderungen am Generationsalgorithmus ungültig geworden sind.
 
-1.2 Aufbau der Arbeit
+Dazu wird ein System vorgestellt, welches einen Generationsalgorithmus als Abhängig­
+keitsgraph  dargestellt.  Dieses  verwendet  Zwischenergebnisse  für  diejenigen  Teile  des 
+Graphen, die sich nicht geändert haben, wieder.
 
 1
 
+Inhaltsverzeichnis
+
+1 Einleitung . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1
+2 Stand der Technik . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+2.1 Noise & Zufälligkeit . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+2.2 Example based Model Synthesis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+2.3 L­Systems . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+2.4 Graph based Model Synthesis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+2.5 KI basierte prozedurale Generation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+2.6 Houdini & Blender Geometry Nodes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+3 Theoretische Grundlagen . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+3.1 Minimales errechnen (Lazy computation) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+3.2 Graphen . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+3.3 Constructive Solid Geometry (CSG) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+3.4 Grafische­Programmierung . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+4 Mein Lösungsansatz . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+4.1 Abhängigkeits­Graph . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+4.2 Framework . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+4.3 Graphischer Editor . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+4.4 Template . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+4.5 Generator . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+4.6 Implementation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+4.7 Beispiele . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19
+5 Analyse . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+5.1 Theoretische Laufzeit . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+5.2 Reduktion der Neuberechnungszeit . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+5.3 Overhead . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+5.4 Nutzerfreundlichkeit . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+5.5 Erweiterbarkeit . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 24
+6 Future Work . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+6.1 Nullwerte führen zu leeren Lösungen . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+6.2 Andere Datenstrukturen . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+6.3 Nutzerfreundlichkeitsstudie . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+6.4 Parallelisierung der Generierung . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+6.5 Automatische Cache­Optimierung . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26
+6.6 Skalierung auf sehr große Welten . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26
+6.7 Integration in bestehende Engines . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26
+6.8 Serialisierung und Persistenz . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26
+7 Bibliografie . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28
+8 Eigenständigkeitserklärungen . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 30
+8.1 Nutzung KI basierte Anwendungen . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 33
+
+2
+
 2 Stand der Technik
+
+Dieses Kapitel gibt einen Überblick über bestehende Ansätze zur prozeduralen Gene­
+rierung  virtueller  Welten  und  bewertet  sie  im  Hinblick  auf  das  zentrale  Ziel  dieser 
+Arbeit:  die  minimale  Neuberechnung  nach  Änderungen  am  Generationsalgorithmus. 
+Dazu werden zunächst klassische Verfahren wie Noise­basierte Methoden und L­Systems 
+betrachtet,  die  in  der  Praxis  weit  verbreitet  sind,  jedoch  kaum  Möglichkeiten  zur 
+gezielten Teilneuberechnung bieten. Anschließend werden constraint­basierte Ansätze 
+wie Example­based Model Synthesis und Graph­basierte Modellsynthese untersucht, die 
+durch  ihre  explizite  Regelstruktur  prinzipiell  besser  für  eine  solche  Analyse  geeignet 
+sind. Darüber hinaus werden KI­basierte Verfahren diskutiert und begründet, warum 
+diese  für  das  Ziel  der  minimalen  Neuberechnung  nicht  geeignet  sind.  Abschließend 
+werden kommerzielle Werkzeuge wie Houdini und Blender Geometry Nodes betrachtet, 
+die  konzeptuell  ähnliche  Ansätze  verfolgen,  jedoch  für  einen  anderen  Einsatzkontext 
+ausgelegt sind.
 
 2.1 Noise & Zufälligkeit
 
 Ein  sehr  verbreiteter  Ansatz  zur  prozeduralen  Generierung  von  Welten  basiert  auf 
-der Verwendung von Noise-Algorithmen. Typischerweise werden hierfür kontinuierliche 
-Noise-Algorithmen  wie  Perlin-Noise  oder  Simplex-Noise  verwendet.  Daher  wird  die 
+der Verwendung von Noise­Algorithmen. Typischerweise werden hierfür kontinuierliche 
+Noise­Algorithmen  wie  Perlin­Noise  oder  Simplex­Noise  verwendet.  Daher  wird  die 
 Struktur der generierten Welt nicht durch explizite Regeln beschrieben, sondern ergibt 
 sich aus einer überlagerung meherer Noise Funktionen mit unterschiedlichen Frequenzen 
 und Amplituden.
 
-Noise-basierte  Verfahren  sind  relativ  leicht  zu  implementieren  und  skalieren  gut  auf 
+Noise­basierte  Verfahren  sind  relativ  leicht  zu  implementieren  und  skalieren  gut  auf 
 große Welten. Aus diesem Grund werden sie häufig in Spielen und Simulationssystemen 
-eingesetzt, insbesondere zur Generierung von Gelände, Vegetation oder anderen natür-
+eingesetzt, insbesondere zur Generierung von Gelände, Vegetation oder anderen natür­
 lichen Strukturen.
 
 Ein wesentlicher Nachteil von rein zufallsbasierten Generationsverfahren besteht darin, 
@@ -71,51 +130,50 @@ vorher zu sagen ist wie die Noise Funktionen in sonder Fällen zusammen spielen,
 es  schwierig  sicherzustellen,  dass  bestimmte  globale  oder  semantische  Anforderungen 
 immer erfüllt werden.
 
-Dies kann dazu führen, dass in seltenen Fällen unerwünschte oder fehlerhafte Struktu-
+Dies kann dazu führen, dass in seltenen Fällen unerwünschte oder fehlerhafte Struktu­
 ren entstehen, beispielsweise unzugängliche Bereiche, unnatürliche Geländeformationen 
-oder inkonsistente Weltstrukturen. Solche Probleme lassen sich häufig nur durch zusätz-
+oder inkonsistente Weltstrukturen. Solche Probleme lassen sich häufig nur durch zusätz­
 liche heuristische Korrekturen oder nachträgliche Validierungsschritte beheben.
 
 Ein weiterer Nachteil im Kontext dieser Arbeit ist, dass die Regeln der Generierung 
 implizit in der komposition der Noise Funktionen enthalten ist. Wenn der Algorithmus 
-verändert wird, ist es daher schwierig zu bestimmen, welche Teile einer bereits gene-
+verändert wird, ist es daher schwierig zu bestimmen, welche Teile einer bereits gene­
 rierten Welt noch gültig sind und welche neu berechnet werden müssen.
 
-2.2 Example based Model Synthesis
+3
 
-Eine  spannende  Arbeit  im  Bereich  „constraint  based  generation“  ist  Paul  Merrels 
-„Example-based Model Synthesis“. [1]
+2.2 Example based Model Synthesis
 
-Die Idee des Algorithmus ist aus einem kleinen Input-Datensatz eine größere Struktur 
-zu erzeugen die lokal den gleichen Regeln folgt.
+Eine bekannte Arbeit im Bereich der constraint­basierten Generation ist Paul Merrels 
+„Example­based Model Synthesis“. [1]
 
-Dabei besteht der Input-Datensatz aus einer Gitter Struktur, wo jede Celle im Gitter 
-ein Wert zu geordnet wird. Nun wird eine Liste aller Nachbar Kombinationen erstellt 
-die im Input Input-Datensatz vorkommen. Diese Liste beschreibt die Regeln nachdem 
-ein neues Modell erzeugt wird.
+Die Grundidee besteht darin, aus einem kleinen Eingabedatensatz eine größere Struktur 
+zu erzeugen, die lokal denselben Regeln folgt.
 
-Generations Algorithmus:
-1. Dabei werden dem Gitter des neuen Modells in jeder Zelle alle Werte zugeordnet.
-2. Wähle die Zelle mit den wenigsten Werten aus und entferne alle bis auf einen.
-3. Entferne alle Werte aus den Nachbar Zellen für die eine Regel nicht mehr erfüllt ist.
-4. Wiederhole 3. für jede Nachbar Zelle bei der Werte entfernt wurden.
+Der  Eingabedatensatz  besteht  aus  einer  Gitterstruktur,  bei  der  jeder  Zelle  ein  Wert 
+zugeordnet ist. Aus diesem Gitter wird eine Liste aller Nachbarkombinationen erstellt, 
+die im Eingabedatensatz vorkommen.
 
-2
-
-5. Wiederhole 2. bis alle Zellen nur noch einen Wert enthalten.
+Diese  Liste  beschreibt  die  Regeln,  nach  denen  ein  neues  Modell  erzeugt  wird.  Der 
+Generationsalgorithmus läuft dabei wie folgt ab: Zunächst werden allen Zellen des neuen 
+Gitters sämtliche möglichen Werte zugeordnet. Dann wird die Zelle mit den wenigsten 
+verbleibenden Möglichkeiten ausgewählt und auf einen einzelnen Wert festgelegt. An­
+schließend werden aus den Nachbarzellen alle Werte entfernt, für die keine gültige Regel 
+mehr existiert. Dieser Bereinigungsschritt wird rekursiv auf alle betroffenen Nachbarn 
+ausgeweitet. Der Vorgang wiederholt sich, bis jede Zelle genau einen Wert enthält.
 
 2.2.1 Minimale Neuberechnung mit Model Systhesis
 
 Ein  möglicher  Ansatz  zur  partiellen  Neuberechnung  prozedural  generierter  Welten 
-könnte auf Verfahren der Example-based Model Synthesis aufbauen. Die grundlegende 
-Idee  wäre  zunächst  eine  vollständige  Welt  mit  dem  Model-Synthesis-Algorithmus  zu 
+könnte auf Verfahren der Example­based Model Synthesis aufbauen. Die grundlegende 
+Idee  wäre  zunächst  eine  vollständige  Welt  mit  dem  Model­Synthesis­Algorithmus  zu 
 generieren.  Wenn  sich  anschließend  die  zugrunde  liegenden  Regeln  ändern,  könnte 
 versucht werden, nur die Teile der Welt zu verändern, die den neuen Regeln nicht mehr 
 entsprechen.
 
 Ein naheliegender Ansatz wäre, alle Felder zu identifizieren, deren aktuelle Werte gegen 
 die  neuen  Regeln  verstoßen.  Für  diese  Felder  müssten  anschließend  wieder  mehrere 
-mögliche Werte zugelassen werden, sodass der Model-Synthesis-Algorithmus erneut eine 
+mögliche Werte zugelassen werden, sodass der Model­Synthesis­Algorithmus erneut eine 
 konsistente Lösung finden kann.
 
 Dabei stellt sich jedoch ein grundlegendes Problem: Wenn einem Feld neue mögliche 
@@ -127,66 +185,97 @@ Dieser Prozess kann sich wiederum auf deren Nachbarn ausbreiten und so weiter.
 Würde man dieses Verfahren naiv implementieren, indem für alle betroffenen Nachbarn 
 wieder sämtliche möglichen Werte zugelassen werden, entstünde im Extremfall erneut 
 ein vollständig unentschiedenes Gitter. In diesem Fall würde der Algorithmus effektiv 
-wieder  bei  einem  normalen  Model-Synthesis-Prozess  beginnen,  wodurch  kein  Vorteil 
+wieder  bei  einem  normalen  Model­Synthesis­Prozess  beginnen,  wodurch  kein  Vorteil 
 gegenüber einer vollständigen Neugenerierung entsteht.
 
 Um dennoch einen Nutzen aus diesem Ansatz zu ziehen, müsste eine möglichst kleine 
 Menge  an  Feldern  gefunden  werden,  deren  Wertebereiche  erweitert  werden,  sodass 
 anschließend wieder eine konsistente Lösung existiert. Diese Menge sollte idealerweise 
 minimal sein, damit möglichst große Teile der bestehenden Welt unverändert bleiben 
-können.  Gleichzeitig  müsste  der  Aufwand  zur  Bestimmung  dieser  Menge  deutlich 
+
+4
+
+können.  Gleichzeitig  müsste  der  Aufwand  zur  Bestimmung  dieser  Menge  deutlich 
 geringer sein als eine komplette Neugenerierung der Welt.
 
-Eine theoretische Möglichkeit bestünde darin, den Raum der möglichen Werteerweite-
+Eine theoretische Möglichkeit bestünde darin, den Raum der möglichen Werteerweite­
 rungen systematisch zu durchsuchen. Beispielsweise könnte eine Breitensuche über den 
 Graphen  der  möglichen  Wertkombinationen  durchgeführt  werden,  um  eine  minimale 
 Menge  an  Änderungen  zu  finden,  die  wieder  zu  einer  gültigen  Konfiguration  führt. 
 Allerdings wächst dieser Suchraum sehr schnell und führt sowohl in Bezug auf Laufzeit 
 als auch Speicherverbrauch zu erheblichen Komplexitätsproblemen.
 
-Der Vorteil des ursprünglichen Model-Synthesis-Algorithmus liegt darin, dass zu jedem 
+Der Vorteil des ursprünglichen Model­Synthesis­Algorithmus liegt darin, dass zu jedem 
 Zeitpunkt alle noch möglichen Kombinationen eine valide Lösung darstellen. Das Finden 
 einer  minimalen  Erweiterung  dieser  Mengen,  die  nach  einer  Regeländerung  wieder 
 eine  gültige  Lösung  ermöglicht,  ist  jedoch  deutlich  schwieriger  als  die  ursprüngliche 
 Generierung selbst.
 
-3
+2.3 L-Systems
 
-2.3 L-Systems
-
-L-Systems (Lindenmayer-Systeme) sind ein regelbasiertes Verfahren zur Beschreibung 
+L­Systems (Lindenmayer­Systeme) sind ein regelbasiertes Verfahren zur Beschreibung 
 und  Generierung  komplexer  Strukturen.  Sie  wurden  ursprünglich  zur  Modellierung 
 biologischer Wachstumsprozesse entwickelt und werden heute häufig in der prozeduralen 
 Generierung natürlicher Strukturen eingesetzt, beispielsweise für Pflanzen, Bäume oder 
 Korallen.
 
-Ein L-System besteht im Kern aus einem Alphabet von Symbolen, einem Startsymbol, 
+Ein L­System besteht im Kern aus einem Alphabet von Symbolen, einem Startsymbol, 
 und einer Menge an Produktionsregeln.
 
 Die Produktionsregeln definieren, wie jedes Symbol durch eine Folge anderer Symbole 
 ersetzt wird. Ausgehend vom Startsymbol wird in jedem Iterationsschritt jedes Symbol 
-gemäß  den  definierten  Regeln  ersetzt.  Dadurch  entsteht  schrittweise  eine  immer  län-
+gemäß  den  definierten  Regeln  ersetzt.  Dadurch  entsteht  schrittweise  eine  immer  län­
 gere Symbolsequenz. Nach mehreren Iterationen entsteht eine lange Symbolfolge, die 
 anschließend interpretiert werden kann.
 
-Ein  wesentlicher  Vorteil  von  L-Systems  ist  ihre  Fähigkeit,  mit  wenigen  Regeln  sehr 
+Ein  wesentlicher  Vorteil  von  L­Systems  ist  ihre  Fähigkeit,  mit  wenigen  Regeln  sehr 
 komplexe und selbstähnliche Strukturen zu erzeugen. Besonders fraktalartige Formen 
 und verzweigte Strukturen wie Pflanzen lassen sich damit sehr kompakt beschreiben.
 
-Ein Nachteil von L-Systems besteht darin, dass sie primär auf rekursiven Ersetzungs-
+Ein Nachteil von L­Systems besteht darin, dass sie primär auf rekursiven Ersetzungs­
 regeln basieren und daher weniger flexibel für die Beschreibung allgemeiner struktureller 
-Abhängigkeiten  sind.  Die  erzeugten  Strukturen  folgen  strikt  den  definierten  Produk-
+Abhängigkeiten  sind.  Die  erzeugten  Strukturen  folgen  strikt  den  definierten  Produk­
 tionsregeln, wodurch es schwierig sein kann, globale Einschränkungen oder komplexe 
 Interaktionen zwischen entfernten Teilen der Struktur zu modellieren.
 
-Ein weiterer Aspekt im Kontext dieser Arbeit ist, dass Änderungen an den Produkti-
+Ein weiterer Aspekt im Kontext dieser Arbeit ist, dass Änderungen an den Produkti­
 onsregeln  typischerweise  eine  vollständige  Neuberechnung  aller  Iterationen  erfordern. 
-Da jede Iteration auf der vorherigen basiert, können Änderungen an einer Regel poten-
+Da jede Iteration auf der vorherigen basiert, können Änderungen an einer Regel poten­
 ziell die gesamte erzeugte Struktur beeinflussen. Dadurch eignet sich dieser Ansatz nur 
 eingeschränkt für Szenarien, in denen eine minimale Neuberechnung nach Änderungen 
 des Generationsalgorithmus angestrebt wird.
 
-2.4 Graph based Model Synthesis
+5
+
+2.4 Graph based Model Synthesis
+
+Die Arbeit Graph based Model Synthesis verbindet die Idee von Graph Grammatiken 
+und Model­Synthesis.
+
+Die Grundidee besteht darin, dass Generationsregeln nicht direkt auf einer expliziten 
+Geometrie arbeiten, sondern auf dem zugrunde liegenden Graphen angewendet werden. 
+Eine  Regel  beschreibt  dabei  eine  Transformation  eines  Teilgraphen  in  einen  anderen 
+Teilgraphen.  Durch  wiederholte  Anwendung  solcher  Regeln  kann  ein  initialer  Graph 
+schrittweise erweitert oder verändert werden.
+
+Ein  Beispiel  für  diesen  Ansatz  ist  die  Verwendung  von  Graph­Grammatiken  zur 
+prozeduralen Modellierung von Polygonmodellen. Dabei wird ein bestehendes Modell 
+zunächst in eine Menge kleiner Strukturelemente zerlegt. Aus diesen Elementen wird 
+anschließend eine Menge von Regeln abgeleitet, die beschreiben, wie lokale Graphstruk­
+turen  miteinander  kombiniert  werden  dürfen.  Durch  wiederholte  Anwendung  dieser 
+Regeln  können  neue  Modelle  erzeugt  werden,  die  lokal  ähnliche  Strukturen  wie  das 
+ursprüngliche Beispiel aufweisen.
+
+Ein Vorteil dieses Ansatzes ist, dass komplexe strukturelle Zusammenhänge explizit im 
+Graphen dargestellt werden. Dadurch können Generationsregeln sehr präzise definieren, 
+unter  welchen  Bedingungen  eine  Transformation  erlaubt  ist.  Gleichzeitig  lassen  sich 
+globale  Strukturen  einfacher  kontrollieren  als  bei  rein  stochastischen  Verfahren  wie 
+Noise­basierten Methoden.
+
+Ein  Nachteil  besteht  jedoch  darin,  dass  die  Definition  geeigneter  Graphregeln  häufig 
+aufwendig ist und ein gutes Verständnis der zugrunde liegenden Datenstruktur erfordert. 
+Außerdem kann die Anwendung vieler Transformationsregeln auf großen Graphen zu 
+einem hohen Rechenaufwand führen.
 
 2.5 KI basierte prozedurale Generation
 
@@ -195,96 +284,76 @@ Datensatz zu erzeugen. In Arbeiten wie [2], [3] und [4] werden Neuronale Modelle
 um Levels aus bekannten 2D Spielen zu reproduzieren. Dabei wird in [2] wird ein Level 
 generations Model gegen ein Spieler Argent Modell trainiert, welches bewertet ob ein 
 Level spielbar ist. Der Ansatz ist meistens fähig spielbare Levels zu generieren, wobei 
-es vereinzelt zu generation Artefakten kommen kann. [2, S. 7]
-
-Jedoch  behandelt  die  Ansätze  simple  2D  Spiele,  für  die  es  viel  vorhandene  Level  zu 
-trainieren gibt. [2, S. 2]
-
-4
-
-In dem Ansatz wir außerdem gezeigt, dass Messbare Level Eigenschaften, wie die Menge 
-der benötigten Sprünge genutzt werden können um „spannendere“ Level zu generieren. 
-[2, S. 7]
-
-[3]
-• Analyse von der Möglichen validen Level eines 2D Mario spiels um unterschiedliche 
-
-spannende Level zu erzeugen.
+es  vereinzelt  zu  generation  Artefakten  kommen  kann.  Jedoch  behandelt  die  Ansätze 
+simple 2D Spiele, für die es viel vorhandene Level zu trainieren gibt.
 
 2.5.1 Terrain Diffusion
 
-[5]
+Im  Ansatz  „Terrain  Diffusion“  werden  Neuronale­Diffusion­Modelle  verwendet.  Diffu­
+sion­Modelle erzeugen Daten, indem sie iterativ aus zufälligem Rauschen eine struktu­
+rierte Lösung rekonstruieren. Dieses Verfahren wird ursprünglich für Bildgenerierung 
+eingesetzt, kann jedoch auch zur Erzeugung von Höhenkarten verwendet werden.
 
-• Weiter Entwicklung von Noise Funktionen für Gelände generation.
-• Es KI Modelle sind teilweise schneller als komplexe Noise Layer Systeme.
-• Haben Geografische Erddaten als Input Datensatz verwendet.
-
-2.5.2 Mit LLM Reden
-
-[6]
-
-• Aktuelle LLMs können sind fähig text basierte Darstellungen von Spiel Welten zu 
-
-generieren und verstehen.
-
-• Jedoch können sie nicht direkt mit Level Daten oder Tile Maps umgehen. Bzw dann 
-
-generieren sie keine validen Ergebnisse
-
-2.5.3 Umsetzung von generations Regeln in KI basierten Ansätzen
-
-Bei der prozeduralen generation mit KI Systemen werden generations Regeln meist nicht 
-explizit definiert. Sie ergeben sich aus dem Trainings-Datensatz und den Bewertungs 
-Methoden der Modells in „Adversarialen“ Ansätzen.
-
-Sollte ich KI sagen oder genauer sein?
-
-ToDo:
-
-Nachhaltig sicherzustellen, dass alle erwünschten Generationsregeln eingehalten werden, 
-bleibt ein Bereich in dem Aktiv geforscht wird.
-
-2.5.4 Bewertung
-
-KI  basierte  Ansätze  zur  prozeduralen  Generation  sind  ein  sich  aktiv  entwickelnder 
-Bereich indem
-
-• Kann nur reproduzieren was schon vorhanden ist bzw benötigt größere Mengen an 
-
-Input Daten.
-
--> Schränk Kreativität ein, obwohl man auch argumentieren kann, dass meist wieder-
-erkennbare Strukturen generiert werden sollen, sodass die nicht wirklich ein Problem ist. 
-Und durch geschickte Kombination bekannter Erdstrukturen kann viel neues erzeugt 
-werden.
-
-• Schwer weitere Regeln direkt einzubauen.
-
-• Grundsätzlich ist es schwer dafür zu sorgen das Neuronale-Netzwerke nur valide 
-
-Lösungen erzeugen, gerade wenn die Regeln komplex werden.
-
-5
-
-2.5.4.1 Minimale Neuberechnung
-
-• Schon alleine mehrere Ergebnisse die gleich aussehen zu errechnen ist schwer.
-
-ToDo:
-
-Aber vielleicht gibt es ja Arbeiten in die Richtung -> Nach Papern 
-suchen
+Hier wird ein neuronales Modell auf reale Geländedaten trainiert, sodass es realistische 
+Terrainstrukturen erzeugen kann. Um weiterhin unendliche Welten generieren zu kön­
 
 6
 
+nen, wird das Gelände in Kacheln erzeugt, die deterministisch aus einem Seed generiert 
+werden. Dadurch können neue Bereiche der Welt bei Bedarf berechnet werden, ähnlich 
+wie bei klassischen Noise­basierten Verfahren.
+
+Der Vorteil dieses Ansatzes liegt darin, dass größere geographische Strukturen realisti­
+scher modelliert werden können als mit klassischen Noise­Funktionen.
+
+Ein Nachteil ist jedoch, dass das Verhalten des Systems stark vom Trainingsdatensatz 
+abhängt und Generationsregeln nicht explizit definiert sind. Dadurch ist es schwierig 
+sicherzustellen, dass bestimmte strukturelle Anforderungen immer erfüllt werden. [5]
+
+2.5.2 Minimale Neuberechnung
+
+KI­basierte Ansätze teilen ein grundlegendes Problem: Die internen Repräsentationen 
+neuronaler Modelle sind nicht interpretierbar. Es ist daher nicht nachvollziehbar, welche 
+Teile der Eingabe oder welche Gewichte des Modells zu welchen Teilen des generierten 
+Ergebnisses  beitragen.  Ändert  sich  ein  Parameter  oder  eine  Eingabe,  gibt  es  keine 
+Möglichkeit, daraus abzuleiten, welche Teile einer bereits generierten Welt noch gültig 
+sind.  Eine  minimale  Neuberechnung  setzt  jedoch  genau  dieses  Wissen  voraus.  Aus 
+diesem Grund werden KI­basierte Ansätze in dieser Arbeit nicht weiter betrachtet.
+
+2.6 Houdini & Blender Geometry Nodes
+
+Werkzeuge wie SideFX Houdini und Blender Geometry Nodes verfolgen einen ähnlichen 
+Ansatz  wie  das  in  dieser  Arbeit  vorgestellte  System:  Generationslogik  wird  nicht  als 
+klassischer Programmcode, sondern als visueller Abhängigkeitsgraph definiert. In Hou­
+dini wird dies durch das sogenannte „Procedural Dependency Graph„­Modell realisiert, 
+bei dem jede Operation als Knoten dargestellt wird und Änderungen an einem Knoten 
+automatisch nur die davon abhängigen Teile des Graphen neu berechnen. Dieser Mecha­
+nismus kommt dem Kernziel dieser Arbeit konzeptuell sehr nahe. Blender Geometry 
+Nodes verfolgt ein ähnliches Prinzip im Kontext der 3D­Modellierung. Beide Systeme 
+sind jedoch primär auf die interaktive Erstellung einzelner Assets ausgelegt und nicht 
+auf die prozedurale Generation großer zusammenhängender Welten mit tausenden von 
+Elementen.  Zudem  sind  beide  Systeme  geschlossene  allgemeine  Werkzeuge  die  nicht 
+darauf ausgelegt sind in eine Spiel­ oder Simulations­Engine eingebettet zu werden. Das 
+in dieser Arbeit vorgestellte System hingegen zielt explizit auf diesen Kontext ab, da 
+der Generationsalgorithmus dort iterativ weiterentwickelt wird und Änderungen schnell 
+in einer bereits bestehenden Welt sichtbar sein sollen.
+
+7
+
 3 Theoretische Grundlagen
+
+Dieses  Kapitel  beschreibt  die  technischen  Konzepte,  auf  denen  das  in  dieser  Arbeit 
+vorgestellte  System  aufbaut.  Dazu  gehören  Lazy  Computation  als  Grundprinzip  der 
+minimalen  Neuberechnung,  Graphen  als  zentrale  Datenstruktur,  Constructive  Solid 
+Geometry zur Darstellung von Geometrie sowie Grafische Programmierung als Grund­
+lage des Editors.
 
 3.1 Minimales errechnen (Lazy computation)
 
-Minimales errechnen auf englisch Lazy computation beschreibt die Idee in Computer-
+Minimales errechnen auf englisch Lazy computation beschreibt die Idee in Computer­
 programmen die Daten erst dann zu errechnen wenn sie benötigt werden.
 
-Es  reduziert  Lag-spikes  gerade  beim  starten  eines  neuen  Prozesses,  da  Anstatt  alle 
+Es  reduziert  Lag­spikes  gerade  beim  starten  eines  neuen  Prozesses,  da  Anstatt  alle 
 nutzbaren Daten nur die, die gerade angefragt benötigt werden errechnet werden.
 
 In Funktionale Programmiersprachen wie Haskell findet dieses Konzept vie Anwendung 
@@ -322,7 +391,7 @@ Knoten verstanden werden.
 𝐺 (𝑣) und 𝑁 +
 
 Diese  Notationen  basieren  auf  den  Notationen  in  „Modern  Graph  Theory“  von  Béla 
-Bollobás [7].
+Bollobás [6].
 
 3.3 Constructive Solid Geometry (CSG)
 
@@ -334,76 +403,58 @@ Diese  Kombination  sind  standartmäßig  Vereinigung,  Schnittmenge  und  Diff
 wurden  jedoch  in  späteren  Arbeiten  mit  komplexeren  Operationen,  wie  Verformung, 
 Duplikation, etc erweitert.
 
-CSGs  werden  als  directed  acyclic  graph  (DAG)  gespeichert.  Jede  Knoten  is  eine 
+8
+
+CSGs  werden  als  directed  acyclic  graph  (DAG)  gespeichert.  Jede  Knoten  is  eine 
 implizierte Operation auf den Volumen der Kinder. Die Blätter sind dahingegen durch 
 Parameter definierte primitive Geometrien.
 
 Der  Vorteil  dieser  Darstellung  ist,  dass  Geometrie  über  Parameter  und  Operationen 
 beschrieben wird. Änderungen an Position, Größe oder anderen Parametern wirken sich 
-
-7
-
-direkt auf das resultierende Volumen aus, ohne dass die gesamte Geometrie neu definiert 
+direkt auf das resultierende Volumen aus, ohne dass die gesamte Geometrie neu definiert 
 werden muss.
 
-Jedoch eignen sich CSGs selten zum direkten rendering mit raytracing, da die Opera-
+Jedoch eignen sich CSGs selten zum direkten rendering mit raytracing, da die Opera­
 tionen zu leistungsaufwendig sind um mit jeden Ray den DAG zu rekursiv zu iterieren. 
-Dazu steigt die Größe des DAGs schnell mit der Komplexität des CSGs. [8], [9]
+Dazu steigt die Größe des DAGs schnell mit der Komplexität des CSGs. [7], [8]
 
 3.4 Grafische-Programmierung
 
-Grafische-Programmierung ist eine From der Programmierung bei der Logik nicht als 
+Grafische­Programmierung ist eine From der Programmierung bei der Logik nicht als 
 Code definiert ist sonder als Diagram in einem grafischen Editor. Funktionen werden als 
 Knoten mit Input und Output dargestellt. Dies können mit Linien verbunden werden 
 um logische Abfolgen zu definieren.
 
-Grafische-Programmierung  erlaubt  ein  besseren  überblick  über  Programmabschnitte 
+Grafische­Programmierung  erlaubt  ein  besseren  überblick  über  Programmabschnitte 
 und ist durch seinen invitieren Syntax Einsteigerfreundlicher.
 
-Grafische-Programme ausgeführt werden indem die Operationen als Graph dargestellt 
+Grafische­Programme ausgeführt werden indem die Operationen als Graph dargestellt 
 werden.  Dieser  kann  vergleichbar  zu  Funktionenprogrammiersparchen  rekursiv  gelöst 
 werden.
 
-Jedoch  ist  es  auch  möglich  einen  Grafische-Programme  in  Code  zu  übersetzen  und 
-Maschinen-Code zu kompilieren. Dies kann massive Leistungsvorteile haben.
+Jedoch  ist  es  auch  möglich  einen  Grafische­Programme  in  Code  zu  übersetzen  und 
+Maschinen­Code zu kompilieren. Dies kann massive Leistungsvorteile haben.
 
-Populäre  Programme  in  den  Grafische-Programmierung  verwendet  wird,  sind  Unity 
+Populäre  Programme  in  den  Grafische­Programmierung  verwendet  wird,  sind  Unity 
 Shader Graphs, Unreal Engine Templates und Blender Geometry Nodes.
 
-Abbildung 1:  Der grafische Editor von Unity Shader Graph
+Abbildung 1:  Der grafischen Editor von Unity Shader Graph
 
-8
+9
 
-4 Meine Arbeit
+4 Mein Lösungsansatz
 
-4.1 Kern Idee
+Dieses  Kapitel  beschreibt  wie  das  in  der  Einleitung  formulierte  Ziel  der  Reduktion 
+der Neuberechnungszeit konkret umgesetzt wurde. Dabei werden die Komponenten des 
+Systems vorgestellt und zentrale Algorithmen erklärt. Daraufhin werden auf Besonder­
+heiten im System eingegangen und Edge Cases diskutiert.
 
-Die Idee ist das die gesamte zu generierende Welt als Graph an Operationen definiert. 
-Operationen  errechnen  aus  eine  Menge  an  Input  Werten  in  eine  Menge  an  Output 
-Werten.
+Der vorgestellte Ansatz zeigt, dass sich prozedurale Generierung so strukturieren lässt, 
+dass Änderungen am Algorithmus nur die betroffenen Teile der Welt betreffen. Dafür 
+muss der Algorithmus als Abhängigkeitsgraph modelliert werden und Zwischenergeb­
+nisse müssen gezielt gespeichert werden.
 
-Beispiel für Operationen sind:
-• Addition
-• Erzeugung einer Kugel aus Position und Größe
-• Union zweier Volumen
-• etc
-
-Operationen nutzen die Ergebnisse von anderen Operationen und bilden so ein Graph 
-an Abhängigkeiten.
-
-Bei der Errechnung werden die Ergebnisse der Operations Knoten zwischen gespeichert.
-
-Wenn  sich  nun  der  Abhängigkeits-Graph  minimal  ändert  entspricht  das  vorherige 
-Ergebnis potenziell nicht mehr dem Abhängigkeits-Graph. Dies verstehe ich in dem Rest 
-der Arbeit als eine invalide Lösung/Ergebnis.
-
-Jedoch  muss  durch  die  zwischen  Speicherung  nicht  den  ganze  Graph  neu  errechnet 
-werden, sondern nur den Teil der nicht mehr valide ist.
-
-Die Kern Leistung meiner Arbeit ist die Entwicklung einer effizienten Implementierung 
-für dieses Modell.
-
-4.2 Abhängigkeits-Graph
+4.1 Abhängigkeits-Graph
 
 Jede  mathematische  Formel  oder  Algorithmus  kann  als  Graph  an  Abhängigkeiten 
 dargestellt werden. Dabei beschreibt jeder Knoten eine mathematische Operation die 
@@ -415,37 +466,59 @@ damit keine Nebeneffekte. (siehe Funktionale Programmierung) Knoten können kein
 Eingangswerte  haben  dann  erzeugen  diese  immer  die  gleichen Werte  und  werden  als 
 konstant verstanden.
 
-4.3 Framework
+4.2 Framework
 
-Overview diagramm
-
-ToDo:
+Abbildung 2: Überblick über Editor, Abhängigkeits­Graph, dessen cache und der Welt. 
+TODO: Sauber zeichnen
 
 Mein generations System besteht aus drei Bestandteilen.
 
-1. Ein Graphischer Editor indem ein Nutzer einen Abhängigkeits-Graph erstellen und 
+1. Ein Graphischer Editor indem ein Nutzer einen Abhängigkeits­Graph erstellen und 
 
 bearbeiten kann.
 
-9
-
-2. Das Template ist eine Datenstruktur die vom Editor erstellt wird und den Abhän-
-gigkeits-Graph  sowie  Informationen  wie  dieser  generiert  und  zwischen  gespeichert 
+2. Das Template ist eine Datenstruktur die vom Editor erstellt wird und den Abhän­
+gigkeits­Graph  sowie  Informationen  wie  dieser  generiert  und  zwischen  gespeichert 
 werden soll enthält.
 
-3. Der Generator vergleicht das aktuelle Template mit dem neuen Template und gene-
+10
+
+3. Der Generator vergleicht das aktuelle Template mit dem neuen Template und gene­
 riert die Bestandteile der Welt neu die nicht dem neuen Template entsprechen.
 
-4.4 Composer
+4.3 Graphischer Editor
 
-4.5 Template
+Zur  interaktiven  definition  des  Abhängigkeits­Graph  wird  ein  Grafische­Programmie­
+rungs­Editor vergleichbar zu Unreal Templates, Blender Geometry Nodes oder Unity 
+Shader Graph genutzt.
 
-Das  Template  ≔ (𝐺ab, 𝐺ch)  besteht  aus  dem  Abhängigkeits-Graph  𝐺ab  und  einem 
+Der Nutzer kann Knoten erstellen die einer Operation entsprechen und frei auf einer 
+unendlichen Fläche angeordnet werden können. Diese Operationen haben auf der linken 
+Seite eine Liste an Input Variabeln und an der Rechten Seite eine Liste an Ergebnissen.
+
+Abbildung 3: Node um ein Kugel Volumen zu definieren. TODO: Hintergrund
+
+Die  Variabeln  und  Ergebnisse  sind  farbig  nach  ihrem  Datentyp  kodiert  und  können 
+mit Linien verbunden werden. Die Symbolsiert, das ein Ergebnis als Variabele für eine 
+andere Operation verwendet werden soll.
+
+So  können  komplexe  Algorithm  über  Knoten  Verbindungen  von  links  nach  rechts 
+dargestellt werden, parallele Stränge werden übereinander angeordnet. Die fördert eine 
+Darstellung die komplexe Abhängigkeiten übersichtlich darstellen kann.
+
+Abbildung 4: Eine Kugel dessen Größe seiner X Position entspricht. TODO: Hinter­
+grund
+
+4.4 Template
+
+Das  Template  ≔ (𝐺ab, 𝐺ch)  besteht  aus  dem  Abhängigkeits­Graph  𝐺ab  und  einem 
 „cache“ Graphen 𝐺ch.
 𝐺ab ist ein Graph der die zu generierende Welt als rekursive Formel an Operationen 
 beschreibt.
 
-Die ein gehenden Nachbarn 𝑁 −
+11
+
+Die ein gehenden Nachbarn 𝑁 −
 𝐺ab
 die ausgehenden Nachbarn 𝑁 +
 𝐺ab
@@ -459,9 +532,8 @@ Beispiel?
 ToDo:
 
 𝐺ch enthält einen Knoten für jeden Knoten in 𝐺ab der Zwischengespeichert werden soll. 
-Dies ist eine Untermenge aller Knoten in 𝐺ab.
-𝑉 (𝐺ch) ⊂ 𝑉 (𝐺ab)
-Bei der Entscheidung wie groß diese Untermenge sein soll muss zwischen dem „Over-
+Dies ist eine Untermenge aller Knoten in 𝐺ab. 𝑉 (𝐺ch) ⊂ 𝑉 (𝐺ab)
+Bei der Entscheidung wie groß diese Untermenge sein soll muss zwischen dem „Over­
 head“ durch zwischengespeicherung und der Zeitersparniss durch wiederverwendung der 
 Ergebnisse abgewägt werden.
 
@@ -471,15 +543,11 @@ Die ein gehenden Nachbarn 𝑁 −
 findet diese indem man den Baum der Abhängigkeiten in 𝐺ab über alle Verzweigungen 
 rekursiv durchsucht bis man auf jeden Weg einen auf einen Knoten in 𝐺ch stößt.
 
-Algorithmus angeben? eigentlich ist das nicht wichtig.
+Grafik von Datentypen und Abhängigkeits­Graph
 
 ToDo:
 
-Grafik von Datentypen und Abhängigkeits-Graph
-
-ToDo:
-
-4.5.1 Level
+4.4.1 Level
 
 Wenn der 𝐺ab ein directed acyclic Graph (DAG) ist dann kann jedem Knoten 𝑣 ∈ 𝐺ab 
 ein Level 𝑙(𝑣) zugeordnet werden. Dies ist definiert als:
@@ -492,17 +560,15 @@ ein Level 𝑙(𝑣) zugeordnet werden. Dies ist definiert als:
 Also das Level eines Knoten ist immer größer als das Level aller Knoten von den er 
 abhängt.
 
-10
-
-Um  den  𝐺ab  zu  errechnen  werden  die  Knoten  der  Level  aufsteigend  errechnet.  Die 
+Um  den  𝐺ab  zu  errechnen  werden  die  Knoten  der  Level  aufsteigend  errechnet.  Die 
 Rheinfolge innerhalb eines Levels ist nicht relevant.
 
-4.5.2 Einen Prozeduralen Algorithmus als Template darstellen
+4.4.2 Einen Prozeduralen Algorithmus als Template darstellen
 
 Bis zu diesem Abschnitt habe ich das Template sehr allgemein beschrieben.
 
 Um mit dem Template eine Prozedurale Welt zu generieren haben ich mich entschieden, 
-dass das Template final eine Volumen als „constructive solid geometry“ (CSG) errechnet.
+dass das Template final ein Volumen als „constructive solid geometry“ (CSG) errechnet.
 
 Diese CSG setzt sich durch union und remove Operationen auf primitiven Geometrien 
 wie Kugeln und Boxen zusammen.
@@ -516,10 +582,12 @@ Daher sind die Operationen die ich implementiert habe:
 • Addition, Subtraktion, Multiplikation und Division von Positionen und Zahlen
 • etc.
 
-4.5.3 Generation eines Templates
+12
 
-Operationen  im  Abhängigkeits-Graph  𝐺ab  können  auch  Mengen  an  Werten  erzeugen. 
-In meiner implementation ist das die beiden Operationen die ein Gitter und zufällige 
+4.4.3 Generation eines Templates
+
+Operationen  im  Abhängigkeits­Graph  𝐺ab  können  auch  Mengen  an  Werten  erzeugen. 
+In meiner implementation sind dies die beiden Operationen die ein Gitter und zufällige 
 Positionen in einem Volumen errechnen.
 
 Nun kann es sein, dass die weiteren Operationen pro Element in dieser Menge ausgeführt 
@@ -529,7 +597,7 @@ an den Apfelbäume stehen sollen und dann generiert man pro Baum die Positionen 
 Äpfel.
 
 Dies ergibt einen klaren Unterschied in der Laufzeit von Algorithmen auf dem Template 
-zu  Algorithmen  auf  der  generierten  Welt.  Die  Menge  an  Knoten  im  Abhängigkeits-
+zu  Algorithmen  auf  der  generierten  Welt.  Die  Menge  an  Knoten  im  Abhängigkeits­
 Graph  und  so  auch  den  cache  Graph  skaliert  mit  der  Menge  an  Operationen  des 
 Generationsalgorithums. Wohin die Menge der Elemente in der Welt mit dem Größen 
 der Mengen an rechneten Werten skaliert. In anderen Worten alle Knoten im Template 
@@ -540,15 +608,12 @@ Daher  arbeiten  alle  Algorithmen  im  meinen  System  immer  nur  auf  den  Kn
 Templates. Sie nutzen die Abhängigkeiten im Template um heraus zu finden wie die 
 Welt neu generiert werden muss.
 
-4.6 Generator
+4.5 Generator
 
 Der  Generator  enthält  einen  Graphen  𝐺gen  der  den  cache  Graphen  𝐺ch  im  Template 
-entspricht. Jeder Knoten 𝑣gen ∈ 𝑉 (𝐺gen) speichert welchem Knoten 𝑣ch ∈ 𝑉 (𝐺ch) er ent-
-
-11
-
-spricht 𝑣ch = cache(𝑣gen). Dazu hat ein Knoten 𝑣gen ∈ 𝑉 (𝐺gen) das Level des entschieden 
-Template Knoten 𝑙(𝑣gen) = 𝑙(cache(𝑣gen)).
+entspricht.  Jeder  Knoten  𝑣gen ∈ 𝑉 (𝐺gen)  speichert  welchem  Knoten  𝑣ch ∈ 𝑉 (𝐺ch)  er 
+entspricht  𝑣ch =  cache(𝑣gen).  Dazu  hat  ein  Knoten  𝑣gen ∈ 𝑉 (𝐺gen)  das  Level  seines 
+„cache“ Template Knoten 𝑙(𝑣gen) = 𝑙(cache(𝑣gen)).
 Jedoch wo 𝐺ch nur einen Knoten pro Operation enthält, enthält 𝐺gen einen Knoten pro 
 Ergebnis welches errechnet werden muss.
 
@@ -556,26 +621,28 @@ Beispiel
 
 ToDo:
 
-Dazu hält der Generator ≔ (𝐺gen, 𝑄tasks) eine Queue 𝑄tasks die zwei Arten Aufträge auf 
-𝐺gen nach ihren Level sortiert.
+Dazu hält der Generator ≔ (𝐺gen, 𝑄tasks) eine Queue 𝑄tasks die zwei Arten Aufträgen 
+auf 𝐺gen nach ihren Level sortiert.
 
 pop(𝑄tasks) ≔ min
 𝑞∈𝑄tasks
 
 (𝑙(𝑞))
 
-Errechnungs-Aufträge  errechnen  den  das  Ergebnis  eines  Knoten  in  𝐺gen  und  Kind-
-Update-Aufträge erzeugen oder löschen Kinder sodass sie dem Template entsprechen.
+Errechnungs­Aufträge  errechnen  den  das  Ergebnis  eines  Knoten  in  𝐺gen  und  Kind­
+Update­Aufträge erzeugen oder löschen Kinder sodass sie dem Template entsprechen.
 
-4.6.1 Abhängigkeite Werte im Generator Graph finden
+4.5.1 Abhängigkeite Werte im Generator Graph finden
 
 Um  einen  Knoten  in  𝐺gen  zu  errechnen  benötigt  man  die  Ergebnisse  der  Knoten  in 
-𝐺gen  von  den  dieser  Knoten  abhängt.  Wie  ich  in  Abschnitt 4.5.3  erklärt  habe  ist  es 
+𝐺gen  von  den  dieser  Knoten  abhängt.  Wie  ich  in  Abschnitt 4.4.3  erklärt  habe  ist  es 
 Laufzeittechnisch nicht möglich diese mit z.B. einer Tiefensuche zu suchen.
 
-Stattdessen wird für jeden Template Knoten 𝑣 ∈ 𝑉 (𝐺ch) einer der Knoten von den er 
+13
+
+Stattdessen wird für jeden Template Knoten 𝑣 ∈ 𝑉 (𝐺ch) einer der Knoten von den er 
 abhängt 𝑁 −
-(𝑣) als Erstellungs-Knoten 𝑣𝑐 ∈ 𝑉 (𝐺ch) im Template markiert 𝑣𝑐 =create
+(𝑣) als Erstellungs­Knoten 𝑣𝑐 ∈ 𝑉 (𝐺ch) im Template markiert 𝑣𝑐 =create
 𝐺ch
 (𝑣).
 
@@ -583,7 +650,7 @@ abhängt 𝑁 −
 
 Um nun für einen Knoten 𝑣gen ∈ 𝑉 (𝐺gen) alle anderen Knoten zu finden von er abhängt 
 𝑁 −
-(𝑣gen),  werden  die  relative  Schritte  in  𝐺ch  vom  Erstellungs-Knoten  𝑣𝑐  zu  den 
+(𝑣gen),  werden  die  relative  Schritte  in  𝐺ch  vom  Erstellungs­Knoten  𝑣𝑐  zu  den 
 anderen Abhängigen Knoten als Baum gespeichert 𝑇rel(𝑣gen).
 Ein relativer Schritt 𝑣step gibt entweder an das man von einem Knoten 𝑣 ∈ 𝑉 (𝐺ch) hoch 
 (up(𝑣step) = True) in einen Knoten 𝑣up ∈ 𝑉 (𝐺ch) von dem 𝑣 abhängt (𝑣up ∈ 𝑁 −
@@ -610,7 +677,7 @@ Für einen Knoten im Template kann es mehrere Knoten im Generator geben, daher
 können  pro  Abhängigkeit  eines  cache  Knoten  auch  mehrere  Knoten  im  Generator 
 gefunden werden.
 
-12
+14
 
 Algorithm 1: Finde abhänige Knoten in 𝐺gen
 
@@ -686,14 +753,14 @@ ToDo:
 
 Beispiel Zeichung
 
-4.6.2 Kind-Update-Aufträge
+4.5.2 Kind-Update-Aufträge
 
-Kind-Update-Aufträge enthalten den Index des Erstellungs-Knoten und den Index eines 
-Erstellungs-Eintrag 𝐸create(𝑣ch) in dessen Template-Knoten. Dieser Erstellungs-Eintrag 
+Kind­Update­Aufträge enthalten den Index des Erstellungs­Knoten und den Index eines 
+Erstellungs­Eintrag 𝐸create(𝑣ch) in dessen Template­Knoten. Dieser Erstellungs­Eintrag 
 definiert wie viele Kinder es geben soll num(𝑣ch, 𝑣gen creates). Dies sind entweder es genau 
-𝑛  pro  Erstellungs-Knoten  oder,  oder  hängen  von  dem  Wert  des  Erstellungs-Knoten 
+𝑛  pro  Erstellungs­Knoten  oder,  oder  hängen  von  dem  Wert  des  Erstellungs­Knoten 
 𝑣gen creates  ab  wie  z.B.  einer  Positions  Menge.  Dazu  gibt  valid(𝑣gen, 𝑣gen creates)  an  ob 
-ein Kind 𝑣gen noch für den Erstellungs-Knoten 𝑣gen creates noch valide ist. z.B. ob eine 
+ein Kind 𝑣gen noch für den Erstellungs­Knoten 𝑣gen creates noch valide ist. z.B. ob eine 
 Position noch in der Menge an Positionen ist.
 
 Darauf wird die vorhandene Menge an Kindern mit der gewünschten Menge verglichen 
@@ -702,7 +769,7 @@ und bei Ungleichheit neue Kinder Knoten erzeugt oder gelöscht.
 Wenn eine neuer Knoten erzeugt wird werden mit dem Baum an relativen Schritten die 
 Indexe von allen abhängige Knoten gesucht und im Knoten gespeichert.
 
-13
+15
 
 Algorithm 2: Kinder updaten
 
@@ -821,12 +888,12 @@ end
 
 𝐺gen
 
-4.6.3 Errechnungs Aufträge
+4.5.3 Errechnungs Aufträge
 
 Errechnungs Aufträge errechnen den Wert von einem Knoten 𝑣gen ∈ 𝑉 (𝐺gen) neu. Dabei 
-wird der Knoten im Abhängigkeits-Graph rekursiv errechnet.
+wird der Knoten im Abhängigkeits­Graph rekursiv errechnet.
 
-14
+16
 
 Wenn  ein  der  Algorithmus  auf  einen  Knoten  𝑣ab ∈ 𝑉 (𝐺ab)  stößt,  welcher  ein  cache 
 Knoten hat 𝑣ab ∈ 𝑉 (𝐺ch) werden die Werte der jeweiligen abhängigen Knoten von 𝑣gen 
@@ -836,16 +903,16 @@ ToDo:
 
 Beispiel
 
-4.6.4 Abhängigkeits Kreise
+4.5.4 Abhängigkeits Kreise
 
 Das Template kann Abhängigkeits Kreise enthalten. Um trotzdem eine valide Lösung 
 errechnen zu können muss es für jeden Knoten 𝑣val einen validen Null Wert geben.
 So kann der Abhängigkeits Graph iterativ gelöst werden. Dazu werden pro Kreis im 
 cut(𝑣) ⊆ 𝑁 +
-Abhängigkeits-Graph eine Kante als durchgeschnitten markiert 𝑁 +
+Abhängigkeits­Graph eine Kante als durchgeschnitten markiert 𝑁 +
 𝑣 ∈
 𝐺dep
-𝑉 (𝐺dep). Der Abhängigkeits-Graph ohne die durch geschnittenen Kanten 𝑁 +
+𝑉 (𝐺dep). Der Abhängigkeits­Graph ohne die durch geschnittenen Kanten 𝑁 +
 not cut(𝑣) ≔
 𝑁 +
 cut(𝑣)  ist  ein  DAG.  Also  kann  jedem  Knoten  ein  Level  𝑙(𝑣)  zu  geordnet 
@@ -860,7 +927,7 @@ werden.
 
 not cut(𝑣)
 
-Die Knoten werden Level nach Level erzeugt und so sichergestellt das alle nicht geschnit-
+Die Knoten werden Level nach Level erzeugt und so sichergestellt das alle nicht geschnit­
 tenen Abhängigkeiten schon errechnet worden sind, wenn der Knoten selbst errechnet 
 wird. Hat ein Knoten geschnittene Abhängigkeiten werden diese zu Errechnung genutzt 
 wenn sie existiert. Andernfalls wird der Null Wert verwendet. Jeder Knoten der Null 
@@ -868,14 +935,14 @@ Werte für seine geschnittenen Abhängigkeiten nutzt wird nochmal errechnet, sob
 Knoten einmal errechnet wurden. Dies wird so lange wiederholt bis keine Null Werte 
 mehr verwendet worden sind.
 
-4.7 Implementation
+4.6 Implementation
 
 Für  die  Beispiel  Implementation  habe  ich  Rust  als  Sprache  gewählt,  da  sie  erlaubt 
 speichersicheren low level code zu schreiben um die Laufzeit von Algorithm effektiv zu 
-verbessern und ein in Gegensatz zu C++ ein umfassenden leicht zu nutzenden Package-
+verbessern und ein in Gegensatz zu C++ ein umfassenden leicht zu nutzenden Package­
 Manager hat.
 
-4.7.1 Stabiele Listen
+4.6.1 Stabiele Listen
 
 Alle Graphen sind mit stabilen Listen implementiert.
 
@@ -886,10 +953,10 @@ nicht. Wenn ein Element entfernt wird, werden die weiteren Elemente nicht aufges
 um  die  Lücke  zu  schließen,  stattdessen  wird  der  Index  des  nächsten  freien  Element 
 gespeichert.  Dazu  speichert  die  List  speichert  den  Index  des  ersten  freien  Element, 
 welches  genutzt  wird  wenn  ein  neues  Element  eingefügt  wird.  Der  dort  gespeicherte 
-nächste freie Index wird dann als erster freier Index gespeichert. Dies erlaubt Einfüge-, 
-Entfernungs- und Zugriffslaufzeit von 𝑂(1).
+nächste freie Index wird dann als erster freier Index gespeichert. Dies erlaubt Einfüge­, 
+Entfernungs­ und Zugriffslaufzeit von 𝑂(1).
 
-15
+17
 
 Dazu wird pro Element eine Versionsnummer gespeichert. Bei einem Zugriff wird die 
 Version des Index mit der Version des Elements an der Stelle des Index verglichen. So 
@@ -901,20 +968,12 @@ können in einer stabilen List 232 Elemente gespeichert werden.
 
 Stabiele Listen erlauben Graphen effizient als Listen darzustellen, indem in den Knoten 
 die Indexe der anderen Knoten gespeichert werden zu den Kanten existieren. Stabiele 
-listen sind dabei wesentlich schneller als HashMaps.
+listen sind dabei wesentlich schneller als HashMaps. [9]
 
-ToDo:
-
-Quelle
-
-4.7.2 Multi Threading
+4.6.2 Multi Threading
 
 Der  Collapser  sowie  die  Sampeling  Operationen  werden  in  asynchronous  Workern 
-ausgeführt. Zur Kommunikation werden Channel verwendet.
-
-Quelle
-
-ToDo:
+ausgeführt. Zur Kommunikation werden Channel verwendet. [10] & [11]
 
 Der Composer läuft im Render Thread und errechnet bei jeder Änderung das aktuelle 
 Template. Dieses Template wird über ein Channel zum Collapser gesendet. Wenn der 
@@ -928,7 +987,7 @@ GPU gelanden.
 Wenn die neue Welt hochgenanden wurde wird der Render Thread über ein Channel 
 über diese Änderung informiert.
 
-4.7.3 Small Vectors
+4.6.3 Small Vectors
 
 Für die Zwischenspeicherung der Werte werden Small Vectors verwendet. Diese haben 
 die Eigenschaft, dass die ersten N Elemente direkt auf dem Stack alloziert werden. Erst 
@@ -937,96 +996,351 @@ wenn diese voll sind wird ein Array auf dem Stack alloziert.
 Da alle Werte müssen als Liste behandelt werden, da ein Knoten immer von mehreren 
 Knoten für ein Input abhängt. Jedoch enthält diese Listen meist doch nur ein Element. 
 Small Vectoren erlauben für diese Fälle die Stack allozieren zu sparen und bieten bessere 
-Cache Lokalität.
+Cache Lokalität. [12]
 
-4.7.4 Output Datenstruktur
+4.6.4 Output Datenstruktur
 
 Das  Kernconzept,  einen  sehr  großen  Graphen  der  eine  prozeduralen  Algorithmus 
 darstellt, zu bearbeiten, indem man die Abhängigkeiten in einem vergleichbar kleinen 
 Template  nutzt,  enthält  keine  konkreten  Anahmen  über  die  Art  der  Geometrie.  In 
-
-16
-
-meiner  Implementation  habe  ich  CSG  genutzt,  da  es  einer  sehr  allgemeine  Form  ist, 
+meiner  Implementation  habe  ich  CSG  genutzt,  da  es  einer  sehr  allgemeine  Form  ist, 
 Volumen darzustellen und diese leicht zu bearbeiten sind.
 
 Gerade  CSGs  mit  vielen  Knoten  sind  jedoch  nicht  performant  zu  rendern.  Deshalb 
 können die CSGs in meiner Implementation entweder als Sparse Voxel DAGs oder mit 
 marching cubes gesampled werden.
 
-4.8 Minimales Beispiel
-
-in welchem lazy generation einen klaren Vorteil hat.
-
-ToDo:
-
-ToDo:
-
-Diagram
-
-4.9 Nutzungs Beispiele
-
-Bilder
-
-• Welt editor
-• Infitie World Generation
-• LOD systems
-
-17
-
-5 Bewertung
-
-5.1 Bewertung und Vergleich zu andere Systemen
-
-5.1.1 Wie kann man überhaupt das System gut vergleichen?
-
-5.1.1.1 Gleiche Regeln in beidem Systemen implementieren und dann Ge-
-
-schwindigkeit vergleichen
-
-• Probleme
-
-‣ Ich habe nur meine Implementation.
-‣ Gibt es überhaupt Regeln für Welten die man in meinem System und WFC 
-
-darstellen kann?
-– Warscheinlich wären die Regeln biased.
-– Regeln von vorhanden Spielen nutzen?
-
-5.1.1.2 Nutzerfreundlichkeit bewerten
-
-Sollte in meinem Fall im Bereich von gesunden Menschenverstand sein und daher wird 
-keine Studie benötigt.
-
 18
+
+Voxel Datenstrukturen können relativ effizient mit ray marching geraytraced werden. 
+[13], [14]
+
+Mit Hilfe von marching cubes kann ein CSG als Mesh approximiert werden. [15]
+
+4.7 Beispiele
+
+Im  Folgenden  werden  mehrere  Beispiele  vorgestellt,  die  die  Funktionen  des  Systems 
+demonstrieren. Dabei wird zuerst in minimalen Beispielen gezeigt wie das System teile 
+der Generierten Welt wiederverwenden kann und danach eine komplexe Welt vorgestellt, 
+welche den Umfang des Systems darstellt.
+
+4.7.1 Nur finales Volumen neu errechnen
+
+Das erste Beispiel generiert eine große Anzahl von Bäumen, die auf einem Gitter verteilt 
+sind. Jeder Baum besteht aus einem Stamm (Zylinder) und einer Baumkrone (Kugel). 
+Die Positionen aller Bäume werden aus einer Gitter­Operation berechnet und im Cache 
+gespeichert. Die Form der Baumkrone wird als separate Operation im Abhängigkeits­
+graphen modelliert.
+
+Wenn nun die Form oder Größe der Baumkrone geändert wird betrifft diese Änderung 
+nur den Teilgraphen, der die Krone berechnet. Dabei können die Positionen der Bäume 
+wiederverwenden.  Der  Generator  erkennt,  dass  nur  die  CSG­Volumen  der  Kronen 
+ungültig sind, und berechnet ausschließlich diese neu.
+
+Abbildung 5: Trees
+
+ToDo:
+
+Update Image
+
+4.7.2 Extern kontrollierte Variable
+
+Knoten im Abhängigkeitsgraphen können nicht nur von anderen berechneten Knoten 
+abhängen, sondern auch von extern kontrollierten Variablen. Ein typisches Beispiel ist 
+die Kameraposition, die vom der Game Engine zur Verfügung gestellt wird und sich 
+kontinuierlich verändern kann.
+
+In diesem Beispiel wird die Kameraposition als konstanter Knoten im Abhängigkeits­
+graphen  modelliert.  Darauf  aufbauend  wird  eine  Positions­Menge  berechnet,  die  alle 
+
+19
+
+Weltabschnitte (Chunks) innerhalb eines bestimmten Radius um die Kamera enthält. 
+Da diese Menge direkt von der Kameraposition abhängt, wird sie neu berechnet, sobald 
+sich die Kameraposition ändert.
+
+Bewegt sich die Kamera, erkennt der Generator, dass der Wert des Kamerapositions­
+Knotens ungültig geworden ist, und errechnet alle abhängigen Knoten neu. Chunks, die 
+nun außerhalb des Radius liegen, werden gelöscht. Gleichzeitig werden für Chunks, die 
+nun im Radius sind, neue Knoten erzeugt und deren Werte berechnet. Chunks, die sich 
+weiterhin im gültigen Bereich befinden, bleiben unverändert im Cache und müssen nicht 
+neu berechnet werden.
+
+Dieses Prinzip lässt sich über die Kameraposition hinaus auf weitere extern kontrollierte 
+Variablen  verallgemeinern.  Für  ein  LOD­System  kann  die  Entfernung  zur  Kamera 
+genutzt werden, um die Detailstufe einzelner Objekte zu bestimmen. Für View Culling 
+kann  die  Blickrichtung  der  Kamera  als  externe  Variable  genutzt  werden,  um  nur 
+sichtbare Weltbereiche zu generieren und nicht sichtbare zu verwerfen. Darüber hinaus 
+können  auch  spielzustandsabhängige  Variablen  genutzt  werden.  Zum  Beispiel  ob  ein 
+bestimmtes Gebiet betreten wurde oder ein Ereignis eingetreten ist genutzt werden um 
+Teile der Welt dynamisch zu laden oder zu verändern, ohne den den Rest der Welt neu 
+zu errechnen.
+
+Extern kontrollierte Variablen ermöglichen es damit, das System nicht nur für statische 
+Änderungen am Generationsalgorithmus einzusetzen, sondern auch für dynamische auf 
+den Spieler reagieren kann.
+
+20
+
+5 Analyse
+
+Die Bewertung eines Systems zur prozeduralen Generierung ist nicht trivial, da unter­
+schiedliche  Systeme  häufig  unterschiedliche  Ziele  verfolgen.  Während  einige  Ansätze 
+primär auf maximale Generationsgeschwindigkeit oder realistische Ergebnisse optimiert 
+sind, liegt der Fokus dieser Arbeit auf der effizienten Neuberechnung nach Änderungen 
+am Generationsalgorithmus. Ziel ist es, bei kleinen Änderungen am Generationsprozess 
+möglichst große Teile der bereits berechneten Welt wiederverwenden zu können.
+
+Im  nächsten  Abschnitt  wird  die  theoretische  Laufzeitcomplexität  und  des  Systems 
+analysiert.
+
+Um meine die reale Reduktion der Neuberechnungszeit zu untersuchen wird benchmarks 
+auf meheren Beispiel Welten durchgeführt und es wird abgeschätzt wie viel Overhead 
+das System gegen eine minimale Implementierung eines Generationsbespiel hat.
+
+Neben den reinen Laufzeiteigenschaften spielt auch die Nutzerfreundlichkeit des Systems 
+eine Rolle. Durch den grafischen Editor lassen sich komplexe Abhängigkeiten oft leichter 
+überblicken als in klassischem Quellcode. Gleichzeitig erhöht dieser Ansatz jedoch auch 
+die Komplexität des Systems. Während klassischer Programmcode sehr flexibel ist und 
+ohne zusätzliche Struktur auskommt, erfordert der hier vorgestellte Ansatz eine explizite 
+Modellierung aller Abhängigkeiten im Graphen.
+
+Im dritten sollte die Aufwand zu Erweiterung des Systems betrachtet werden. Meine 
+Implementation  nutzt  nur  simple  Operationen  auf  CSGs.  Dies  entspricht  nicht  den 
+wirklichen Datenstrukturen und Problemen in Spielen oder Simulationen. Daher würde 
+eine Große Menge an weiteren Operationen und Datentypen implement werden müssen.
+
+5.1 Theoretische Laufzeit
+
+Die Kern Idee des System ist das der Generationsalgorithmus der Welt als Abhängig­
+keits­Graph  definiert  ist.  Angenommen  der  Abhängigkeits­Graph  hat  𝑎  Knoten.  Die 
+errechneten Ergebnisse von manchen Knoten im Abängigkeits­Graph werden zwischen 
+gespeichert dies ist durch den Cache­Graph definiert. Angenommen dieser hat 𝑐 Knoten 
+wobei 𝑐 ≤ 𝑎 ist. Wir definieren einen Cache­Faktor als 𝑐𝑓 ≔ 𝑐
+𝑎 . Ein Knoten im Abhän­
+gigkeits­Graph kann mehrere Knoten im Generator haben und jeder dieser Knoten kann 
+wieder  mehrere  Kinder  Knoten  für  ein  Kind  im  Abhängigkeits­Graph  haben.  Daher 
+definieren wir einen Branche­Faktor 𝑏𝑓  der die durchschnittliche Menge an Kindern pro 
+Abhängigkeits­Knoten definiert. Zu letzt müssen bei einer Änderung des Abhängigkeits­
+Graph  nur  manche  Knoten  neu  errechnet  werden.  Den  Faktor  der  zu  neu  errechnen 
+Knoten im Generator nennen wir 𝑔𝑓 .
+Somit ist die Laufzeitcomplexit einer Errechnung nach Template­Änderung oder Ände­
+rung einer externen Variabel:
+
+𝑂
+
+𝑏𝑓
+
+(cid:87)(cid:88)(𝑎𝑐𝑓 )
+(
+
+𝑔𝑓 )
+
+(cid:91)(cid:92) = 𝑂(𝑎𝑏𝑓 )
+
+21
+
+Dagegen ist die Laufzeit ein Template zu errechnen 𝑂(𝑎2). Die quadratische Laufzeit 
+entsteht da pro Cache­Knoten die relativen Pfade errechnet werden müssen. Bei großen 
+Welten mit vielen Details kann 𝑏𝑓  wesentlich größer als 2 sein und Faktoren im Bereich 
+von 10 − 100 sind nicht unrealistisch.
+
+5.2 Reduktion der Neuberechnungszeit
+
+Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark sich 
+die Laufzeit im Vergleich zu einer vollständigen Neugenerierung reduziert.
+
+Abbildung 6: 
+
+Abbildung 7: 
+
+ToDo:
+
+Analyse
+
+5.3 Overhead
+
+Ein weiteres wichtiges Kriterium ist der Overhead des Systems. Da der Generationsal­
+gorithmus  nicht  direkt  als  kompilierten  Programmcode  ausgeführt  wird,  sondern  als 
+Abhängigkeitsgraph interpretiert wird, entstehen zusätzliche Kosten. Diese entstehen 
+insbesondere durch:
+• die Verwaltung und Modifikation der Graphstruktur,
+• das rekursive Auflösen der Abhängigkeiten während der Berechnung.
+
+Hierfür wurde das Beispiel TODO: Name in zwei weiteren Versionen implementiert.
+
+22
+
+In  der  ersten  würde  die  Generator­Graph­Verwaltungs­Logik  entfernt.  Hier  wird  der 
+Abhängigkeits­Graph direkt evaluatiert ohne Zwischenspeicher anzulegen oder zu ver­
+walten. Diese Änderunge reduziert zwar die Menge an Code signifikant jedoch hat keine 
+großen Auswirkungen auf die Laufzeit. Dies hat wahrscheinlich Folgende Gründe: Die in 
+Zwischenspeicher genutzten Mengen müssen bei der evaluation des Graphs eh angelegt 
+werden und werden in diesem Fall nur wieder deallokiert anstatt weiterhin gespeichert 
+zu bleiben.
+
+Als zweites wurde eine Version des Generationsalgorithmus ohne Abhängigkeits­Graph 
+direkt implementiert. Diese Version ist ca. 3 − 6x schneller als das Beispiel. Dies hat 
+wahrscheinlich mit dem Overhead durch die evaluation des Abhängigkeits­Graph zu tun. 
+Einerseits können durch direkte Kapselung von loops die Allozierung und Erstellung 
+von Mengen Vektoren gespart werden. Der Abhängigkeits­Graph benötigt durch seine 
+Polymorphe­Natur viele Switch­Statements um zwischen den verschiedenen Funktionen 
+die  einen  Wert  erzeugen  dynamisch  zu  unterschieden.  Dies  fällt  bei  einer  direkten 
+Implementierung weg. Dazu kann dadurch der Generationsalgorithmus könnte stärker 
+durch den Compiler optimiert werden.
+
+5.4 Nutzerfreundlichkeit
+
+Durch  den  grafischen  Editor  kann  der  Generationsprozess  als  Abhängigkeits­Graph 
+visualisiert und direkt manipuliert werden. Dadurch lassen sich komplexe Zusammen­
+hänge zwischen einzelnen Operationen häufig leichter nachvollziehen als in klassischem 
+Quellcode, da Datenflüsse und Abhängigkeiten explizit dargestellt sind.
+
+Insbesondere  bei  der  experimentellen  Entwicklung  von  Generationsalgorithmen  kann 
+dieser Ansatz Vorteile bieten. Änderungen am Graphen können direkt im Editor vorge­
+nommen werden, ohne dass der gesamte Algorithmus neu implementiert werden muss. In 
+Kombination mit der minimalen Neuberechnung des Generators können Anpassungen 
+am Generationsprozess schnell getestet werden, da nur die betroffenen Teile der Welt 
+neu berechnet werden.
+
+Gleichzeitig hängt die wahrgenommene Nutzerfreundlichkeit stark vom jeweiligen Nut­
+zertyp  ab.  Nutzer  mit  viel  Erfahrung  in  klassischer  Softwareentwicklung  bevorzugen 
+häufig  eine  direkte  Implementierung  in  Quellcode,  da  diese  mehr  Kontrolle  bietet 
+und weniger strukturelle Einschränkungen besitzt. Für weniger erfahrene Nutzer oder 
+für Anwender, die primär konzeptionell arbeiten möchten, kann ein grafischer Editor 
+hingegen zugänglicher sein. Die visuelle Darstellung der Abhängigkeiten erleichtert das 
+Verständnis des Systems und erlaubt es, Generationslogik zu definieren, ohne sich stark 
+mit  den  Details  einer  Programmiersprache  beschäftigen  zu  müssen.  Allerdings  kann 
+ein  solcher  Editor  auch  einschränkend  wirken,  da  nur  die  im  System  vorgesehenen 
+Operationen und Strukturen genutzt werden können.
+
+Insgesamt bietet der grafische Ansatz insbesondere für komplexe prozedurale Systeme 
+Vorteile,  da  er  eine  bessere  Übersicht  über  den  Generationsprozess  ermöglicht  und 
+
+23
+
+iterative  Änderungen  am  Algorithmus  erleichtert,  während  klassische  Code­basierte 
+Ansätze weiterhin mehr Flexibilität für erfahrene Entwickler bieten.
+
+5.5 Erweiterbarkeit
+
+Um das System um weitere Operationen oder oder Datentype zu erweitern ist ein gutes 
+Verständnis der Codestruktur benötigt. Jedoch sind keine grundlegenden Änderungen 
+nötigt. Der Editor, das Template und der Generator stellen keine Erwartungen an die 
+Art der Datentypen oder Operationen im Abhängigkeits Graph. Die Datentypen und 
+Operationen sind mit Typed Unions implement daher können diese einfach erweitert 
+werden. Jedoch muss die neue Variation an jeder Stelle wo ein Datentyp oder Operation 
+allgemein  verwendet  wird  implementiert  werden  um  sie  in  das  bestehende  Netz  an 
+möglichen Abhängigkeiten zu intrigieren.
+
+24
 
 6 Future Work
 
 6.1 Nullwerte führen zu leeren Lösungen
 
 Da  der  Null  Wert  per  definition  eine  valider  Wert  ist  kann  es  dazu  kommen,  dass 
-sich ein Abhängigkeits-Kreis zu null als Lösung entwickelt, auch wenn es theoretisch 
+sich ein Abhängigkeits­Kreis zu null als Lösung entwickelt, auch wenn es theoretisch 
 andere Lösungen gebe. Um dies zu lösen müsste ein anderer Ansatz zur Lösung von 
-Abhängigkeits-Kreisen genutzt werden.
+Abhängigkeits­Kreisen genutzt werden.
 
 Arbeiten in Richtung closely connected Components in Verbindung könnten hier eine 
 Lösung sein.
 
 6.2 Andere Datenstrukturen
 
-Wie schon in Abschnitt 4.7.4 beschrieben eignen sich CSGs nicht zum direkten rende-
+Wie schon in Abschnitt 4.6.4 beschrieben eignen sich CSGs nicht zum direkten rende­
 ring. Die Umwandlung zu einem Mesh mit „marching cubes“ ist aufwendig und mehr 
 wesentlich mehr Leistung benötigen, als die Generation selbst. Somit besteht weiterhin 
 die  Forschungsfrage  in  wie  weit  minimale  Neuberechnung  von  prozeduralen  Meshen 
 möglich ist.
 
-19
+6.3 Nutzerfreundlichkeitsstudie
 
-Bibliografie
+Die  Nutzerfreundlichkeit  des  Systems  wurde  in  dieser  Arbeit  bisher  nur  qualitativ 
+betrachtet.  Eine  fundierte  Bewertung  sollte  durch  strukturierte  Nutzerstudien  oder 
+Experteninterviews ergänzt werden. Dabei wäre insbesondere interessant, wie Nutzer 
+mit  unterschiedlichem  Erfahrungshintergrund  mit  dem  grafischen  Editor  umgehen. 
+Erfahrene Entwickler könnten den Editor als zu einschränkend empfinden, da nur die im 
+System vorgesehenen Operationen genutzt werden können, während weniger erfahrene 
+Nutzer  von  der  visuellen  Darstellung  der  Abhängigkeiten  profitieren  könnten.  Ein 
+konkreter Ansatz zur Verbesserung der Nutzerfreundlichkeit wäre die Einführung von 
+aussagekräftigen Fehlermeldungen und Warnungen im Editor. Aktuell gibt das System 
+wenig Rückmeldung darüber, warum ein bestimmter Generationsschritt fehlschlägt oder 
+ein unerwartetes Ergebnis liefert. Eine bessere Visualisierung des Generationsprozesses, 
+beispielsweise durch das Hervorheben von Knoten die neu berechnet werden, könnte dem 
+Nutzer helfen nachzuvollziehen welche Teile der Welt von einer Änderung betroffen sind.
 
-[1] P. Merrell, „Example-based model synthesis“, in Proceedings of the 2007 Symposium 
-on Interactive 3D Graphics and Games, in I3D '07. Seattle, Washington: Association 
-for Computing Machinery,  2007, S. 105–112. doi: 10.1145/1230100.1230119.
+6.4 Parallelisierung der Generierung
+
+In der aktuellen Implementation werden unabhängige Knoten im Abhängigkeitsgraph 
+sequenziell abgearbeitet. Da Knoten desselben Levels keine gegenseitigen Abhängigkei­
+ten haben, könnten diese grundsätzlich parallel berechnet werden. Eine systematische 
+Parallelisierung der Levelweise Berechnung könnte die Generierungszeit bei komplexen 
+Algorithmen mit vielen unabhängigen Operationen erheblich reduzieren. Dabei müsste 
+jedoch sichergestellt werden, dass Schreibzugriffe auf den Generator­Graphen thread­
+sicher sind, ohne dabei zu viel Overhead durch Synchronisation zu erzeugen.
+
+25
+
+6.5 Automatische Cache-Optimierung
+
+Aktuell muss der Nutzer manuell entscheiden, welche Knoten im Abhängigkeitsgraph 
+gecacht  werden  sollen.  Diese  Entscheidung  hat  direkten  Einfluss  auf  die  Balance 
+zwischen Speicherverbrauch und Neuberechnungszeit. Ein zu sparsames Caching führt 
+dazu, dass bei Änderungen viele Knoten neu berechnet werden müssen, während ein zu 
+großzügiges Caching unnötig viel Speicher verbraucht und den Overhead erhöht.
+
+Ein interessanter Forschungsansatz wäre ein System, das diese Entscheidung automa­
+tisch  trifft.  Dazu  könnte  der  Generator  zur  Laufzeit  messen,  wie  häufig  ein  Knoten 
+wiederverwendet wird und wie aufwendig seine Berechnung ist. Basierend auf diesen 
+Metriken  könnte  das  System  dynamisch  entscheiden,  welche  Knoten  gecacht  werden 
+sollen. Ein solcher Ansatz würde die Nutzerfreundlichkeit erheblich verbessern, da der 
+Nutzer sich nicht mehr mit den Details der Cache­Verwaltung beschäftigen müsste.
+
+6.6 Skalierung auf sehr große Welten
+
+Die vorliegende Arbeit evaluiert das System anhand vergleichsweise kleiner Beispielwel­
+ten. Es bleibt offen, wie das System mit sehr großen Welten skaliert, die aus tausenden 
+gleichzeitig aktiver Chunks und sehr tiefen Abhängigkeitsgraphen bestehen. Insbeson­
+dere die Größe des Generator­Graphen 𝐺gen wächst direkt mit der Anzahl der generierten 
+Elemente. Bei sehr großen Welten könnte dies zu erheblichem Speicherverbrauch und 
+längeren  Traversierungszeiten  führen.  Zukünftige  Arbeiten  sollten  untersuchen,  ab 
+welcher Weltgröße der Overhead des Systems die Vorteile der minimalen Neuberechnung 
+überwiegt, und ob Optimierungen wie das selektive Entladen inaktiver Graphbereiche 
+diesen Grenzwert verschieben können.
+
+6.7 Integration in bestehende Engines
+
+Ein  erklärtes  Ziel  dieser  Arbeit  ist  es,  das  System  in  eine  Spiel­  oder  Simulations­
+Engine einbettbar zu gestalten. Eine konkrete Evaluation dieser Integration steht jedoch 
+noch aus. Zukünftige Arbeiten sollten untersuchen, welche Schnittstellen eine Engine 
+bereitstellen muss und welcher Integrationsaufwand in bestehende Engines wie Unity 
+oder Unreal Engine entsteht. Dabei sind insbesondere die Synchronisation zwischen dem 
+Generator und dem Render­Thread sowie die Übergabe extern kontrollierter Variablen 
+wie Kameraposition oder Spielzustand relevante Fragestellungen.
+
+6.8 Serialisierung und Persistenz
+
+In der aktuellen Implementation existieren gecachte Zwischenergebnisse nur im Arbeits­
+speicher  und  gehen  beim  Beenden  der  Anwendung  verloren.  Für  einen  praktischen 
+Einsatz wäre es jedoch wünschenswert, den Zustand des Generator­Graphen auf Disk 
+zu persistieren. So könnten bereits berechnete Teile der Welt beim nächsten Start der 
+Anwendung  wiederverwendet  werden,  ohne  sie  vollständig  neu  berechnen  zu  müssen. 
+Dabei stellen sich Fragen zur effizienten Serialisierung großer Graphstrukturen sowie zur 
+
+26
+
+Invalidierung gespeicherter Ergebnisse, wenn sich das Template zwischen zwei Sitzungen 
+geändert hat.
+
+27
+
+7 Bibliografie
+
+[1] P. Merrell, „Example­based model synthesis“, in Proceedings of the 2007 Symposi­
+um on Interactive 3D Graphics and Games, in I3D '07. Seattle, Washington: Asso­
+ciation for Computing Machinery,  2007, S. 105–112. doi: 10.1145/1230100.1230119.
 
 [2] V.  Volz,  J.  Schrum,  J.  Liu,  S.  M.  Lucas,  A.  Smith,  und  S.  Risi,  „Evolving 
 Mario Levels in the Latent Space of a Deep Convolutional Generative Adversarial 
@@ -1037,50 +1351,98 @@ in  Proceedings  of  the  20th  International  Conference  on  the  Foundations 
 Digital  Games,  in  FDG  '25.:  Association  for  Computing  Machinery,    2025.  doi: 
 10.1145/3723498.3723845.
 
-[4] O.  Withington  und  L.  Tokarchuk,  „Compressing  and  Comparing  the  Generative 
-Spaces of Procedural Content Generators“, in 2022  IEEE  Conference  on  Games 
+[4] O. Withington und L. Tokarchuk, „Compressing and Comparing the Generative 
+Spaces of Procedural Content Generators“, in 2022 IEEE Conference on Games 
 (CoG),  2022, S. 143–150. doi: 10.1109/CoG51982.2022.9893615.
 
-[5] A.  Goslin,  „Terrain  Diffusion:  A  Diffusion-Based  Successor  to  Perlin  Noise  in 
-Infinite,  Real-Time  Terrain  Generation“.  [Online].  Verfügbar  unter:  https://arxiv.
+[5] A.  Goslin,  „Terrain  Diffusion:  A  Diffusion­Based  Successor  to  Perlin  Noise  in 
+Infinite, Real­Time Terrain Generation“. [Online]. Verfügbar unter: https://arxiv.
 org/abs/2512.08309
 
-[6] J. Whitehead u. a., „Conversational Interactions with Procedural Generators using 
-Large Language Models“, in Proceedings of the 20th International Conference on the 
-Foundations of Digital Games, in FDG '25.: Association for Computing Machinery,  
-2025. doi: 10.1145/3723498.3723788.
+[6] B.  Bollobás,  Modern  Graph  Theory.  Springer  New  York,  2013.  doi: 
 
-[7] B.  Bollobás,  Modern  Graph  Theory.  Springer  New  York,  2013.  doi: 
+10.1007/978­1­4612­0619­4.
 
-10.1007/978-1-4612-0619-4.
-
-[8] A. A. G. Requicha und H. B. Voelcker, „Constructive Solid Geometry“, Rochester, 
+[7] A. A. G. Requicha und H. B. Voelcker, „Constructive Solid Geometry“, Rochester, 
 
 NY, USA, technical report, 1977.
 
-[9] B.  Wassermann,  S.  Kollmannsberger,  T.  Bog,  und  E.  Rank,  „From  geometric 
+[8] B.  Wassermann,  S.  Kollmannsberger,  T.  Bog,  und  E.  Rank,  „From  geometric 
 design to numerical analysis: A direct approach using the Finite Cell Method on 
 Constructive Solid Geometry“, Computers &amp; Mathematics with Applications, 
 Bd. 74, Nr. 7, S. 1703–1726, Okt. 2017, doi: 10.1016/j.camwa.2017.01.027.
 
-Text
+[9] O. Peters, „slotmap: A Rust library for stable keys and values“. [Online]. Verfügbar 
 
-Text
+unter: https://crates.io/crates/slotmap
 
-TODO: Text
+[10] C. A. R. Hoare, „Communicating Sequential Processes“, Communications of the 
 
-Text
+ACM, Bd. 21, Nr. 8, S. 666–677, 1978, doi: 10.1145/359576.359585.
 
-Idee:
+[11] smol­rs  developers,  „async­channel:  Async  multi­producer  multi­consumer  chan­
 
-ToDo:
+nel“. [Online]. Verfügbar unter: https://docs.rs/async­channel
 
-Frage:
+[12] S. P. Developers, „smallvec: A vector that can store a small number of elements 
 
-𝐴 = 𝜋
+inline“. [Online]. Verfügbar unter: https://crates.io/crates/smallvec
 
-20
+[13] J. Amanatides und A. Woo, „A Fast Voxel Traversal Algorithm for Ray Tracing“, 
 
-(1)
+Proceedings of EuroGraphics, Bd. 87, S. , 1987.
+
+[14] S. Laine und T. Karras, „Efficient Sparse Voxel Octrees“, IEEE Transactions on 
+Visualization  and  Computer  Graphics,  Bd.  17,  Nr.  8,  S.  1048–1059,  2011,  doi: 
+10.1109/TVCG.2010.240.
+
+28
+
+[15] W. E. Lorensen und H. E. Cline, „Marching cubes: A high resolution 3D surface 
+construction algorithm“, SIGGRAPH Comput. Graph., Bd. 21, Nr. 4, S. 163–169, 
+Aug. 1987, doi: 10.1145/37402.37422.
+
+29
+
+Nummer
+
+Behn
+
+Maarten
+
+Minimale Neuberechnung Abhängigkeits­Graph basierter Regeln zur prozeduralen
+
+Welten­Generation.
+
+X
+
+X
+
+X
+
+X
+
+8.1 Nutzung KI basierte Anwendungen
+
+Neuronale Large Language Modells wurden zur Erstellung dieser Arbeit in Folgenden 
+Bereichen verwendet:
+
+• In der Recherche: Um einen Überblick über den Stand der Technik zu bekommen 
+und Arbeiten zu finden die ich noch nicht kannte habe ich mir Empfehlungen für 
+bestehende Arbeiten generien lassen.
+
+• Rechtschreib­  und  Satzbaukorrektur:  Eine  von  mir  verfasste  roh  Fassung  wurde 
+von KI auf Rechtschreibung­ und Satzbaukorrigiert. Dabei habe ich genau darauf 
+geachtet sich der Inhalt vorgeschlagener Anpassung nicht geändert hat.
+
+Bereiche in den keine KI verwendet wurden ist:
+
+• Programmierung: Es wurde keine KI verwendet um dem Code meiner Implementa­
+
+tion zu schreiben.
+
+• Text Inhalte: KI wurde nicht verwendet um den Inhalt der Arbeit zu bestimmen.
+
+33
 
 

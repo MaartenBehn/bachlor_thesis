@@ -1,12 +1,17 @@
 
 == Noise & Zufälligkeit <noise_based_generation>
 
-Ein sehr verbreiteter Ansatz zur prozeduralen Generierung von Welten basiert auf der Verwendung von Noise-Algorithmen. Typischerweise werden hierfür kontinuierliche Noise-Algorithmen wie Perlin-Noise oder Simplex-Noise verwendet. Daher wird die Struktur der generierten Welt nicht durch explizite Regeln beschrieben, sondern ergibt sich aus einer überlagerung meherer Noise Funktionen mit unterschiedlichen Frequenzen und Amplituden.
+Viele prozedurale Generatoren nutzen Noise-Algorithmen um Welten zu erzeugen. 
+Die Grundidee ist, mehrere Noise-Funktionen wie Perlin-Noise oder Simplex-Noise mit unterschiedlichen Frequenzen und Amplituden zu überlagern. 
+Ein Berg entsteht zum Beispiel durch eine Noise-Funktion mit niedriger Frequenz und hoher Amplitude, während kleinere Details wie Steine durch eine Funktion mit hoher Frequenz und niedriger Amplitude hinzugefügt werden. 
+Die Struktur der Welt ergibt sich also nicht aus expliziten Regeln, sondern aus dem Zusammenspiel dieser Funktionen.
 
-Noise-basierte Verfahren sind relativ leicht zu implementieren und skalieren gut auf große Welten. Aus diesem Grund werden sie häufig in Spielen und Simulationssystemen eingesetzt, insbesondere zur Generierung von Gelände, Vegetation oder anderen natürlichen Strukturen.
+Der praktische Vorteil ist, dass sich dieser Ansatz leicht implementieren lässt und gut auf große Welten skaliert. 
+Minecraft nutzt zum Beispiel Perlin-Noise um sein Gelände und Höhlen effizient zu generieren.
 
-Ein wesentlicher Nachteil von rein zufallsbasierten Generationsverfahren besteht darin, dass komplexe strukturelle Regeln nur schwer garantiert werden können. Da die schwer vorher zu sagen ist wie die Noise Funktionen in sonder Fällen zusammen spielen, ist es schwierig sicherzustellen, dass bestimmte globale oder semantische Anforderungen immer erfüllt werden.
+Das Problem ist, dass sich mit Noise-Funktionen nur schwer globale Bedingungen garantieren lassen. 
+Ob ein generiertes Gelände zum Beispiel immer einen zugänglichen Weg zwischen zwei Punkten hat, lässt sich aus den Noise-Funktionen allein nicht bestimmen. 
+Solche Regeln müssen im im späteren Generations Schritten überprüft und die Welt gegeben Falls angepasst werden. 
+Jedoch werden in vielen Generations Systemen diese Fehler einfach akzeptiert wenn sie nur selten auftauchen.
 
-Dies kann dazu führen, dass in seltenen Fällen unerwünschte oder fehlerhafte Strukturen entstehen, beispielsweise unzugängliche Bereiche, unnatürliche Geländeformationen oder inkonsistente Weltstrukturen. Solche Probleme lassen sich häufig nur durch zusätzliche heuristische Korrekturen oder nachträgliche Validierungsschritte beheben.
-
-Ein weiterer Nachteil im Kontext dieser Arbeit ist, dass die Regeln der Generierung implizit in der komposition der Noise Funktionen enthalten ist. Wenn der Algorithmus verändert wird, ist es daher schwierig zu bestimmen, welche Teile einer bereits generierten Welt noch gültig sind und welche neu berechnet werden müssen.
+Für minimale Neuberechnung sind Noise-basierte Verfahren besonders ungeeignet, da theoretische jede Noise Ebene einfluss auf jedes Ergebniss hat. Die Generierungslogik steckt implizit in der Komposition der Funktionen. Ändert man eine Funktion oder ihre Parameter, kann dies eine Komplett andere Welt bedeuten.

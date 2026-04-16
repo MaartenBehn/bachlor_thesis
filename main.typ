@@ -75,6 +75,10 @@
 
 #include "./5_evaluation/future_work.typ"
 
+= Fazit
+
+#include "./6_conclusion/conclusion.typ"
+
 #show bibliography: set heading(numbering: "1")
 #bibliography("citations.bib")
 

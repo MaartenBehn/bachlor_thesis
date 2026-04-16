@@ -1,29 +1,29 @@
 #import "../layout/ba.typ": *
 
-== L-Systems
+== Graph Grammatiken
+Eine Graph Grammatik ist ein System aus Regeln die beschreiben wie ein Graph verändert werden kann. 
+Jede Regel besteht aus zwei Teilen: einem Teilgraph der gesucht wird, und einem Teilgraph der ihn ersetzt. 
+Durch wiederholtes Anwenden solcher Regeln kann aus einem kleinen Startgraph eine komplexe Struktur wachsen. 
+Zum Beispiel kann aus einem einzelnen Knoten durch Regeln wie „füge zwei Kindknoten hinzu" ein ganzer Baum entstehen.
 
-L-Systems (Lindenmayer-Systeme) sind ein regelbasiertes Verfahren zur Beschreibung und Generierung komplexer Strukturen. Sie wurden ursprünglich  zur Modellierung biologischer Wachstumsprozesse entwickelt und werden heute häufig in der prozeduralen Generierung natürlicher Strukturen eingesetzt, beispielsweise für Pflanzen, Bäume oder Korallen.
+=== L-Systems
+L-Systems sind eine frühe Anwendung dieser Idee, entwickelt in den 1960ern vom Biologen Aristid Lindenmayer um Pflanzenwachstum zu modellieren. 
+Statt auf einem Graphen arbeiten sie auf einer Sequenz von Symbolen. 
+In jedem Schritt werden alle Symbole gleichzeitig durch die passende Regel ersetzt. 
+Ein Startsymbol F könnte die Regel haben „ersetze F durch F[+F][-F]", wobei + und - für eine Drehung stehen. 
+Nach wenigen Iterationen entsteht so eine verzweigte Struktur die wie ein Baum aussieht.
 
-Ein L-System besteht im Kern aus einem Alphabet von Symbolen, einem Startsymbol, und einer Menge an Produktionsregeln.
+L-Systems eignen sich gut für Vegetation, weil natürliche Strukturen oft selbstähnlich sind. 
+Ein Ast sieht aus wie ein kleiner Baum, ein Zweig wie ein kleiner Ast. 
+Mit wenigen Regeln lassen sich so sehr organisch wirkende Formen erzeugen.
 
-Die Produktionsregeln definieren, wie jedes Symbol durch eine Folge anderer Symbole ersetzt wird. Ausgehend vom Startsymbol wird in jedem Iterationsschritt jedes Symbol gemäß den definierten Regeln ersetzt. Dadurch entsteht schrittweise eine immer längere Symbolsequenz.
-Nach mehreren Iterationen entsteht eine lange Symbolfolge, die anschließend interpretiert werden kann. 
+===  Graph based Model Synthesis
+Graph based Model Synthesis erweitert das Konzept von Graph Grammatiken in dem die Regeln diese selbstständig aus einem Beispiel errechnet werden. 
+Ein bestehendes Modell das in kleine Strukturelemente zerlegt wird. 
+Daraus werden Regeln abgeleitet wie Teilgraphen ersetzt werden dürfen. 
+Durch wiederholtes Anwenden dieser Regeln entstehen neue Modelle welches lokal den gleichen Regeln wie das Beispiel hat, aber global aber eine andere Struktur haben kann.
+Im Vergleich zu L-Systems können Regeln hier auf beliebige Graphstrukturen verweisen und komplexere räumliche Bedingungen beschreiben. Außerdem ist das Verfahren nicht auf lineare Symbolsequenzen beschränkt, was es für dreidimensionale Strukturen besser eignet.
 
-Ein wesentlicher Vorteil von L-Systems ist ihre Fähigkeit, mit wenigen Regeln sehr komplexe und selbstähnliche Strukturen zu erzeugen. Besonders fraktalartige Formen und verzweigte Strukturen wie Pflanzen lassen sich damit sehr kompakt beschreiben.
-
-Ein Nachteil von L-Systems besteht darin, dass sie primär auf rekursiven Ersetzungsregeln basieren und daher weniger flexibel für die Beschreibung allgemeiner struktureller Abhängigkeiten sind. Die erzeugten Strukturen folgen strikt den definierten Produktionsregeln, wodurch es schwierig sein kann, globale Einschränkungen oder komplexe Interaktionen zwischen entfernten Teilen der Struktur zu modellieren.
-
-Ein weiterer Aspekt im Kontext dieser Arbeit ist, dass Änderungen an den Produktionsregeln typischerweise eine vollständige Neuberechnung aller Iterationen erfordern. Da jede Iteration auf der vorherigen basiert, können Änderungen an einer Regel potenziell die gesamte erzeugte Struktur beeinflussen. Dadurch eignet sich dieser Ansatz nur eingeschränkt für Szenarien, in denen eine minimale Neuberechnung nach Änderungen des Generationsalgorithmus angestrebt wird.
-
-== Graph based Model Synthesis 
-
-Die Arbeit Graph based Model Synthesis verbindet die Idee von Graph Grammatiken und Model-Synthesis.  
-
-Die Grundidee besteht darin, dass Generationsregeln nicht direkt auf einer expliziten Geometrie arbeiten, sondern auf dem zugrunde liegenden Graphen angewendet werden. Eine Regel beschreibt dabei eine Transformation eines Teilgraphen in einen anderen Teilgraphen. Durch wiederholte Anwendung solcher Regeln kann ein initialer Graph schrittweise erweitert oder verändert werden.
-
-Ein Beispiel für diesen Ansatz ist die Verwendung von Graph-Grammatiken zur prozeduralen Modellierung von Polygonmodellen. Dabei wird ein bestehendes Modell zunächst in eine Menge kleiner Strukturelemente zerlegt. Aus diesen Elementen wird anschließend eine Menge von Regeln abgeleitet, die beschreiben, wie lokale Graphstrukturen miteinander kombiniert werden dürfen. Durch wiederholte Anwendung dieser Regeln können neue Modelle erzeugt werden, die lokal ähnliche Strukturen wie das ursprüngliche Beispiel aufweisen.
-
-Ein Vorteil dieses Ansatzes ist, dass komplexe strukturelle Zusammenhänge explizit im Graphen dargestellt werden. Dadurch können Generationsregeln sehr präzise definieren, unter welchen Bedingungen eine Transformation erlaubt ist. Gleichzeitig lassen sich globale Strukturen einfacher kontrollieren als bei rein stochastischen Verfahren wie Noise-basierten Methoden.
-
-Ein Nachteil besteht jedoch darin, dass die Definition geeigneter Graphregeln häufig aufwendig ist und ein gutes Verständnis der zugrunde liegenden Datenstruktur erfordert. Außerdem kann die Anwendung vieler Transformationsregeln auf großen Graphen zu einem hohen Rechenaufwand führen.
+=== Minimale Neuberechnung
+Keiner dieser Ansätze unterstützt minimale Neuberechnung. Bei L-Systems baut jede Iteration direkt auf der vorherigen auf. Eine Regeländerung macht damit alle folgenden Iterationen ungültig, unabhängig davon wie klein die Änderung war. Bei Graph based Model Synthesis ist das Problem ein anderes: Die Regeln werden aus einem Beispiel abgeleitet und beschreiben lokale Nachbarschaftsbedingungen. Ändert sich eine Regel, ist nicht klar welche Teile des generierten Modells diese Bedingung noch erfüllen, ohne die gesamte Struktur neu zu prüfen. In beiden Fällen fehlt eine explizite Darstellung welche Teile des Ergebnisses von welchen Regeln abhängen. Genau das ist jedoch die Voraussetzung für minimale Neuberechnung.
 

@@ -103,7 +103,7 @@
   )
   #set par(leading: paragraphSpacing, first-line-indent: 0em, justify: true, hanging-indent: 0em, spacing: 1em)
   #set text(font: "New Computer Modern", size: fontSize, lang: "de")
-  #show raw: set text(font: "New Computer Modern Mono")
+  //#show raw: set text(font: "New Computer Modern Mono")
   #show heading: set block(above: 1.4em, below: 1em)
   #show outline.entry.where(level: 1): entry => { strong(entry) }
   #show: thmrules.with(qed-symbol: $square$)
