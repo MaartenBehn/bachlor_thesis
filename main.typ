@@ -720,13 +720,38 @@ Bei großen Welten mit vielen Details kann $b_f$ wesentlich größer als 2 sein 
 
 == Reduktion der Neuberechnungszeit
 
+#import "@preview/lilaq:0.6.0" as lq
+
 Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark sich die Laufzeit im Vergleich zu einer vollständigen Neugenerierung reduziert. 
 
 #ba_image("../assets/full.png", 100%, [])
 #ba_image("../assets/full_graph.png", 100%, [])
 
-#todo("Analyse")
+#figure(lq.diagram(
+  lq.hviolin(
+    (15, 18, 16, 14, 18, 23, 20, 21, 17, 21),
+    (11, 17, 16, 18, 22, 18, 14, 18, 17),
+    (5, 4.5, 6.1, 5.4, 4, 5, 5.8, 4.6, 6),
+    (4, 5, 4.9, 7.7, 4.6, 4.4, 9, 4.5, 5.3, 5.5),
+    y: (4, 3, 2, 1),
+    trim: false,
+    extrema: false,
+    boxplot: none,
+  ),
+  xlabel: [Neuberechnungszeit (ms)],
+  ylabel: [Stelle im Graph],
+),
+  caption: [Unterschied der Neuberechnungszeit zwischen verschiedenen geänderten Stellen im Graph]
+)
 
+Stellen: 
+- 4 ganz linke Box2D Node
+- 3 mittlere Path2D Node
+- 2 untere Disk Node 
+- 1 Sphere Node der Baum Krone auf der rechten Seite
+
+In diesem Beispiel sieht man das Neuberechnungszeit nicht linear abfällt, sonder alle Änderungen wo die Wege und Bäume neu berechnet werden müssen im Durchschnitt 17ms benötigen wohin Änderungen die nur das finale Volumen betreffen um Durchschnitt 5ms benötigen.
+Somit lässt sich davon ausgehen das die Berechnung der Wege und Bäume ca. 12ms benötigt, welche weg fallen wenn die zwischengespeicherten Daten verwendet werden.
 
 == Overhead
 
