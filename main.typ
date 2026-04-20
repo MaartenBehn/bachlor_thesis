@@ -98,6 +98,8 @@ Eine theoretische Möglichkeit bestünde darin, den Raum der möglichen Werteerw
 
 Der Vorteil des ursprünglichen Model-Synthesis-Algorithmus liegt darin, dass zu jedem Zeitpunkt alle noch möglichen Kombinationen eine valide Lösung darstellen. Das Finden einer minimalen Erweiterung dieser Mengen, die nach einer Regeländerung wieder eine gültige Lösung ermöglicht, ist jedoch deutlich schwieriger als die ursprüngliche Generierung selbst. 
 
+#todo("Überarbeiten")
+
 == Graph Grammatiken
 Eine Graph Grammatik ist ein System aus Regeln, die beschreiben, wie ein Graph verändert werden kann. 
 Jede Regel besteht aus zwei Teilen: einem Teilgraph, der gesucht wird, und einem Teilgraph, der ihn ersetzt. 
@@ -133,6 +135,8 @@ In Arbeiten wie @evolvingmariolevels @Level_Generation_with_Constrained_Expressi
 Dabei wird in @evolvingmariolevels ein Level-Generations-Model gegen ein Spieler-Agent-Modell, welches die "Spielbarkeit" eines Levels bewertet, trainiert. 
 Dieser Ansatz ist in dem meisten Fällen in der Lage, spielbare Levels zu generieren. Vereinzelt werden jedoch Generationsartefakte, zum Beispiel unerreichbare Plattformen oder auch komplett leere Bereiche, erzeugt.
 Dazu muss gesagt werden, dass die oben genannten Paper "nur" die simplen und zahlreich vorhandenen 2D-Welten des Spiels "Super Mario" als Trainingsdatensätze heranziehen. Offen ist, ob der vorgestellte Ansatz auch in neueren und komplexeren Spielen funktioniert. 
+
+#todo("Namen der Paper?")
 
 === Terrain Diffusion
 
@@ -191,6 +195,7 @@ Ein einzelner Knoten wird als $v in V$ und eine einzelne Kante als $e in E$ gesc
 
 Eine Kante ist ein Tuple zweier Knoten $e := (v_a, v_b)$. 
 In dieser Arbeit sind Kanten grundsätzlich gerichtet und werden dann auch als $arrow(v_a v_b)$ geschrieben.
+#todo("Nicht genutzt")
 
 Die Menge aller eingehenden bzw. ausgehender Kanten eines Knoten $v$ wird als $E^-_G (v)$ und $E^+_G (v)$ geschrieben.
 
@@ -199,6 +204,7 @@ da sie als die Nachbarn von diesem Knoten verstanden werden.
 
 Diese Notationen basieren auf den Notationen in "Modern Graph Theory" von Béla Bollobás @modern_graph_theory.
 
+#todo("Kinder erklären")
 
 == Constructive Solid Geometry (CSG)
 
@@ -362,7 +368,7 @@ Sie nutzen die Abhängigkeiten im Template, um herauszufinden wie die Welt neu g
 
 Der Generator enthält einen Graphen $G_"gen"$, der dem Cache-Graphen $G_"ch"$ im Template entspricht.
 Jeder Knoten $v_"gen" in V(G_"gen")$ speichert, welchem Knoten $v_"ch" in V(G_"ch")$ er entspricht $v_"ch" = $ *cache*$(v_"gen")$.
-Dazu hat ein Knoten $v_"gen" in V(G_"gen")$ das (?gleiche?) Level wie sein Cache-Template-Knoten $l(v_"gen") = l($*cache*$(v_"gen"))$.
+Dazu hat ein Knoten $v_"gen" in V(G_"gen")$ das gleiche Level wie sein Cache-Template-Knoten $l(v_"gen") = l($*cache*$(v_"gen"))$.
 
 Jedoch wenn $G_"ch"$ nur einen Knoten pro Operation enthält, enthält $G_"gen"$ einen Knoten pro Ergebnis, welches errechnet werden muss. 
 
@@ -373,7 +379,7 @@ $
 "pop"(Q_"tasks") := min_(q in Q_"tasks") (l(q))
 $
 
-Berechnungs-Aufträge ermitteln das Ergebnis eines Knoten in $G_"gen"$. Kind-Update-Aufträge erzeugen oder löschen Kinder (?Wort?), bis ihre Anzahl für das Template geeignet ist.
+Berechnungs-Aufträge ermitteln das Ergebnis eines Knoten in $G_"gen"$. Kind-Update-Aufträge erzeugen oder löschen Kinder #itodo("Erklären was Kinder sind?"), bis ihre Anzahl für das Template geeignet ist.
 
 === Abhängigkeiten-Werte im Generator-Graph finden
 
@@ -386,13 +392,14 @@ Um nun für einen Knoten $v_"gen" in V(G_"gen")$ alle weitern Knoten zu finden, 
 werden die relativen Schritte in $G_"ch"$ ausgehend vom Erstellungsknoten $v_c$ hin zu den weiteren abhängigen Knoten als Baum gespeichert $T_"rel" (v_"gen")$.
 
 Ein relativer Schritt $v_"step"$ gibt an, dass man 
-beginnend bei einem Knoten $v in V(G_"ch")$ entweder hoch (?aufwärts?) (*up*($v_"step"$) = True) in einen Knoten $v_"up" in V(G_"ch")$ gehen soll, von dem $v$ abhängt ($v_"up" in N^-_G_"ch" (v)$),  oder runter (?abwärts?) (*up*($v_"step"$) = False) in einen Knoten $v_"down" in V(G_"ch")$, der von $v$ abhängt ($v_"down" in N^+_G_"ch" (v)$). 
+beginnend bei einem Knoten $v in V(G_"ch")$ entweder aufwärts (*up*($v_"step"$) = True) in einen Knoten $v_"up" in V(G_"ch")$ gehen soll, von dem $v$ abhängt ($v_"up" in N^-_G_"ch" (v)$),  oder abwärts (*up*($v_"step"$) = False) in einen Knoten $v_"down" in V(G_"ch")$, der von $v$ abhängt ($v_"down" in N^+_G_"ch" (v)$). 
 
 Da ein Knoten $v in V(g_"ch")$ mehr als einen eingehenden oder ausgehenden Nachbarn haben kann, speichert ein relativer Schritt auch, in welchen Nachbarn gegangen werden soll (*cache*($v_"step"$)). Ein relativer Schritt Speicher weiterhin, ob dieser Nachbar eine Abhängigkeit für $v_"gen"$ ist (*deps*($v_"step"$) = True).
 
 Jeder relative Schritt $v_"step"$ speichert auch, in welche der Nachbarknoten gegangen werden soll. 
+#todo("Das macht kein Sinn")
 
-Diese relativen Schritte nutzen (?berücksichtigen?) nur Knoten, die ein kleineres Level als $v_"gen"$ haben. 
+Diese relativen Schritte verwenden nur Knoten, die ein kleineres Level als $v_"gen"$ haben. 
 Da im Generator Knoten im Level in aufsteigender Reihenfolge erstellt werden, ist so sichergestellt, dass alle relativen Wege existieren.
 
 Für einen Knoten im Template kann es mehrere Knoten im Generator geben. Daher können dort pro Abhängigkeit eines Cache-Knoten 
@@ -447,14 +454,14 @@ auch mehrere Knoten gefunden werden.
 
 === Kind-Update-Aufträge
 
-Kind-Update-Aufträge enthalten den Index des Erstellungsknoten und den Index eines Erstellungseintrags $E_"create" (v_"ch")$ in dessen Template-Knoten (?gehört "in dessen Template-Knoten" hierher oder eher direkt hinter "Kind-Update-Aufträge?).
+Kind-Update-Aufträge enthalten den Index des Erstellungsknoten und den Index eines Erstellungseintrags $E_"create" (v_"ch")$ in dessen Template-Knoten. 
 
 Dieser Erstellungseintrag definiert, wie viele Kinder es geben soll *num*$(v_"ch", v_"gen creates")$. 
 Dies sind entweder genau $n$ pro Erstellungsknoten oder hängen von dem Wert des Erstellungsknotens $v_"gen creates"$ ab, 
 wie z.B. einer Positionsmenge.
 Dazu gibt *valid*$(v_"gen", v_"gen creates")$ an, ob ein Kind $v_"gen"$ für den Erstellungsknoten $v_"gen creates"$ noch valide ist, also ob beispielsweise eine Position noch in der Menge an Positionen ist. 
 
-Daraufhin wird die vorhandene Menge an Kindern mit der gewünschten Menge verglichen. Bei Ungleichheit werden neue Kinderknoten (?oder muss es hier auch "Kinder" heißen wie oben im Kap. Generator?) erzeugt oder gelöscht. 
+Daraufhin wird die vorhandene Menge an Kindern mit der gewünschten Menge verglichen. Bei Ungleichheit werden neue Kinderknoten erzeugt oder gelöscht. 
 
 Wenn eine neuer Knoten erzeugt wird, werden mit dem Baum an relativen Schritten die Indizes aller abhängige Knoten gesucht und im Knoten gespeichert.
 #block(
@@ -534,8 +541,8 @@ Wenn eine neuer Knoten erzeugt wird, werden mit dem Baum an relativen Schritten 
     })
   }))
 
-=== Errechnungs Aufträge 
-Errechnungs Aufträge (?Berechnungsaufträge?) ermitteln den Wert eines Knotens $v_"gen" in V(G_"gen")$ neu. 
+=== Berechnungs-Aufträge 
+Berechnungs-Aufträge ermitteln den Wert eines Knotens $v_"gen" in V(G_"gen")$ neu. 
 Dabei wird der Knoten im Abhängigkeits-Graph rekursiv errechnet.
 
 Wenn der Algorithmus auf einen Knoten $v_"ab" in V(G_"ab")$ stößt, welcher einen Cache-Knoten hat $v_"ab" in V(G_"ch")$, werden die Werte der jeweiligen abhängigen Knoten von $v_"gen"$ verwendet. 
@@ -550,7 +557,7 @@ So kann der Abhängigkeitsgraph iterativ gelöst werden.
 Pro Kreis im Abhängigkeits-Graph wird eine Kante als durchgeschnitten markiert 
 $N^+_"cut" (v) subset.eq N^+_G_"dep" (v) quad v in V(G_"dep")$.
 Der Abhängigkeitsgraph ohne die durchtrennte Kanten 
-$N^+_"not cut" (v) := N^+_G_"dep" (v) without N^+_"cut" (v)$ ist ein DAG (!in Klammern einmal ausschreiben!). 
+$N^+_"not cut" (v) := N^+_G_"dep" (v) without N^+_"cut" (v)$ ist ein DAG (Directed Acyclic Graph). 
 Folglich kann jedem Knoten ein Level $l(v)$ zu geordnet werden. 
 $
   l(v) > l(v_i) quad forall v_i in N^+_"not cut" (v)
@@ -560,9 +567,9 @@ Die Knoten werden Level für Level erzeugt. So wird sichergestellt, dass alle ni
 Hat ein Knoten geschnittene Abhängigkeiten, werden diese für das Errechnen genutzt, sofern sie existieren. Andernfalls wird der Nullwert verwendet. Jeder Knoten, der Nullwerte für seine geschnittenen Abhängigkeiten nutzt, wird erneut errechnet, sobald alle Knoten einmal errechnet wurden. Dies wird so oft wiederholt, bis keine Nullwerte mehr verwendet werden.
 
 
-== Implementation (?besser: Implementierung, weil sie den Prozess anstatt das Ergebnis meint?)
+== Implementierung
 
-Für die Beispiel-Implementation (?...?) habe ich Rust als Programmiersprache gewählt, da sie erlaubt, speichersicheren Lowlevel-Code zu schreiben, um die Laufzeit von Algorithm effektiv zu verbessern. Zudem hat sie einen (im Gegensatz zu C++) umfassenden und einfach zu nutzenden Package-Manager.  
+Für meine Implementierung habe ich Rust als Programmiersprache gewählt, da sie erlaubt, speichersicheren Lowlevel-Code zu schreiben, um die Laufzeit von Algorithm effektiv zu verbessern. Zudem hat sie einen (im Gegensatz zu C++) umfassenden und einfach zu nutzenden Package-Manager.  
 
 === Stabile Listen
 Alle Graphen sind mit stabilen Listen implementiert.
@@ -583,32 +590,28 @@ Stabile Listen ermöglichen es, Graphen effizient als Listen darzustellen, indem
 
 Der Collapser sowie die Sampling-Operationen werden in asynchronen Workern ausgeführt. Für die Kommunikation werden Channel verwendet. @channels_theory & @async_channel
 
-Der Composer läuft im Render Thread und errechnet bei jeder Änderung das aktuelle Template. Dieses wird über einen Channel zum Collapser gesendet. Wenn der Channel noch ein altes Template enthält, werden die Änderungsnotizen zum alten Template dem neuen Template hinzugefügt. Danach wird das Template wird ersetzt. 
+Der Editor läuft im Render Thread und errechnet bei jeder Änderung das aktuelle Template. Dieses wird über einen Channel zum Generator gesendet. Der Generator vergleicht sein aktuelles Template mit dem neuen. Berechnet alle benötigten Änderungen an der Welt und speichert das neue Template als sein aktuelles.
 
 Die errechnete CSG-Darstellung der Welt wird mit einem weiteren Channel an die Sampler gesendet, welche die CSG-Darstellung in ein Voxel DAG oder Mesh umrechnen und auf die GPU transferieren. 
 
-Sobald die neue Welt hochgeladen wurde, wird der Render Thread über einen Channel über diese Änderung informiert. 
-
 === Small Vectors
 
-Für die Zwischenspeicherung der Werte werden Small Vectors verwendet. Diese haben die Eigenschaft, dass die ersten N Elemente direkt auf dem Stack alloziert werden. Sobald diese voll sind, wird ein Array auf dem Stack alloziert. 
+Für die Zwischenspeicherung der Werte werden Small Vectors verwendet. Diese haben die Eigenschaft, dass die ersten N Elemente direkt auf dem Stack alloziert werden. Sobald diese voll sind, wird ein Array auf dem Heap alloziert. 
 
-Alle Werte müssen hierbei als Liste behandelt werden, da ein Knoten für seinen Input immer von mehreren Knoten abhängt. Jedoch enthält diese Liste meist nur ein Element. Small Vectoren erlauben es, für diese Fälle, auf das Allozieren des Stack zu verzichten, und bieten eigene bessere Cache-Lokalitäten. @smallvec_crate
+Alle Werte müssen hierbei als Liste behandelt werden, da ein Knoten für einen Input immer von mehreren Knoten abhängen kann. Jedoch enthält diese Liste meist nur ein Element. Small Vectoren erlauben es, für diese Fälle, auf das Allozieren des Heap zu verzichten, und bieten eigene bessere Cache-Lokalitäten. @smallvec_crate
 
 === Output Datenstruktur <output_datastructure>
 
 Der Kernkonzept, einen sehr großen Graphen, der einen prozeduralen Algorithmus darstellt, zu bearbeiten, indem man die Abhängigkeiten in einem vergleichbaren kleineren Template nutzt, enthält keine konkreten Annahmen über die Art der Geometrie. In meiner Implementation habe ich CSG genutzt, da es einer sehr allgemeine Form ist, Volumen darzustellen, und diese zudem leicht zu bearbeiten sind.
 
-Aber gerade CSGs mit vielen Knoten sind jedoch nicht performant zu rendern. Deshalb können sie in meiner Implementation entweder als Sparse Voxel DAGs oder mit Marching Cubes gesampled (!bitte anderes Wort!) werden.
+Aber gerade CSGs mit vielen Knoten sind jedoch nicht performant zu rendern. Deshalb können sie in meiner Implementation entweder als Sparse Voxel DAGs oder mit Marching Cubes diskretisiert werden.
 
-Voxel-Datenstrukturen können relativ effizient mit Ray Marching geraytraced (!bitte anderes Wort!) werden. @dda @nvidia_octree
-
+Voxel-Datenstrukturen können relativ effizient mit Ray Marching gerendert werden. @dda @nvidia_octree
 Mit Hilfe von Marching Cubes kann ein CSG als Mesh approximiert werden. @marching_cubes
-
 
 == Beispiele 
 
-Im Folgenden werden mehrere Beispiele vorgestellt, die die Funktionen (?Funktionsweise?) des Systems demonstrieren. 
+Im Folgenden werden mehrere Beispiele vorgestellt, die die Funktionsweise des Systems demonstrieren. 
 Dabei wird zuerst in minimalen Beispielen gezeigt, wie das System Teile der generierten Welt wiederverwenden kann. Danach wird eine komplexe Welt vorgestellt, welche den Umfang des Systems veranschaulicht.
 
 === Nur finales Volumen neu errechnen
