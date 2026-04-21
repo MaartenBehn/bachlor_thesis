@@ -332,27 +332,20 @@ Einige der Operationen, die ich implementiert habe, sind:
 
 === Generation eines Templates <generation_of_template>
 
-#todo("Dieses Kapitel solltest du neu aufbauen und die Aussagen in eine nachvollziehbare Reihenfolge bringen: Das Wichtigste zuerst, dann Einzelheiten und Schritte usw., dann Besonderheiten")
+Die Operationen, ein Gitter oder zufällige Positionen zu berechnen, erzeugen eine Menge an Werten (mehrere Positionen). 
+Operationen die diese Mengen verwenden können entweder die Operationen auf die gesamte Menge an wenden, zum Beispiel eine Filter Operation, 
+oder wenden die Operationen auf jedes einzelne Element an separat an. 
+Zum Beispiel platziere an jede Position ein Baum.
 
-Operationen im Abhängigkeits-Graph $G_"ab"$ können auch Mengen an Werten erzeugen. 
-In meiner Implementierung sind dies die beiden Operationen, die einerseits ein Gitter und andererseits zufällige Positionen in einem Volumen errechnen.
+Die Fähigkeit weitere Operationen pro Element auszuführen, ermöglicht es, iterativ immer feiner werdende Details zu generieren 
 
-Es kann vorkommen, dass die weiteren Operationen nicht auf der ganzen Menge, sondern pro Element ausgeführt werden sollen. 
-Dieser Schritt im prozeduralen Algorithmus ermöglicht es, iterativ immer feiner werdende Details zu generieren.
-
-Zu Beispiel errechnet man eine Menge an Positionen an den Apfelbäume stehen sollen 
-und dann generiert man pro Baum die Positionen der Äpfel.
-
-#todo("ganzen Absatz nochmal prüfen, Beispiel im Zweifel weglassen")
-
-In meinem System arbeiten alle Algorithmen nur auf den Knoten des Templates. (Begründung ergänzen: ...)
-
-Dies führt zu einem klaren Unterschied in der Laufzeit von Algorithmen auf dem Template im Vergleich zu Algorithmen auf der generierten Welt. 
+In meinem System arbeiten alle Algorithmen nur auf den Knoten des Templates. 
+Denn Algorithmen auf dem Template haben einen klaren Laufzeit Unterschied zu Algorithmen auf der generierten Welt. 
 Die Menge an Knoten im Abhängigkeits-Graphen und so auch im Cache-Graphen skaliert mit der Menge an Operationen des Generationsalgorithums.
 Wobei die Menge der Elemente in der generierten Welt mit den Größen der Mengen an rechneten Werten skaliert.
-In anderen Worten: Alle Knoten im Template zu iterieren, ist relativ schnell möglich. Hingegen kann die Laufzeit exponentiell ansteigen, wenn alle Elemente in der Welt zu iterieren sind. 
+In anderen Worten: Alle Knoten im Template zu iterieren, ist relativ schnell möglich. Hingegen kann die Laufzeit exponentiell ansteigen, wenn alle Elemente in der Welt zu iterieren werden. 
 
-Sie nutzen die Abhängigkeiten im Template, um herauszufinden wie die Welt neu generiert werden muss. 
+Daher werden die Abhängigkeiten im Template verwendet, um herauszufinden wie die Welt neu generiert werden muss. 
 
 == Generator
 
@@ -615,7 +608,7 @@ Wenn nun die Form oder Größe der Baumkrone verändert wird, betrifft diese Än
   caption: [Trees],
 ) <fig-trees>
 
-#todo("Update Image")
+#todo("Besseres Bild")
 
 === Extern kontrollierte Variable
 
@@ -636,10 +629,10 @@ Darüber hinaus können auch Variablen genutzt werden, die von Spielständen abh
 Extern kontrollierte Variablen ermöglichen es daher, das System nicht nur für statische Änderungen am Generationsalgorithmus einzusetzen, sondern auch für dynamische Änderungen, auf die Spieler reagieren können.
 
 == Insel-Beispiel
-Dies ist ein komplexeres Beispiel welches den Umfang meiner Implementierung darstellt. 
 
 #ba_image("../assets/full.png", 100%, [])
 
+Dies ist ein komplexeres Beispiel welches den Umfang meiner Implementierung darstellt. 
 In einem rechteckigen Generationsbereich, werden in regelmäßigen Abständen Inseln plaziert. 
 Auf jeder Insel werden eine Menge an zufälligen Kreuzungs-Punkte generiert. 
 Kreuzungs-Punkte die in der Nähe von einander sind werden mit zufällig verlaufenden Wegen verbunden. 
