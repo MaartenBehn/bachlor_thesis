@@ -679,25 +679,53 @@ Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark s
 #ba_image("../assets/full.png", 100%, [])
 #ba_image("../assets/full_graph.png", 100%, [#itodo("Stellen einzeichnen")])
 
-#figure(lq.diagram(
-  lq.hviolin(
-    (15, 18, 16, 14, 18, 23, 20, 21, 17, 21),
-    (11, 17, 16, 18, 22, 18, 14, 18, 17),
-    (5, 4.5, 6.1, 5.4, 4, 5, 5.8, 4.6, 6),
-    (4, 5, 4.9, 7.7, 4.6, 4.4, 9, 4.5, 5.3, 5.5),
-    y: (4, 3, 2, 1),
-    extrema: false,
-    boxplot: none,
+#figure(
+  grid(
+    columns: 1,        
+    rows: 2,         
+    gutter: 0.8cm, 
+    lq.diagram(
+      lq.hviolin(
+        (15, 18, 16, 14, 18, 23, 20, 21, 17, 21),
+        (11, 17, 16, 18, 22, 18, 14, 18, 17),
+        (5, 4.5, 6.1, 5.4, 4, 5, 5.8, 4.6, 6),
+        (4, 5, 4.9, 7.7, 4.6, 4.4, 9, 4.5, 5.3, 5.5),
+        y: (4, 3, 2, 1),
+        extrema: false,
+        boxplot: none,
+      ),
+      title: [Insel-Beispiel (Generationsvolumen: $2000^2$m)],
+      xlabel: [Neuberechnungszeit (ms)],
+      ylabel: [Geänderte Stelle],
+      yaxis: (
+        ticks: range(1, 5).zip(([D], [C], [B], [A])),
+        subticks: none,
+      ),
+      width: 100%,
+    ),
+    lq.diagram(
+      lq.hviolin(
+        (547, 541, 580, 543, 470, 569, 496, 523),
+        (535, 527, 518, 544, 553, 512, 562, 470),
+        (239, 243, 235, 228, 229, 232, 223, 221, 227, 234),
+        (223, 227, 228, 224, 224, 224, 229, 237, 221),
+        y: (4, 3, 2, 1),
+        extrema: false,
+        boxplot: none,
+      ),
+      title: [Insel-Beispiel (Generationsvolumen: $20000^2$m)],
+      xlabel: [Neuberechnungszeit (ms)],
+      ylabel: [Geänderte Stelle],
+      yaxis: (
+        ticks: range(1, 5).zip(([D], [C], [B], [A])),
+        subticks: none,
+      ),
+      width: 100%,
+    ),
+    v(0cm)
   ),
-  title: [Insel-Beispiel (Generationsvolumen: $2000^2$m)],
-  xlabel: [Neuberechnungszeit (ms)],
-  ylabel: [Stelle im Graph],
-   yaxis: (
-    ticks: range(1, 5).zip(([D], [C], [B], [A]))
-  ),
-  width: 100%,
-),
-  caption: [Unterschied der Neuberechnungszeit zwischen verschiedenen geänderten Stellen im Graph]
+  caption: [Unterschied der Neuberechnungszeit zwischen verschiedenen geänderten Stellen im Graph],
+  placement: auto,
 )
 
 Stellen: 
@@ -709,26 +737,6 @@ Stellen:
 In diesem Beispiel sieht man das Neuberechnungszeit nicht linear abfällt, sonder alle Änderungen wo die Wege und Bäume neu berechnet werden müssen im Durchschnitt 17ms benötigen wohin Änderungen die nur das finale Volumen betreffen um Durchschnitt 5ms benötigen.
 Somit lässt sich davon ausgehen das die Berechnung der Wege und Bäume ca. 12ms benötigt, welche weg fallen wenn die zwischengespeicherten Daten verwendet werden.
 
-#figure(lq.diagram(
-  lq.hviolin(
-    (547, 541, 580, 543, 470, 569, 496, 523),
-    (535, 527, 518, 544, 553, 512, 562, 470),
-    (239, 243, 235, 228, 229, 232, 223, 221, 227, 234),
-    (223, 227, 228, 224, 224, 224, 229, 237, 221),
-    y: (4, 3, 2, 1),
-    extrema: false,
-    boxplot: none,
-  ),
-  title: [Insel-Beispiel (Generationsvolumen: $20000^2$m)],
-  xlabel: [Neuberechnungszeit (ms)],
-  ylabel: [Stelle im Graph],
-   yaxis: (
-    ticks: range(1, 5).zip(([D], [C], [B], [A]))
-  ),
-  width: 100%,
-),
-  caption: [Unterschied der Neuberechnungszeit zwischen verschiedenen geänderten Stellen im Graph]
-)
 
 
 == Overhead
@@ -737,25 +745,28 @@ Ein weiteres wichtiges Kriterium ist der Overhead des Systems. Da der Generation
 - die Verwaltung und Modifikation der Graphstruktur,
 - das rekursive Auflösen der Abhängigkeiten während der Berechnung.
 
-Hierfür wurde das Beispiel #itodo("Name") in zwei weiteren Versionen implementiert. 
+Hierfür wurde zwei weiteren Versionen des Insel-Beispiels implementiert. 
 
-#figure(lq.diagram(
-  lq.hviolin(
-    (434, 546, 401, 489, 627, 598, 587, 577, 533, 490, 550, 460, 547, 541, 580, 543, 470, 569, 496, 523),
-    (533, 490, 550, 460, 547, 541, 580, 490, 532, 567, 568, 450, 423, 589, 532,  598, 587, 577, 533, 542),
-    (100, 112, 160, 98, 77, 102, 110, 90, 130),
-    y: (3, 2, 1),
-    extrema: false,
-    boxplot: none,
+#figure(
+  lq.diagram(
+    lq.hviolin(
+      (434, 546, 401, 489, 627, 598, 587, 577, 533, 490, 550, 460, 547, 541, 580, 543, 470, 569, 496, 523),
+      (533, 490, 550, 460, 547, 541, 580, 490, 532, 567, 568, 450, 423, 589, 532,  598, 587, 577, 533, 542),
+      (100, 112, 160, 98, 77, 102, 110, 90, 130),
+      y: (3, 2, 1),
+      extrema: false,
+      boxplot: none,
+    ),
+    title: [Insel-Beispiel (Generationsvolumen: $20000^2$m)],
+    xlabel: [Berechnungszeit (ms)],
+    yaxis: (
+      ticks: range(1, 4).zip(([direkt implementiert], [ohne Generator], [mein System])),
+      subticks: none,
+    ),
+    width: 100%,
   ),
-  title: [Insel-Beispiel (Generationsvolumen: $20000^2$m)],
-  xlabel: [Berechnungszeit (ms)],
-  yaxis: (
-    ticks: range(1, 4).zip(([direkt implementiert], [ohne Generator], [mein System]))
-  ),
-  width: 100%,
-),
-  caption: [Unterschied der Berechnungszeit zwischen meinem System hinzu einer direkten Implementierung]
+  caption: [Unterschied der Berechnungszeit zwischen meinem System hinzu einer direkten Implementierung],
+  placement: top,
 )
 
 In der ersten würde die Generator-Graph-Verwaltungs-Logik entfernt. Hier wird der Abhängigkeits-Graph direkt evaluatiert ohne Zwischenspeicher anzulegen oder zu verwalten. 
@@ -764,7 +775,7 @@ Dies hat wahrscheinlich Folgende Gründe:
 Die in Zwischenspeicher genutzten Mengen müssen bei der evaluation des Graphs eh angelegt werden und werden in diesem Fall nur wieder deallokiert anstatt weiterhin gespeichert zu bleiben.
 
 Als zweites wurde eine Version des Generationsalgorithmus ohne Abhängigkeits-Graph direkt implementiert. 
-Diese Version ist ca. $5 - 6$x schneller als das Beispiel. 
+Diese Version ist ca. $4 - 6$x schneller als das Beispiel. 
 Dies hat wahrscheinlich mit dem Overhead durch die evaluation des Abhängigkeits-Graph zu tun. 
 Einerseits können durch direkte Kapselung von loops die Allozierung und Erstellung von Mengen Vektoren gespart werden.  
 Der Abhängigkeits-Graph benötigt durch seine Polymorphe-Natur viele Switch-Statements um zwischen den verschiedenen Funktionen die einen Wert erzeugen dynamisch zu unterschieden. Dies fällt bei einer direkten Implementierung weg. 
@@ -866,7 +877,7 @@ In dieser Arbeit wurde gezeigt, dass minimale Neuberechnung für prozedurale Gen
 Die Beispielimplementation zeigt, dass sich ein Generationsalgorithmus als Abhängigkeitsgraph darstellen lässt und Zwischenergebnisse gezielt wiederverwendet werden können. Ändert sich ein Teil des Algorithmus, müssen nur die betroffenen Knoten neu berechnet werden.
 
 Jedoch da der Algorithmus als Graph interpretiert wird statt direkt als kompilierten Code ausgeführt zu werden, ist er deutlich langsamer als eine direkte Implementierung. 
-In den Benchmarks war eine optimierte direkte Implementierung etwa 5 - 6x schneller. Dieser Overhead entsteht vor allem durch das rekursive Auflösen der Abhängigkeiten und die polymorphe Natur des Graphen.
+In den Benchmarks war eine optimierte direkte Implementierung etwa 4 - 6x schneller. Dieser Overhead entsteht vor allem durch das rekursive Auflösen der Abhängigkeiten und die polymorphe Natur des Graphen.
 Dazu kommt, dass der Aufwand zur Implementierung aller benötigten Operationen und Datentypen. 
 
 Trotzdem bietet mein Ansatz mein ein graphisches Interface um Prozedurale Generationsalgorithen interaktiv zu entwickeln. 
