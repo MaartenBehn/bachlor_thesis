@@ -167,89 +167,79 @@ Beide Systeme sind jedoch auf die interaktive Erstellung einzelner Assets ausgel
 Zudem sind sie geschlossene Programme, die nicht darauf ausgelegt sind, in eine Spiel- oder Simulations-Engine eingebettet zu werden. 
 Das in dieser Arbeit vorgestellte System ist aber genau dafür konzipiert. Der Generationsalgorithmus soll in der Umgebung iterativ weiterentwickelt werden können und Änderungen in einer bereits bestehenden Welt sollen unmittelbar sichtbar werden.
 
+
 = Theoretische Grundlagen 
 
-Dieses Kapitel beschreibt die technischen Konzepte, auf denen das in dieser Arbeit vorgestellte System aufbaut. 
-Dazu gehören Lazy Computation als Grundprinzip der minimalen Neuberechnung, 
+Dieses Kapitel beschreibt die technischen Konzepte, auf denen das in dieser Arbeit vorgestellte System basiert. 
+Dazu zählen Lazy Computation als Grundprinzip der minimalen Neuberechnung, 
 Graphen als zentrale Datenstruktur, Constructive Solid Geometry zur Darstellung von Geometrie sowie Grafische Programmierung als Grundlage des Editors.
 
 == Minimales Berechnen (Lazy computation)
 
-Minimales Berechnen (englisch: lazy computation) beschreibt die Idee in Computerprogrammen die Daten erst dann zu berechnen, wenn sie benötigt werden. 
+Minimales Berechnen (englisch: lazy computation) beschreibt die Idee, in Computerprogrammen Daten erst dann zu berechnen, wenn sie benötigt werden.
 
-Es reduziert Lag-spikes gerade beim starten eines neuen Prozesses, da Anstatt alle nutzbaren Daten nur die, die gerade angefragt benötigt werden errechnet werden.  
+Es reduziert Lag-Spikes, insbesondere beim Starten eines neuen Prozesses, da anstatt alle nutzbaren Daten nur jene berechnet werden, die aktuell benötigt werden.  
 
-In Funktionale Programmiersprachen wie Haskell findet dieses Konzept vie Anwendung und erlaubt für unendliche Datenstrukturen. 
-
+In funktionalen Programmiersprachen wie Haskell findet dieses Konzept viel Anwendung und erlaubt die Nutzung unendlicher Datenstrukturen. 
 
 == Graphen
 
-Die Datenstrukturen in dieser Arbeit basieren auf mathematische Graphen. 
+Die Datenstrukturen in dieser Arbeit basieren auf mathematischen Graphen. 
+Daher erklärt dieser Abschnitt die hier genutzten Notationen.
 
-Daher erklärt dieser Abschnitt die in der weiteren Arbeit genutzten Notationen.
-
-Ein Graph $G := (V, E)$ ist besteht aus einer Menge an Knoten $V$ und einer Menge an Kanten $E$.
-Die Funktionen $V(G) = V$ und $E(G) = E$ werden als verkürzte Notationen genutzt. 
+Ein Graph G := (V, E) besteht aus einer Menge von Knoten V und einer Menge von Kanten E.
+Die Funktionen V(G) = V und E(G) = E werden als verkürzte Notationen verwendet.
 
 Ein einzelner Knoten wird als $v in V$ und eine einzelne Kante als $e in E$ geschrieben.
 
-Eine Kante ist ein Tuple zweier Knoten $e := (v_a, v_b)$. 
-In dieser Arbeit sind Kanten grundsätzlich gerichtet und werden dann auch als $arrow(v_a v_b)$ geschrieben.
-#todo("Nicht genutzt")
+Eine Kante ist ein Tupel zweier Knoten $e := (v_a, v_b)$. 
+In dieser Arbeit sind Kanten grundsätzlich gerichtet von $v_a$ nach $v_b$.
 
-Die Menge aller eingehenden bzw. ausgehender Kanten eines Knoten $v$ wird als $E^-_G (v)$ und $E^+_G (v)$ geschrieben.
+Die Menge aller eingehenden bzw. ausgehender Kanten eines Knoten $v$ wird als $E^-_G (v)$ bzw. $E^+_G (v)$ geschrieben.
 
-Die Menge aller Knoten die eine eingehende bzw. ausgehende Kante zu einem Knoten haben werden als $N^-_G (v)$ und $N^+_G (v)$ geschrieben, 
-da sie als die Nachbarn von diesem Knoten verstanden werden.
+Die Menge aller Knoten, die eine eingehende bzw. ausgehende Kante zu einem Knoten haben, wird als $N^-_G (v)$ und $N^+_G (v)$ beschrieben, da sie als die Nachbarn dieses Knotens verstanden werden.
+In "directed acyclic graphs" (DAG) und damit auch Bäumen werden ausgehende Nachbarn $N^+_G (v)$ auch Kinder eines Knoten genannt.
 
-Diese Notationen basieren auf den Notationen in "Modern Graph Theory" von Béla Bollobás @modern_graph_theory.
-
-#todo("Kinder erklären")
+Die Notationen basieren auf den Notationen in "Modern Graph Theory" von Béla Bollobás @modern_graph_theory.
 
 == Constructive Solid Geometry (CSG)
 
-Constructive Solid Geometry (CSG) ist eine Methode zur Darstellung von Volumen, bei der komplexe Geometrien durch die Kombination primitiver Geometry (Box, Kugel, etc) dargestellt wird.
+Constructive Solid Geometry (CSG) ist eine Methode zur Darstellung von Volumen, bei der komplexe Geometrien durch die Kombination primitiver Geometrien (Box, Kugel etc.) dargestellt werden.
 
-Diese Kombination sind standartmäßig Vereinigung, Schnittmenge und Differenz, wurden jedoch in späteren Arbeiten mit komplexeren Operationen,
-wie Verformung, Duplikation, etc erweitert.
+Diese Kombinationen umfassen standardmäßig Vereinigung, Schnittmenge und Differenz, wurden jedoch in späteren Arbeiten um komplexere Operationen wie Verformung und Duplikation erweitert.
 
-CSGs werden als directed acyclic graph (DAG) gespeichert. 
-Jede Knoten is eine implizierte Operation auf den Volumen der Kinder. 
-Die Blätter sind dahingegen durch Parameter definierte primitive Geometrien.
+CSG werden als "directed acyclic graph" (DAG) gespeichert. 
+Jeder Knoten ist eine implizite Operation auf den Volumen der Kindknoten. Die Blätter sind dahingegen durch Parameter definierte primitive Geometrien.
 
-Der Vorteil dieser Darstellung ist, dass Geometrie über Parameter und Operationen beschrieben wird. Änderungen an Position, Größe oder anderen Parametern wirken sich direkt auf das resultierende Volumen aus, ohne dass die gesamte Geometrie neu definiert werden muss.
+Der Vorteil dieser Darstellung ist, dass die Geometrie über Parameter und Operationen beschrieben wird. Änderungen von Positionen, Größen oder anderen Parametern wirken sich unmittelbar auf das resultierende Volumen aus, ohne dass die gesamte Geometrie neu definiert werden muss.
 
-Jedoch eignen sich CSGs selten zum direkten rendering mit raytracing, da die Operationen zu leistungsaufwendig sind um mit jeden Ray den DAG 
-zu rekursiv zu iterieren. Dazu steigt die Größe des DAGs schnell mit der Komplexität des CSGs. 
-@csg_original @csg_advanced
+Jedoch eignen sich CSG selten zum direkten Rendering mit Raytracing, da die Operationen zu leistungsaufwendig sind, um mit jedem Ray den DAG rekursiv zu iterieren. Zudem wächst die Größe des DAGs schnell mit der Komplexität der CSG-Repräsentation. @csg_original @csg_advanced
 
 
 == Grafische-Programmierung
 
-Grafische-Programmierung ist eine From der Programmierung bei der Logik nicht als Code definiert ist sonder als Diagram 
-in einem grafischen Editor. Funktionen werden als Knoten mit Input und Output dargestellt.
-Dies können mit Linien verbunden werden um logische Abfolgen zu definieren. 
+Grafische Programmierung ist eine Form der Programmierung, bei der Logik nicht als Code definiert ist, sondern als Diagramm in einem grafischen Editor. Funktionen werden als Knoten mit Input und Output dargestellt. Diese können mit Linien verbunden werden, um logische Abfolgen zu definieren. 
 
-Grafische-Programmierung erlaubt ein besseren überblick über Programmabschnitte 
-und ist durch seinen invitieren Syntax Einsteigerfreundlicher.
+Grafische Programmierung gibt einen besseren Überblick über Programmabschnitte und ist durch ihren intuitiven Syntax 
+leichter für Leihen zu verstehen.
 
-Grafische-Programme ausgeführt werden indem die Operationen als Graph dargestellt werden. 
-Dieser kann vergleichbar zu Funktionenprogrammiersparchen rekursiv gelöst werden. 
+Grafische Programme werden ausgeführt, indem die Operationen als Graph dargestellt werden. 
+Dieser kann, vergleichbar mit funktionalen Programmiersparchen, rekursiv gelöst werden. 
 
-Jedoch ist es auch möglich einen Grafische-Programme in Code zu übersetzen und Maschinen-Code zu kompilieren.
-Dies kann massive Leistungsvorteile haben.
+Jedoch ist es auch möglich, grafische Programme in Code zu übersetzen und zu Maschinencode zu kompilieren. Dies kann große Leistungsvorteile bringen.
 
-Populäre Programme in den Grafische-Programmierung verwendet wird, sind Unity Shader Graphs, Unreal Engine Templates und Blender Geometry Nodes. 
+Populäre Programme, in denen grafische Programmierung verwendet wird, sind Unity Shader Graphs, Unreal Engine Templates und Blender Geometry Nodes. 
 
 #ba_image("./../assets/Shader Graph.png", 100%, [ Der grafischen Editor von Unity Shader Graph ])
+
 
 
 = Mein Lösungsansatz
 
 Dieses Kapitel beschreibt, wie das Ziel, die Neuberechnungszeit zu verkürzen, erreicht werden kann. Die Komponenten des Systems werden vorgestellt und zentrale Algorithmen werden erklärt.
-Weiterhin werden Besonderheiten im System sowie mögliche Probleme diskutiert. 
+Weiterhin werden Besonderheiten des Systems sowie mögliche Probleme diskutiert. 
 
-Mein Lösungsansatz beschreibt, wie prozedurale Generierung strukturiert sein sollte, damit das System automatisch erkennt, welche Teile der Welt es bei einer Änderungen im Algorithmus neu berechnen muss.
+Mein Lösungsansatz beschreibt, wie prozedurale Generierung strukturiert sein sollte, damit das System automatisch erkennt, welche Teile der Welt es bei einer Änderung im Algorithmus neu berechnen muss.
 Dafür wird der Algorithmus als Abhängigkeitsgraph modelliert. 
 
 
@@ -687,7 +677,7 @@ Bei großen Welten mit vielen Details kann $b_f$ wesentlich größer als 2 sein 
 Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark sich die Laufzeit im Vergleich zu einer vollständigen Neugenerierung reduziert. 
 
 #ba_image("../assets/full.png", 100%, [])
-#ba_image("../assets/full_graph.png", 100%, [])
+#ba_image("../assets/full_graph.png", 100%, [#itodo("Stellen einzeichnen")])
 
 #figure(lq.diagram(
   lq.hviolin(
@@ -696,24 +686,50 @@ Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark s
     (5, 4.5, 6.1, 5.4, 4, 5, 5.8, 4.6, 6),
     (4, 5, 4.9, 7.7, 4.6, 4.4, 9, 4.5, 5.3, 5.5),
     y: (4, 3, 2, 1),
-    trim: false,
     extrema: false,
     boxplot: none,
   ),
+  title: [Insel-Beispiel (Generationsvolumen: $2000^2$m)],
   xlabel: [Neuberechnungszeit (ms)],
   ylabel: [Stelle im Graph],
+   yaxis: (
+    ticks: range(1, 5).zip(([D], [C], [B], [A]))
+  ),
+  width: 100%,
 ),
   caption: [Unterschied der Neuberechnungszeit zwischen verschiedenen geänderten Stellen im Graph]
 )
 
 Stellen: 
-- 4 ganz linke Box2D Node
-- 3 mittlere Path2D Node
-- 2 untere Disk Node 
-- 1 Sphere Node der Baum Krone auf der rechten Seite
+- A ganz linke Box2D Node
+- B mittlere Path2D Node
+- C untere Disk Node 
+- D Sphere Node der Baum Krone auf der rechten Seite
 
 In diesem Beispiel sieht man das Neuberechnungszeit nicht linear abfällt, sonder alle Änderungen wo die Wege und Bäume neu berechnet werden müssen im Durchschnitt 17ms benötigen wohin Änderungen die nur das finale Volumen betreffen um Durchschnitt 5ms benötigen.
 Somit lässt sich davon ausgehen das die Berechnung der Wege und Bäume ca. 12ms benötigt, welche weg fallen wenn die zwischengespeicherten Daten verwendet werden.
+
+#figure(lq.diagram(
+  lq.hviolin(
+    (547, 541, 580, 543, 470, 569, 496, 523),
+    (535, 527, 518, 544, 553, 512, 562, 470),
+    (239, 243, 235, 228, 229, 232, 223, 221, 227, 234),
+    (223, 227, 228, 224, 224, 224, 229, 237, 221),
+    y: (4, 3, 2, 1),
+    extrema: false,
+    boxplot: none,
+  ),
+  title: [Insel-Beispiel (Generationsvolumen: $20000^2$m)],
+  xlabel: [Neuberechnungszeit (ms)],
+  ylabel: [Stelle im Graph],
+   yaxis: (
+    ticks: range(1, 5).zip(([D], [C], [B], [A]))
+  ),
+  width: 100%,
+),
+  caption: [Unterschied der Neuberechnungszeit zwischen verschiedenen geänderten Stellen im Graph]
+)
+
 
 == Overhead
 
@@ -723,13 +739,32 @@ Ein weiteres wichtiges Kriterium ist der Overhead des Systems. Da der Generation
 
 Hierfür wurde das Beispiel #itodo("Name") in zwei weiteren Versionen implementiert. 
 
+#figure(lq.diagram(
+  lq.hviolin(
+    (434, 546, 401, 489, 627, 598, 587, 577, 533, 490, 550, 460, 547, 541, 580, 543, 470, 569, 496, 523),
+    (533, 490, 550, 460, 547, 541, 580, 490, 532, 567, 568, 450, 423, 589, 532,  598, 587, 577, 533, 542),
+    (100, 112, 160, 98, 77, 102, 110, 90, 130),
+    y: (3, 2, 1),
+    extrema: false,
+    boxplot: none,
+  ),
+  title: [Insel-Beispiel (Generationsvolumen: $20000^2$m)],
+  xlabel: [Berechnungszeit (ms)],
+  yaxis: (
+    ticks: range(1, 4).zip(([direkt implementiert], [ohne Generator], [mein System]))
+  ),
+  width: 100%,
+),
+  caption: [Unterschied der Berechnungszeit zwischen meinem System hinzu einer direkten Implementierung]
+)
+
 In der ersten würde die Generator-Graph-Verwaltungs-Logik entfernt. Hier wird der Abhängigkeits-Graph direkt evaluatiert ohne Zwischenspeicher anzulegen oder zu verwalten. 
 Diese Änderunge reduziert zwar die Menge an Code signifikant jedoch hat keine großen Auswirkungen auf die Laufzeit. 
 Dies hat wahrscheinlich Folgende Gründe: 
 Die in Zwischenspeicher genutzten Mengen müssen bei der evaluation des Graphs eh angelegt werden und werden in diesem Fall nur wieder deallokiert anstatt weiterhin gespeichert zu bleiben.
 
 Als zweites wurde eine Version des Generationsalgorithmus ohne Abhängigkeits-Graph direkt implementiert. 
-Diese Version ist ca. $3 - 6$x schneller als das Beispiel. 
+Diese Version ist ca. $5 - 6$x schneller als das Beispiel. 
 Dies hat wahrscheinlich mit dem Overhead durch die evaluation des Abhängigkeits-Graph zu tun. 
 Einerseits können durch direkte Kapselung von loops die Allozierung und Erstellung von Mengen Vektoren gespart werden.  
 Der Abhängigkeits-Graph benötigt durch seine Polymorphe-Natur viele Switch-Statements um zwischen den verschiedenen Funktionen die einen Wert erzeugen dynamisch zu unterschieden. Dies fällt bei einer direkten Implementierung weg. 
@@ -831,7 +866,7 @@ In dieser Arbeit wurde gezeigt, dass minimale Neuberechnung für prozedurale Gen
 Die Beispielimplementation zeigt, dass sich ein Generationsalgorithmus als Abhängigkeitsgraph darstellen lässt und Zwischenergebnisse gezielt wiederverwendet werden können. Ändert sich ein Teil des Algorithmus, müssen nur die betroffenen Knoten neu berechnet werden.
 
 Jedoch da der Algorithmus als Graph interpretiert wird statt direkt als kompilierten Code ausgeführt zu werden, ist er deutlich langsamer als eine direkte Implementierung. 
-In den Benchmarks war eine optimierte direkte Implementierung etwa 3 - 6x schneller. Dieser Overhead entsteht vor allem durch das rekursive Auflösen der Abhängigkeiten und die polymorphe Natur des Graphen.
+In den Benchmarks war eine optimierte direkte Implementierung etwa 5 - 6x schneller. Dieser Overhead entsteht vor allem durch das rekursive Auflösen der Abhängigkeiten und die polymorphe Natur des Graphen.
 Dazu kommt, dass der Aufwand zur Implementierung aller benötigten Operationen und Datentypen. 
 
 Trotzdem bietet mein Ansatz mein ein graphisches Interface um Prozedurale Generationsalgorithen interaktiv zu entwickeln. 
