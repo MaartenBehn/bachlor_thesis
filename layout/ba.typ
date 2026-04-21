@@ -2,6 +2,7 @@
 #import "./theorems.typ": *
 #import "./utils.typ": *
 #import "./images.typ": *
+#import "./trimmed_image.typ": *
 
 
 

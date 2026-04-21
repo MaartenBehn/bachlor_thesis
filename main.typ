@@ -635,6 +635,37 @@ Darüber hinaus können auch Variablen genutzt werden, die von Spielständen abh
 
 Extern kontrollierte Variablen ermöglichen es daher, das System nicht nur für statische Änderungen am Generationsalgorithmus einzusetzen, sondern auch für dynamische Änderungen, auf die Spieler reagieren können.
 
+== Insel-Beispiel
+Dies ist ein komplexeres Beispiel welches den Umfang meiner Implementierung darstellt. 
+
+#ba_image("../assets/full.png", 100%, [])
+
+In einem rechteckigen Generationsbereich, werden in regelmäßigen Abständen Inseln plaziert. 
+Auf jeder Insel werden eine Menge an zufälligen Kreuzungs-Punkte generiert. 
+Kreuzungs-Punkte die in der Nähe von einander sind werden mit zufällig verlaufenden Wegen verbunden. 
+Danach werden die ungenutzten Flächen der Insel mit zufällig plazierten Bäumen gefüllt.
+
+Dieses Beispiel wird mit diesem aus diesem Editor Graph erzeugt:
+#itodo("Sollte wahrscheinlich in den Anhang")
+
+#context {
+  set figure(placement: top)
+
+  figure({
+    v(18%)
+    block(width: 180%, {
+      rotate(90deg, trimmed-image("../assets/full_graph.png", trim: (right: 50%)))
+    })
+  })
+
+  figure({
+    v(18%)
+    block(width: 180%, {
+      rotate(90deg, trimmed-image("../assets/full_graph.png", trim: (left: 50%)))
+    })
+  })
+}
+
 = Analyse
 
 Die Bewertung eines Systems zur prozeduralen Generierung ist nicht trivial, da unterschiedliche Systeme häufig unterschiedliche Ziele verfolgen. Während einige Ansätze primär auf maximale Generationsgeschwindigkeit oder realistische Ergebnisse optimiert sind, liegt der Fokus dieser Arbeit auf der effizienten Neuberechnung nach Änderungen am Generationsalgorithmus. Ziel ist es, bei kleinen Änderungen am Generationsprozess möglichst große Teile der bereits berechneten Welt wiederverwenden zu können.
@@ -676,9 +707,6 @@ Bei großen Welten mit vielen Details kann $b_f$ wesentlich größer als 2 sein 
 
 Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark sich die Laufzeit im Vergleich zu einer vollständigen Neugenerierung reduziert. 
 
-#ba_image("../assets/full.png", 100%, [])
-#ba_image("../assets/full_graph.png", 100%, [#itodo("Stellen einzeichnen")])
-
 #figure(
   grid(
     columns: 1,        
@@ -694,7 +722,7 @@ Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark s
         extrema: false,
         boxplot: none,
       ),
-      title: [Insel-Beispiel (Generationsvolumen: $2000^2$m)],
+      title: [Insel-Beispiel (Generationsbereich: $2000^2$m)],
       xlabel: [Neuberechnungszeit (ms)],
       ylabel: [Geänderte Stelle],
       yaxis: (
@@ -713,7 +741,7 @@ Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark s
         extrema: false,
         boxplot: none,
       ),
-      title: [Insel-Beispiel (Generationsvolumen: $20000^2$m)],
+      title: [Insel-Beispiel (Generationsbereich: $20000^2$m)],
       xlabel: [Neuberechnungszeit (ms)],
       ylabel: [Geänderte Stelle],
       yaxis: (
@@ -725,19 +753,41 @@ Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark s
     v(0cm)
   ),
   caption: [Unterschied der Neuberechnungszeit zwischen verschiedenen geänderten Stellen im Graph],
-  placement: auto,
+  //placement: auto,
 )
 
-Stellen: 
-- A ganz linke Box2D Node
-- B mittlere Path2D Node
-- C untere Disk Node 
-- D Sphere Node der Baum Krone auf der rechten Seite
+#let place_marker(dx: relative, dy: relative, body) = place(alignment.top, dy: dy, dx: dx, 
+  circle(
+    {set align(center + horizon); body},
+    fill: white, 
+    stroke: black, 
+    inset: 1pt,
+  )
+)
 
-In diesem Beispiel sieht man das Neuberechnungszeit nicht linear abfällt, sonder alle Änderungen wo die Wege und Bäume neu berechnet werden müssen im Durchschnitt 17ms benötigen wohin Änderungen die nur das finale Volumen betreffen um Durchschnitt 5ms benötigen.
+
+#figure(
+  {
+    image("./assets/full_graph.png", width: 100%)
+    place_marker(dy: 2.3cm, dx: 0.3cm, [A])
+    place_marker(dy: 0.6cm, dx: 5.3cm, [B])
+    place_marker(dy: 2.6cm, dx: 4.7cm, [C])
+    place_marker(dy: 0.6cm, dx: 12cm, [D])
+  },
+  caption: [Geänderte Stellen im Insel-Beispiel],
+)
+
+#pagebreak()
+
+Ich habe folgende Stellen im Graph für den Benchmark ausgewählt.
+Stelle A ist der 2D Box Knoten der den Generationsbereich definiert.
+Als Stelle B habe ich den Knoten ausgewählt der die Wege auf den Inseln berechnet.
+C ist das Disk Volumen welches als Boden für den Inseln verwendet wird und D ist das Kugel Volumen das als Baumkronen verwendet wird. 
+
+In diesem Benchmark sieht man das Neuberechnungszeit nicht linear abfällt, sonder alle Änderungen wo die Wege und Bäume neu berechnet werden müssen im Durchschnitt 17ms benötigen wohin Änderungen die nur das finale Volumen betreffen um Durchschnitt 5ms benötigen.
 Somit lässt sich davon ausgehen das die Berechnung der Wege und Bäume ca. 12ms benötigt, welche weg fallen wenn die zwischengespeicherten Daten verwendet werden.
 
-
+#todo("Weitere Beispiele")
 
 == Overhead
 
@@ -757,7 +807,7 @@ Hierfür wurde zwei weiteren Versionen des Insel-Beispiels implementiert.
       extrema: false,
       boxplot: none,
     ),
-    title: [Insel-Beispiel (Generationsvolumen: $20000^2$m)],
+    title: [Insel-Beispiel (Generationsbereich: $20000^2$m)],
     xlabel: [Berechnungszeit (ms)],
     yaxis: (
       ticks: range(1, 4).zip(([direkt implementiert], [ohne Generator], [mein System])),
@@ -766,7 +816,7 @@ Hierfür wurde zwei weiteren Versionen des Insel-Beispiels implementiert.
     width: 100%,
   ),
   caption: [Unterschied der Berechnungszeit zwischen meinem System hinzu einer direkten Implementierung],
-  placement: top,
+  //placement: top,
 )
 
 In der ersten würde die Generator-Graph-Verwaltungs-Logik entfernt. Hier wird der Abhängigkeits-Graph direkt evaluatiert ohne Zwischenspeicher anzulegen oder zu verwalten. 
