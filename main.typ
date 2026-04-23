@@ -68,7 +68,7 @@ Für minimale Neuberechnung sind Noise-basierte Verfahren besonders ungeeignet, 
 
 == Example based Model Synthesis 
 
-Eine bekannte Arbeit im Bereich der constraint-basierten Generation ist Paul Merrels "Example-based Model Synthesis".
+Eine relativ neuer Ansatz im Bereich der constraint-basierten Generation ist Paul Merrels "Example-based Model Synthesis".
 @model_synthesis
 
 Die Grundidee ist hier, aus einem kleinen Eingabedatensatz eine größere Struktur zu erzeugen, die lokal denselben Regeln folgt.
@@ -84,21 +84,27 @@ Der Vorgang wiederholt sich, bis jede Zelle genau einen Wert enthält.
 
 === Minimale Neuberechnung mit Model Systhesis 
 
-Ein möglicher Ansatz zur partiellen Neuberechnung prozedural generierter Welten könnte auf Verfahren der Example-based Model Synthesis aufbauen. Die grundlegende Idee wäre, zunächst eine vollständige Welt mit dem Model-Synthesis-Algorithmus zu generieren. Wenn sich anschließend die zugrunde liegenden Regeln ändern, könnte versucht werden, nur die Teile der Welt zu verändern, die den neuen Regeln nicht mehr entsprechen.
+Da der Bereich, bestehenden Model Systhesis Ereignis an geänderte Regeln anzupassen, bisher unerforscht ist habe ich dies zu Beginn meiner Arbeit aktiv als Kern Thema in Betracht gezogen.
+Nun möchte ich kurz anschaulich erläutern warum ich diesen Ansatz verworfen haben, 
+da man beim Versuch Model Systhesis Ereignis an geänderte Regeln anzupassen, einen entscheiden Vorteil von Model Systhesis verliert.
 
-Ein naheliegender Ansatz wäre, alle Felder zu identifizieren, deren aktuelle Werte gegen die neuen Regeln verstoßen. Für diese Felder müssten anschließend wieder mehrere mögliche Werte zugelassen werden, sodass der Model-Synthesis-Algorithmus erneut eine konsistente Lösung finden kann.
+Angenommen eine vollständiges Ereignis wurde mit dem Model-Synthesis-Algorithmus zu generiert. 
+Wenn sich anschließend die zugrunde liegenden Regeln ändern, kann man grundsätzlich nicht sicherstellen das die Welt den neuen Regeln entspricht. 
+
+Um das Ergebnis an die neuen Regeln anzupassen müssten alle Felder zu identifizieren werden, deren aktuelle Werte gegen die neuen Regeln verstoßen. Für diese Felder müssten anschließend wieder mehrere mögliche Werte zugelassen werden, sodass der Model-Synthesis-Algorithmus erneut eine konsistente Konfiguration finden kann.
 
 Dabei zeigt sich jedoch ein grundlegendes Problem: Wenn einem Feld neue mögliche Werte hinzugefügt werden, sind diese zunächst nicht notwendigerweise mit den aktuellen Werten der Nachbarfelder kompatibel. Damit die lokalen Regeln wieder erfüllt sind, müssten auch den Nachbarfeldern zusätzliche mögliche Werte hinzugefügt werden. Dieser Prozess kann sich wiederum auf deren Nachbarn ausbreiten und so weiter.
 
 Würde man dieses Verfahren naiv implementieren, indem für alle betroffenen Nachbarn wieder sämtliche möglichen Werte zugelassen werden, entstünde im Extremfall erneut ein vollständig unentschiedenes Gitter. In diesem Fall würde der Algorithmus effektiv wieder bei einem normalen Model-Synthesis-Prozess beginnen, wodurch kein Vorteil gegenüber einer vollständigen Neugenerierung entsteht.
 
-Um dennoch einen Nutzen aus diesem Ansatz zu ziehen, müsste man eine möglichst kleine Menge an Feldern finden, deren Wertebereiche erweitert werden, sodass anschließend wieder eine konsistente Lösung existiert. Diese Menge sollte idealerweise minimal sein, damit möglichst große Teile der bestehenden Welt unverändert bleiben können. Gleichzeitig müsste der Aufwand zur Bestimmung dieser Menge deutlich geringer sein als eine komplette Neugenerierung der Welt.
+Um dennoch einen Nutzen aus diesem Ansatz zu ziehen, müsste man eine Menge an Werten für Felder finden, sodass anschließend wieder eine konsistente Konfiguration existiert. 
+Diese Menge sollte idealerweise minimal sein, damit möglichst große Teile der bestehenden Welt unverändert bleiben können. Gleichzeitig müsste der Aufwand zur Bestimmung dieser Menge deutlich geringer sein als eine komplette Neugenerierung der Welt.
 
-Eine theoretische Möglichkeit bestünde darin, den Raum der möglichen Werteerweiterungen systematisch zu durchsuchen. Beispielsweise könnte eine Breitensuche über den Graphen der möglichen Wertkombinationen durchgeführt werden, um eine minimale Menge an Änderungen zu finden, die wieder zu einer gültigen Konfiguration führt. Allerdings wächst dieser Suchraum sehr schnell und führt sowohl in Bezug auf Laufzeit als auch Speicherverbrauch zu erheblichen Komplexitätsproblemen.
+Eine theoretische Möglichkeit bestünde darin, den Raum der möglichen Werteerweiterungen systematisch zu durchsuchen. 
+Beispielsweise könnte eine Breitensuche über den Graphen der möglichen Wertkombinationen durchgeführt werden, um eine minimale Menge an Änderungen zu finden, die wieder zu einer konsistente Konfiguration führt. 
+Allerdings wächst dieser Suchraum sehr schnell und führt sowohl in Bezug auf Laufzeit als auch Speicherverbrauch zu erheblichen Komplexitätsproblemen.
 
 Der Vorteil des ursprünglichen Model-Synthesis-Algorithmus liegt darin, dass zu jedem Zeitpunkt alle noch möglichen Kombinationen eine valide Lösung darstellen. Das Finden einer minimalen Erweiterung dieser Mengen, die nach einer Regeländerung wieder eine gültige Lösung ermöglicht, ist jedoch deutlich schwieriger als die ursprüngliche Generierung selbst. 
-
-#todo("Überarbeiten")
 
 == Graph Grammatiken
 Eine Graph Grammatik ist ein System aus Regeln, die beschreiben, wie ein Graph verändert werden kann. 
@@ -127,19 +133,14 @@ Im Vergleich zu L-Systems können Regeln hier auf beliebige Graphstrukturen verw
 === Minimale Neuberechnung
 Keiner dieser Ansätze unterstützt minimale Neuberechnung. Bei L-Systems baut jede Iteration direkt auf der vorherigen auf. Eine Regeländerung macht damit alle folgenden Iterationen ungültig, unabhängig davon, wie klein die Änderung ist. Bei Graph-based Model Synthesis ist das Problem ein anderes: Die Regeln werden aus einem Beispiel abgeleitet und beschreiben lokale Nachbarschaftsbedingungen. Ändert sich eine Regel, ist nicht klar welche Teile des generierten Modells diese Bedingung noch erfüllen, ohne die gesamte Struktur neu zu prüfen. In beiden Fällen fehlt eine explizite Darstellung, welche Teile des Ergebnisses von welchen Regeln abhängen. Genau das ist jedoch die Voraussetzung für minimale Neuberechnung.
 
-
 == KI basierte prozedurale Generation
-
 Neuronale Netzwerke können genutzt werden, um aus einen Trainingsdatensatz, der eine Menge an Beispielen enthält, ein weiteres ähnliches Beispiel zu erzeugen. 
 In Arbeiten wie @evolvingmariolevels @Level_Generation_with_Constrained_Expressive_Range und @Compressing_and_Comparing_the_Generative_Spaces_of_Procedural_Content_Generators werden Neuronale Modelle genutzt, um Levels aus bekannten 2D-Spielen zu reproduzieren. 
 Dabei wird in @evolvingmariolevels ein Level-Generations-Model gegen ein Spieler-Agent-Modell, welches die "Spielbarkeit" eines Levels bewertet, trainiert. 
 Dieser Ansatz ist in dem meisten Fällen in der Lage, spielbare Levels zu generieren. Vereinzelt werden jedoch Generationsartefakte, zum Beispiel unerreichbare Plattformen oder auch komplett leere Bereiche, erzeugt.
 Dazu muss gesagt werden, dass die oben genannten Paper "nur" die simplen und zahlreich vorhandenen 2D-Welten des Spiels "Super Mario" als Trainingsdatensätze heranziehen. Offen ist, ob der vorgestellte Ansatz auch in neueren und komplexeren Spielen funktioniert. 
 
-#todo("Namen der Paper?")
-
 === Terrain Diffusion
-
 Im Ansatz „Terrain Diffusion“ werden Neuronale-Diffusion-Modelle verwendet. Diffusion-Modelle erzeugen Daten, indem sie iterativ aus zufälligem Rauschen eine strukturierte Lösung rekonstruieren. Dieses Verfahren wurde ursprünglich für die Bildgenerierung entwickelt. Heute wird es zum Beispiel auch für das Erzeugen von Höhenkarten genutzt.
 
 Hier wird ein Neuronales Modell mit realen Geländedaten trainiert, damit es realistische Terrainstrukturen erzeugen kann. Um auch weiterhin unendliche Welten generieren zu können, wird das Gelände in Form von Kacheln erzeugt, die deterministisch aus einem sogenannten "Seed" generiert werden. So können, ähnlich wie bei klassischen Noise-basierten Verfahren, bei Bedarf neue Bereiche der Welt errechnet werden.
@@ -230,9 +231,10 @@ Jedoch ist es auch möglich, grafische Programme in Code zu übersetzen und zu M
 
 Populäre Programme, in denen grafische Programmierung verwendet wird, sind Unity Shader Graphs, Unreal Engine Templates und Blender Geometry Nodes. 
 
-#ba_image("./../assets/Shader Graph.png", 100%, [ Der grafischen Editor von Unity Shader Graph ])
-
-
+#figure(
+  image("assets/Shader Graph.png", width: 100%),
+  caption: [ Der grafischen Editor von Unity Shader Graph ],
+) <fig-sphere>
 
 = Mein Lösungsansatz
 
@@ -255,7 +257,10 @@ Knoten und deren Ergebnisse, die keine Eingangswerte haben, bezeichne ich als ko
 
 == Framework
 
-#ba_image("../assets/overview_diagramm.png", 100%, [Überblick über Editor, Abhängigkeits-Graph, dessen cache und der Welt. #itodo("Sauber zeichnen")])
+#figure(
+  image("assets/overview_diagramm.png", width: 100%),
+  caption: [Überblick über Editor, Abhängigkeits-Graph, dessen cache und der Welt. #itodo("Sauber zeichnen")],
+) <fig-sphere>
 
 Mein Generationssystem besteht aus drei Bestandteilen: 
 1. Ein graphischer Editor,  mit dem ein Nutzer einen Abhängigkeits-Graph erstellen und bearbeiten kann. 
@@ -271,8 +276,10 @@ Zur interaktiven Definition des Abhängigkeits-Graph wird ein grafischer Program
 Der Nutzer kann Knoten erstellen, die einer Operation entsprechen, und diese auf einer unendlichen Fläche frei anordnen. 
 Diese Operationen haben auf ihrer linken Seite eine Liste mit Eingangswerten und auf ihrer rechten Seite eine Liste mit Ergebnissen. 
 
-#ba_image("../assets/sphere.png", 80%, [Node um ein Kugel Volumen zu definieren. #itodo("Hintergrund")])
-
+#figure(
+  image("assets/sphere.png", width: 80%),
+  caption: [Node um ein Kugel Volumen zu definieren. #itodo("Hintergrund")],
+) <fig-sphere>
 
 Die Eingangswerte und Ergebnisse sind je nach Datentyp farbig kodiert und können mit Linien verbunden werden. 
 Dies zeigt, dass ein Ergebnis als Eingangswert für eine andere Operation verwendet werden soll. 
@@ -281,7 +288,10 @@ Um komplexe Algorithmen zu modellieren, werden Knotenverbindungen links nach rec
 Parallele Stränge werden übereinander angeordnet. 
 Damit werden auch komplexe Abhängigkeiten übersichtlich dargestellt.  
 
-#ba_image("../assets/nodes.png", 80%, [Eine Kugel dessen Größe seiner X Position entspricht. #itodo("Hintergrund")])
+#figure(
+  image("assets/nodes.png", width: 80%),
+  caption: [Eine Kugel dessen Größe ihrer X Position entspricht. #itodo("Hintergrund")],
+) <fig-nodes>
 
 == Template 
 
@@ -291,9 +301,6 @@ $G_"ab"$ ist ein Graph, der die zu generierende Welt als rekursive Formel beschr
 
 Die Eingehenden Nachbarn $N^-_G_"ab"$ errechnen die Eingangswerte für eine Operation und die 
 Ausgehenden Nachbarn $N^+_G_"ab"$ sind alle Operationen, die das Ergebnis benötigen. 
-
-#todo("Beispiel?")
-
 
 $G_"ch"$ enthält einen Knoten für jeden Knoten in $G_"ab"$, der zwischengespeichert werden soll. 
 Dies ist eine Untermenge aller Knoten in $G_"ab"$ $V(G_"ch") subset V(G_"ab")$.
@@ -355,14 +362,12 @@ Dazu hat ein Knoten $v_"gen" in V(G_"gen")$ das gleiche Level wie sein Cache-Tem
 
 Jedoch wenn $G_"ch"$ nur einen Knoten pro Operation enthält, enthält $G_"gen"$ einen Knoten pro Ergebnis, welches errechnet werden muss. 
 
-#todo("Beispiel")
-
 Dafür enthält der Generator $:= (G_"gen", Q_"tasks")$ eine Queue $Q_"tasks"$, die zwei Arten von Aufträgen auf $G_"gen"$ nach ihren Levels sortiert.    
 $
 "pop"(Q_"tasks") := min_(q in Q_"tasks") (l(q))
 $
 
-Berechnungs-Aufträge ermitteln das Ergebnis eines Knoten in $G_"gen"$. Kind-Update-Aufträge erzeugen oder löschen Kinder #itodo("Erklären was Kinder sind?"), bis ihre Anzahl für das Template geeignet ist.
+Berechnungs-Aufträge ermitteln das Ergebnis eines Knoten in $G_"gen"$. Kind-Update-Aufträge erzeugen oder löschen Kinder, bis ihre Anzahl für das Template geeignet ist.
 
 === Abhängigkeiten-Werte im Generator-Graph finden
 
@@ -379,14 +384,17 @@ beginnend bei einem Knoten $v in V(G_"ch")$ entweder aufwärts (*up*($v_"step"$)
 
 Da ein Knoten $v in V(g_"ch")$ mehr als einen eingehenden oder ausgehenden Nachbarn haben kann, speichert ein relativer Schritt auch, in welchen Nachbarn gegangen werden soll (*cache*($v_"step"$)). Ein relativer Schritt Speicher weiterhin, ob dieser Nachbar eine Abhängigkeit für $v_"gen"$ ist (*deps*($v_"step"$) = True).
 
-Jeder relative Schritt $v_"step"$ speichert auch, in welche der Nachbarknoten gegangen werden soll. 
-#todo("Das macht kein Sinn")
-
 Diese relativen Schritte verwenden nur Knoten, die ein kleineres Level als $v_"gen"$ haben. 
 Da im Generator Knoten im Level in aufsteigender Reihenfolge erstellt werden, ist so sichergestellt, dass alle relativen Wege existieren.
 
 Für einen Knoten im Template kann es mehrere Knoten im Generator geben. Daher können dort pro Abhängigkeit eines Cache-Knoten 
 auch mehrere Knoten gefunden werden.
+
+#figure(
+  image("assets/relative_schritte.png", width: 100%),
+  caption: [ Beispiel der Anwendung eines Baum an relativen Schritten auf das Template und den Generator. #itodo("Sauber zeichnen") ],
+  placement: auto,
+) <fig-relative_schritte>
 
 #block(
   breakable: false,
@@ -432,7 +440,6 @@ auch mehrere Knoten gefunden werden.
   }))
 
 
-#todo("Beispiel Zeichung")
 
 
 === Kind-Update-Aufträge
@@ -630,7 +637,10 @@ Extern kontrollierte Variablen ermöglichen es daher, das System nicht nur für 
 
 == Insel-Beispiel
 
-#ba_image("../assets/full.png", 100%, [])
+#figure(
+  image("assets/full.png", width: 80%),
+  caption: [],
+) <fig-relative_schritte>
 
 Dies ist ein komplexeres Beispiel welches den Umfang meiner Implementierung darstellt. 
 In einem rechteckigen Generationsbereich, werden in regelmäßigen Abständen Inseln plaziert. 
@@ -639,7 +649,7 @@ Kreuzungs-Punkte die in der Nähe von einander sind werden mit zufällig verlauf
 Danach werden die ungenutzten Flächen der Insel mit zufällig plazierten Bäumen gefüllt.
 
 Dieses Beispiel wird mit diesem aus diesem Editor Graph erzeugt:
-#itodo("Sollte wahrscheinlich in den Anhang")
+#itodo("Sollte wahrscheinlich in den Anhang?")
 
 #context {
   set figure(placement: top)
@@ -776,7 +786,7 @@ C ist das Disk Volumen welches als Boden für den Inseln verwendet wird und D is
 In diesem Benchmark sieht man das Neuberechnungszeit nicht linear abfällt, sonder alle Änderungen wo die Wege und Bäume neu berechnet werden müssen im Durchschnitt 17ms benötigen wohin Änderungen die nur das finale Volumen betreffen um Durchschnitt 5ms benötigen.
 Somit lässt sich davon ausgehen das die Berechnung der Wege und Bäume ca. 12ms benötigt, welche weg fallen wenn die zwischengespeicherten Daten verwendet werden.
 
-#todo("Weitere Beispiele")
+#todo("Weitere Beispiele benchmarken")
 
 == Overhead
 
