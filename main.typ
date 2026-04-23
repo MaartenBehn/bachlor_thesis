@@ -310,7 +310,11 @@ Bei der Entscheidung, wie groß diese Untermenge sein soll, müssen der "Overhea
 Die Eingehenden Nachbarn $N^-_G_"ch"$ sind alle Caches, von denen der Knoten abhängt. 
 Man findet diese, indem man den Baum der Abhängigkeiten in $G_"ab"$ in allen seinen Verzweigungen rekursiv durchsucht, bis man jeweils auf einen Knoten in $G_"ch"$ stößt.
 
-#todo("Grafik von Datentypen und Abhängigkeits-Graph")
+
+#figure(
+  image("assets/cache_graph.png", width: 60%),
+  caption: [ Beispiel eines Abhängigkeites-Graph und dessen Cache-Knoten zur Generierung einer Menge an Bäumen. #itodo("Sauber zeichnen") ],
+) <fig-cache_graph>
 
 === Level
 
@@ -537,8 +541,6 @@ Dabei wird der Knoten im Abhängigkeits-Graph rekursiv errechnet.
 
 Wenn der Algorithmus auf einen Knoten $v_"ab" in V(G_"ab")$ stößt, welcher einen Cache-Knoten hat $v_"ab" in V(G_"ch")$, werden die Werte der jeweiligen abhängigen Knoten von $v_"gen"$ verwendet. 
 
-#todo("Beispiel")
-
 === Abhängigkeitskreise
 Das Template kann Abhängigkeitskreise enthalten. 
 Um dennoch valide Lösungen errechnen zu können, muss es für jeden Knoten $v_"val"$ einen validen Nullwert geben. 
@@ -612,10 +614,8 @@ Wenn nun die Form oder Größe der Baumkrone verändert wird, betrifft diese Än
 
 #figure(
   image("./assets/trees.png", width: 80%),
-  caption: [Trees],
+  caption: [ Baum-Mengen-Beispiel #itodo("Besseres Bild")],
 ) <fig-trees>
-
-#todo("Besseres Bild")
 
 === Extern kontrollierte Variable
 
@@ -639,8 +639,8 @@ Extern kontrollierte Variablen ermöglichen es daher, das System nicht nur für 
 
 #figure(
   image("assets/full.png", width: 80%),
-  caption: [],
-) <fig-relative_schritte>
+  caption: [ Insel-Beispiel ],
+)
 
 Dies ist ein komplexeres Beispiel welches den Umfang meiner Implementierung darstellt. 
 In einem rechteckigen Generationsbereich, werden in regelmäßigen Abständen Inseln plaziert. 
