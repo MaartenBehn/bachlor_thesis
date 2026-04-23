@@ -34,7 +34,7 @@ Lange Neugenerationszeiten können hier sehr stören.
 Ziel dieser Arbeit ist es, zu untersuchen, inwieweit sich die Neugenerationszeit einer prozeduralen Welt verkürzen lässt, 
 wenn nur diejenigen Teile der Welt neu berechnet werden, die durch Änderungen am Generationsalgorithmus ungültig geworden sind.
 
-Dazu wird ein System vorgestellt, welches einen Generationsalgorithmus als Abhängigkeitsgraph darstellt. 
+Dazu wird ein System vorgestellt, welches einen Generationsalgorithmus als Abhängigkeits-Graph darstellt. 
 Dieses verwendet Zwischenergebnisse für diejenigen Teile des Graphen, die sich nicht geändert haben, wieder.
 
 #outline(depth: 2)
@@ -240,7 +240,7 @@ Dieses Kapitel beschreibt, wie das Ziel, die Neuberechnungszeit zu verkürzen, e
 Weiterhin werden Besonderheiten des Systems sowie mögliche Probleme diskutiert. 
 
 Mein Lösungsansatz beschreibt, wie prozedurale Generierung strukturiert sein sollte, damit das System automatisch erkennt, welche Teile der Welt es bei einer Änderung im Algorithmus neu berechnen muss.
-Dafür wird der Algorithmus als Abhängigkeitsgraph modelliert. 
+Dafür wird der Algorithmus als Abhängigkeits-Graph modelliert. 
 
 
 == Abhängigkeits-Graph
@@ -536,10 +536,10 @@ Wenn der Algorithmus auf einen Knoten $v_"ab" in V(G_"ab")$ stößt, welcher ein
 Das Template kann Abhängigkeitskreise enthalten. 
 Um dennoch valide Lösungen errechnen zu können, muss es für jeden Knoten $v_"val"$ einen validen Nullwert geben. 
 
-So kann der Abhängigkeitsgraph iterativ gelöst werden. 
+So kann der Abhängigkeits-Graph iterativ gelöst werden. 
 Pro Kreis im Abhängigkeits-Graph wird eine Kante als durchgeschnitten markiert 
 $N^+_"cut" (v) subset.eq N^+_G_"dep" (v) quad v in V(G_"dep")$.
-Der Abhängigkeitsgraph ohne die durchtrennte Kanten 
+Der Abhängigkeits-Graph ohne die durchtrennte Kanten 
 $N^+_"not cut" (v) := N^+_G_"dep" (v) without N^+_"cut" (v)$ ist ein DAG (Directed Acyclic Graph). 
 Folglich kann jedem Knoten ein Level $l(v)$ zu geordnet werden. 
 $
@@ -599,7 +599,7 @@ Dabei wird zuerst in minimalen Beispielen gezeigt, wie das System Teile der gene
 
 === Nur finales Volumen neu errechnen
 
-Im ersten Beispiel wird eine große Anzahl von Bäumen generiert, die auf einem Gitter verteilt sind. Jeder Baum besteht aus einem Stamm (Zylinder) und einer Baumkrone (Kugel). Die Positionen aller Bäume werden mit einer Gitter-Operation berechnet und im Cache gespeichert. Die Form der Baumkrone wird als separate Operation im Abhängigkeitsgraphen modelliert.
+Im ersten Beispiel wird eine große Anzahl von Bäumen generiert, die auf einem Gitter verteilt sind. Jeder Baum besteht aus einem Stamm (Zylinder) und einer Baumkrone (Kugel). Die Positionen aller Bäume werden mit einer Gitter-Operation berechnet und im Cache gespeichert. Die Form der Baumkrone wird als separate Operation im Abhängigkeits-Graphen modelliert.
 
 Wenn nun die Form oder Größe der Baumkrone verändert wird, betrifft diese Änderung nur den Teilgraphen, der die Baumkrone berechnet. Dabei können die Positionen der Bäume wiederverwendet werden. Der Generator erkennt, dass nur die CSG-Volumen der Baumkronen ungültig sind und berechnet ausschließlich diese neu.
 
@@ -612,9 +612,9 @@ Wenn nun die Form oder Größe der Baumkrone verändert wird, betrifft diese Än
 
 === Extern kontrollierte Variable
 
-Knoten im Abhängigkeitsgraphen können nicht nur von anderen berechneten Knoten abhängen, sondern auch von extern kontrollierten Variablen.  Ein typisches Beispiel ist die Kameraposition, die vom der Game Engine zur Verfügung gestellt wird und sich kontinuierlich verändern kann.
+Knoten im Abhängigkeits-Graphen können nicht nur von anderen berechneten Knoten abhängen, sondern auch von extern kontrollierten Variablen.  Ein typisches Beispiel ist die Kameraposition, die vom der Game Engine zur Verfügung gestellt wird und sich kontinuierlich verändern kann.
 
-In diesem Beispiel wird die Kameraposition als konstanter Knoten im Abhängigkeitsgraphen modelliert. Darauf aufbauend wird eine Positionsmenge berechnet, die alle Weltabschnitte (Chunks) innerhalb eines bestimmten Radius um die Kamera enthält. 
+In diesem Beispiel wird die Kameraposition als konstanter Knoten im Abhängigkeits-Graphen modelliert. Darauf aufbauend wird eine Positionsmenge berechnet, die alle Weltabschnitte (Chunks) innerhalb eines bestimmten Radius um die Kamera enthält. 
 Da diese Menge direkt von der Kameraposition abhängt, wird sie neu berechnet, sobald sich die Kameraposition ändert.
 
 Bewegt sich die Kamera, erkennt der Generator, dass der Wert des Knotens für die Kameraposition ungültig geworden ist und berechnet alle abhängigen Knoten neu.
@@ -663,34 +663,30 @@ Dieses Beispiel wird mit diesem aus diesem Editor Graph erzeugt:
 
 Die Bewertung eines Systems zur prozeduralen Generierung ist nicht trivial, da unterschiedliche Systeme häufig unterschiedliche Ziele verfolgen. Während einige Ansätze primär auf maximale Generationsgeschwindigkeit oder realistische Ergebnisse optimiert sind, liegt der Fokus dieser Arbeit auf der effizienten Neuberechnung nach Änderungen am Generationsalgorithmus. Ziel ist es, bei kleinen Änderungen am Generationsprozess möglichst große Teile der bereits berechneten Welt wiederverwenden zu können.
 
-Im nächsten Abschnitt wird die theoretische Laufzeitcomplexität und des Systems analysiert.  
+Im nächsten Abschnitt wird die theoretische Laufzeitkomplexität des Systems analysiert.
 
-Um meine die reale Reduktion der Neuberechnungszeit zu untersuchen wird benchmarks auf meheren Beispiel Welten durchgeführt und 
-es wird abgeschätzt wie viel Overhead das System gegen eine minimale Implementierung eines Generationsbespiel hat. 
+Um die reale Reduktion der Neuberechnungszeit zu untersuchen, werden Benchmarks auf mehreren Beispielwelten durchgeführt, und es wird abgeschätzt, wie viel Overhead das System gegenüber einer minimalen Implementierung eines Generationsbeispiels hat.
 
 Neben den reinen Laufzeiteigenschaften spielt auch die Nutzerfreundlichkeit des Systems eine Rolle. Durch den grafischen Editor lassen sich komplexe Abhängigkeiten oft leichter überblicken als in klassischem Quellcode.
 Gleichzeitig erhöht dieser Ansatz jedoch auch die Komplexität des Systems. Während klassischer Programmcode sehr flexibel ist und ohne zusätzliche Struktur auskommt, erfordert der hier vorgestellte Ansatz eine explizite Modellierung aller Abhängigkeiten im Graphen.
 
-Im dritten sollte die Aufwand zu Erweiterung des Systems betrachtet werden. 
-Meine Implementation nutzt nur simple Operationen auf CSGs. Dies entspricht nicht den wirklichen Datenstrukturen und Problemen in Spielen oder Simulationen. 
-Daher würde eine Große Menge an weiteren Operationen und Datentypen implement werden müssen.
-
+Im dritten Abschnitt sollte der Aufwand zur Erweiterung des Systems betrachtet werden. Meine Implementierung nutzt nur einfache Operationen auf CSGs. Dies entspricht nicht den tatsächlichen Datenstrukturen und Problemen in Spielen oder Simulationen. Daher würde eine große Menge an weiteren Operationen und Datentypen implementiert werden müssen.
 
 == Theoretische Laufzeit
 
-Die Kern Idee des System ist das der Generationsalgorithmus der Welt als Abhängigkeits-Graph definiert ist. 
+Die Kern Idee des System ist, dass der Generationsalgorithmus der Welt als Abhängigkeits-Graph definiert ist. 
 Angenommen der Abhängigkeits-Graph hat $a$ Knoten. 
-Die errechneten Ergebnisse von manchen Knoten im Abängigkeits-Graph werden zwischen gespeichert dies ist durch den Cache-Graph definiert. 
+Die errechneten Ergebnisse von manchen Knoten im Abhängigkeits-Graph werden zwischen gespeichert dies ist durch den Cache-Graph definiert. 
 Angenommen dieser hat $c$ Knoten wobei $c <= a$ ist.
 Wir definieren einen Cache-Faktor als $c_f := c / a$.
-Ein Knoten im Abhängigkeits-Graph kann mehrere Knoten im Generator haben und jeder dieser Knoten kann wieder mehrere Kinder Knoten für ein Kind im Abhängigkeits-Graph haben. Daher definieren wir einen Branche-Faktor $b_f$ der die durchschnittliche Menge an Kindern pro Abhängigkeits-Knoten definiert. Zu letzt müssen bei einer Änderung des Abhängigkeits-Graph nur manche Knoten neu errechnet werden.
-Den Faktor der zu neu errechnen Knoten im Generator nennen wir $g_f$.
+Ein Knoten im Abhängigkeits-Graph kann mehrere Knoten im Generator haben und jeder dieser Knoten kann wieder mehrere Kinder Knoten für ein Kind im Abhängigkeits-Graph haben. Daher definieren wir einen Branche-Faktor $b_f$ der die durchschnittliche Menge an Kindern pro Abhängigkeits-Knoten definiert. Zuletzt müssen bei einer Änderung des Abhängigkeits-Graph nur manche Knoten neu berechnet werden.
+Den Faktor der neu zu berechnet Knoten im Generator nennen wir $g_f$.
 
 Somit ist die Laufzeitcomplexit einer Errechnung nach Template-Änderung oder Änderung einer externen Variabel: 
 $ O(((a c_f)^(b_f)) / g_f) = O(a^(b_f)) $
 
-Dagegen ist die Laufzeit ein Template zu errechnen $O(a^2)$. 
-Die quadratische Laufzeit entsteht da pro Cache-Knoten die relativen Pfade errechnet werden müssen. 
+Dagegen ist die Laufzeit ein Template zu berechnet $O(a^2)$. 
+Die quadratische Laufzeit entsteht da pro Cache-Knoten die relativen Pfade berechnet werden müssen. 
 Bei großen Welten mit vielen Details kann $b_f$ wesentlich größer als 2 sein und Faktoren im Bereich von $10-100$ sind nicht unrealistisch.
 
 
@@ -784,7 +780,7 @@ Somit lässt sich davon ausgehen das die Berechnung der Wege und Bäume ca. 12ms
 
 == Overhead
 
-Ein weiteres wichtiges Kriterium ist der Overhead des Systems. Da der Generationsalgorithmus nicht direkt als kompilierten Programmcode ausgeführt wird, sondern als Abhängigkeitsgraph interpretiert wird, entstehen zusätzliche Kosten. Diese entstehen insbesondere durch:
+Ein weiteres wichtiges Kriterium ist der Overhead des Systems. Da der Generationsalgorithmus nicht direkt als kompilierten Programmcode ausgeführt wird, sondern als Abhängigkeits-Graph interpretiert wird, entstehen zusätzliche Kosten. Diese entstehen insbesondere durch:
 - die Verwaltung und Modifikation der Graphstruktur,
 - das rekursive Auflösen der Abhängigkeiten während der Berechnung.
 
@@ -812,18 +808,18 @@ Hierfür wurde zwei weiteren Versionen des Insel-Beispiels implementiert.
   //placement: top,
 )
 
-In der ersten würde die Generator-Graph-Verwaltungs-Logik entfernt. Hier wird der Abhängigkeits-Graph direkt evaluatiert ohne Zwischenspeicher anzulegen oder zu verwalten. 
-Diese Änderunge reduziert zwar die Menge an Code signifikant jedoch hat keine großen Auswirkungen auf die Laufzeit. 
-Dies hat wahrscheinlich Folgende Gründe: 
-Die in Zwischenspeicher genutzten Mengen müssen bei der evaluation des Graphs eh angelegt werden und werden in diesem Fall nur wieder deallokiert anstatt weiterhin gespeichert zu bleiben.
+In der ersten Version würde die Generator-Graph-Verwaltungs-Logik entfernt. 
+Hier wird der Abhängigkeits-Graph direkt evaluiert, ohne Zwischenspeicher anzulegen oder zu verwalten. 
+Diese Änderung reduziert zwar die Menge an Code signifikant, hat jedoch keine großen Auswirkungen auf die Laufzeit. 
+Dies hat wahrscheinlich folgende Gründe: 
+Die im Zwischenspeicher genutzten Mengen müssen bei der Evaluation des Graphen ohnehin angelegt werden und werden in diesem Fall nur wieder deallokiert, anstatt weiterhin gespeichert zu bleiben.
 
-Als zweites wurde eine Version des Generationsalgorithmus ohne Abhängigkeits-Graph direkt implementiert. 
-Diese Version ist ca. $4 - 6$x schneller als das Beispiel. 
-Dies hat wahrscheinlich mit dem Overhead durch die evaluation des Abhängigkeits-Graph zu tun. 
-Einerseits können durch direkte Kapselung von loops die Allozierung und Erstellung von Mengen Vektoren gespart werden.  
-Der Abhängigkeits-Graph benötigt durch seine Polymorphe-Natur viele Switch-Statements um zwischen den verschiedenen Funktionen die einen Wert erzeugen dynamisch zu unterschieden. Dies fällt bei einer direkten Implementierung weg. 
-Dazu kann dadurch der Generationsalgorithmus könnte stärker durch den Compiler optimiert werden.
-
+Als Zweites wurde eine Version des Generationsalgorithmus ohne Abhängigkeits-Graph direkt implementiert. 
+Diese Version ist ca. $4 – 6$x schneller als das Beispiel. Dies hat wahrscheinlich mit dem Overhead durch die Evaluation des Abhängigkeits-Graphen zu tun. 
+Einerseits können durch direkte Kapselung von Loops die Allokierung von Mengen als Vektoren gespart werden. 
+Der Abhängigkeits-Graph benötigt durch seine polymorphe Natur viele Switch-Statements, um zwischen den verschiedenen Funktionen, die einen Wert erzeugen, dynamisch zu unterscheiden. 
+Dies fällt bei einer direkten Implementierung weg. 
+Zudem kann der Generationsalgorithmus dadurch stärker durch den Compiler optimiert werden.
 
 == Nutzerfreundlichkeit
 
@@ -850,83 +846,56 @@ Insgesamt bietet der grafische Ansatz insbesondere für komplexe prozedurale Sys
 
 
 == Erweiterbarkeit
-
-Um das System um weitere Operationen oder oder Datentype zu erweitern ist ein gutes Verständnis der Codestruktur benötigt.
-Jedoch sind keine grundlegenden Änderungen nötigt. 
-Der Editor, das Template und der Generator stellen keine Erwartungen an die Art der Datentypen oder Operationen im Abhängigkeits Graph. 
-Die Datentypen und Operationen sind mit Typed Unions implement daher können diese einfach erweitert werden.
-Jedoch muss die neue Variation an jeder Stelle wo ein Datentyp oder Operation allgemein verwendet wird implementiert werden
-um sie in das bestehende Netz an möglichen Abhängigkeiten zu intrigieren.
+Um das System um weitere Operationen oder Datentypen zu erweitern, wird ein gutes Verständnis der Codestruktur benötigt. 
+Jedoch sind keine grundlegenden Änderungen nötig. 
+Der Editor, das Template und der Generator stellen keine Erwartungen an die Art der Datentypen oder Operationen im Abhängigkeits-Graph. 
+Die Datentypen und Operationen sind als Typed Unions implementiert, daher können diese einfach erweitert werden. 
+Jedoch muss die neue Variante an jeder Stelle, wo ein Datentyp oder eine Operation allgemein verwendet wird, implementiert werden, um sie in das bestehende Netz an möglichen Abhängigkeiten zu integrieren.
 
 
 = Future Work
 
 == Nullwerte führen zu leeren Lösungen
-Da der Null Wert per definition eine valider Wert ist kann es dazu kommen, dass sich ein Abhängigkeits-Kreis zu null als Lösung entwickelt, auch wenn es theoretisch andere Lösungen gebe. 
-Um dies zu lösen müsste ein anderer Ansatz zur Lösung von Abhängigkeits-Kreisen genutzt werden. 
-
+Da der Nullwert per Definition ein valider Wert ist, kann es dazu kommen, dass sich ein Abhängigkeitskreis zu Null als Lösung entwickelt, auch wenn es theoretisch andere Lösungen gäbe. Um dies zu lösen, müsste ein anderer Ansatz zur Lösung von Abhängigkeitskreisen genutzt werden.
 Arbeiten in Richtung closely connected Components in Verbindung könnten hier eine Lösung sein.
 
 == Andere Datenstrukturen
-Wie schon in @output_datastructure beschrieben eignen sich CSGs nicht zum direkten rendering.
-Die Umwandlung zu einem Mesh mit "marching cubes" ist aufwendig und benötigt wesentlich mehr Leistung benötigen, als die Generation selbst.
-Somit besteht weiterhin die Forschungsfrage in wie weit minimale Neuberechnung von prozeduralen Meshen direkt möglich ist.
+Wie schon in @output_datastructure beschrieben, eignen sich CSGs nicht zum direkten Rendering. Die Umwandlung zu einem Mesh mit „marching cubes“ ist aufwendig und benötigt wesentlich mehr Leistung als die Generation selbst. Somit besteht weiterhin die Forschungsfrage, inwieweit minimale Neuberechnung von prozeduralen Meshes direkt möglich ist.
 
 == Nutzerfreundlichkeitsstudie
 Die Nutzerfreundlichkeit des Systems wurde in dieser Arbeit bisher nur qualitativ betrachtet. 
 Eine fundierte Bewertung sollte durch strukturierte Nutzerstudien oder Experteninterviews ergänzt werden. 
 Dabei wäre insbesondere interessant, wie Nutzer mit unterschiedlichem Erfahrungshintergrund mit dem grafischen Editor umgehen. 
-Erfahrene Entwickler könnten den Editor als zu einschränkend empfinden, da nur die im System vorgesehenen Operationen genutzt werden können, während weniger erfahrene Nutzer von der visuellen Darstellung der Abhängigkeiten profitieren könnten.
-Ein konkreter Ansatz zur Verbesserung der Nutzerfreundlichkeit wäre die Einführung von aussagekräftigen Fehlermeldungen und Warnungen im Editor. 
-Aktuell gibt das System wenig Rückmeldung darüber, warum ein bestimmter Generationsschritt fehlschlägt oder ein unerwartetes Ergebnis liefert. 
-Eine bessere Visualisierung des Generationsprozesses, beispielsweise durch das Hervorheben von Knoten die neu berechnet werden, könnte dem Nutzer helfen nachzuvollziehen welche Teile der Welt von einer Änderung betroffen sind.
+
+Erfahrene Entwickler könnten den Editor als zu einschränkend empfinden, da nur die im System vorgesehenen Operationen genutzt werden können, während weniger erfahrene Nutzer von der visuellen Darstellung der Abhängigkeiten profitieren könnten. Ein konkreter Ansatz zur Verbesserung der Nutzerfreundlichkeit wäre die Einführung von aussagekräftigen Fehlermeldungen und Warnungen im Editor. Aktuell gibt das System wenig Rückmeldung darüber, warum ein bestimmter Generationsschritt fehlschlägt oder ein unerwartetes Ergebnis liefert. Eine bessere Visualisierung des Generationsprozesses, beispielsweise durch das Hervorheben von Knoten, die neu berechnet werden, könnte dem Nutzer helfen, nachzuvollziehen, welche Teile der Welt von einer Änderung betroffen sind.
 
 == Parallelisierung der Generierung
-In der aktuellen Implementation werden unabhängige Knoten im Abhängigkeitsgraph sequenziell abgearbeitet. 
-Da Knoten desselben Levels keine gegenseitigen Abhängigkeiten haben, könnten diese grundsätzlich parallel berechnet werden. 
-Eine systematische Parallelisierung der Levelweise Berechnung könnte die Generierungszeit bei komplexen Algorithmen mit vielen unabhängigen Operationen erheblich reduzieren. 
-Dabei müsste jedoch sichergestellt werden, dass Schreibzugriffe auf den Generator-Graphen thread-sicher sind, ohne dabei zu viel Overhead durch Synchronisation zu benötigen.
+In der aktuellen Implementierung werden unabhängige Knoten im Abhängigkeits-Graphen sequenziell abgearbeitet. Da Knoten desselben Levels keine gegenseitigen Abhängigkeiten haben, könnten diese grundsätzlich parallel berechnet werden. Eine systematische Parallelisierung der levelweisen Berechnung könnte die Generierungszeit bei komplexen Algorithmen mit vielen unabhängigen Operationen erheblich reduzieren. Dabei müsste jedoch sichergestellt werden, dass Schreibzugriffe auf den Generatorgraphen thread-sicher sind, ohne dabei zu viel Overhead durch Synchronisation zu benötigen.
 
 == Automatische Cache-Optimierung
-Aktuell muss der Nutzer manuell entscheiden, welche Knoten im Abhängigkeitsgraph gecacht werden sollen. 
+Aktuell muss der Nutzer manuell entscheiden, welche Knoten im Abhängigkeits-Graph gecacht werden sollen. 
 Ein zu sparsames Caching führt dazu, dass bei Änderungen viele Knoten neu berechnet werden müssen, während ein zu großzügiges Caching unnötig viel Speicher verbraucht und den Overhead erhöht.
 
-Ein interessanter Forschungsansatz wäre ein System, das diese Entscheidung automatisch trifft. 
-Dazu könnte der Generator zur Laufzeit messen, wie häufig ein Knoten wiederverwendet wird und wie aufwendig seine Berechnung ist. 
-Basierend auf diesen Metriken könnte das System dynamisch entscheiden, welche Knoten gecacht werden sollen. 
+Ein interessanter Forschungsansatz wäre ein System, das diese Entscheidung automatisch trifft. Dazu könnte der Generator zur Laufzeit messen, wie häufig ein Knoten wiederverwendet wird und wie aufwendig seine Berechnung ist. Basierend auf diesen Metriken könnte das System dynamisch entscheiden, welche Knoten gecacht werden sollen.
 
 == Skalierung auf sehr große Welten
-Die vorliegende Arbeit evaluiert das System anhand vergleichsweise kleiner Beispielwelten. 
-Es bleibt offen, wie das System mit sehr großen Welten skaliert, die aus tausenden gleichzeitig aktiver Chunks und sehr tiefen Abhängigkeitsgraphen bestehen. 
-Bei sehr großen Welten könnte dies zu erheblichem Speicherverbrauch führen. 
-Zukünftige Arbeiten sollten untersuchen, wie ein solches System auf gesamten Spielwelten agiert.
+Die vorliegende Arbeit evaluiert das System anhand vergleichsweise kleiner Beispielwelten. Es bleibt offen, wie das System mit sehr großen Welten skaliert, die aus tausenden gleichzeitig aktiver Chunks und sehr tiefen Abhängigkeits-Graphen bestehen. Bei sehr großen Welten könnte dies zu erheblichem Speicherverbrauch führen. Zukünftige Arbeiten sollten untersuchen, wie ein solches System auf gesamten Spielwelten agiert.
 
 == Integration in bestehende Engines
-Diese Arbeit stellt ein System vor welches Spiel- oder Simulations-Engine einbettbar sein soll. 
-Jedoch wurde die Frage einer Integration in eine bestehende Game Engine nicht behandelt.
-
-Zukünftige Arbeiten sollten untersuchen, welche Schnittstellen eine Engine bereitstellen muss und welcher Integrationsaufwand in bestehende Engines wie Unity oder Unreal Engine entsteht. 
-Dabei sind insbesondere die Synchronisation zwischen dem Generator und dem Render-Thread sowie die Übergabe extern kontrollierter Variablen wie Kameraposition oder Spielzustand relevante Fragestellungen.
+Diese Arbeit stellt ein System vor, welches in Spiel- oder Simulations-Engines einbettbar sein soll. Jedoch wurde die Frage einer Integration in eine bestehende Game Engine nicht behandelt. Zukünftige Arbeiten sollten untersuchen, welche Schnittstellen eine Engine bereitstellen muss und welcher Integrationsaufwand in bestehende Engines wie Unity oder Unreal Engine entsteht. Dabei sind insbesondere die Synchronisation zwischen dem Generator und dem Render-Thread sowie die Übergabe extern kontrollierter Variablen wie Kameraposition oder Spielzustand relevante Fragestellungen.
 
 == Serialisierung und Persistenz
-In der aktuellen Implementation existieren gecachte Zwischenergebnisse nur im Arbeitsspeicher und gehen beim Beenden der Anwendung verloren.
-Für einen praktischen Einsatz wäre es jedoch hilfreich, den Zustand des Generator-Graphen auf Disk zu speichern. 
-So könnten bereits berechnete Teile der Welt beim nächsten Start der Anwendung wiederverwendet werden, ohne sie vollständig neu berechnen zu müssen. 
-Dabei stellen sich Fragen zur effizienten Serialisierung großer Graphstrukturen sowie zur Invalidierung gespeicherter Ergebnisse, wenn sich das Template zwischen zwei Sitzungen geändert hat.
+In der aktuellen Implementierung existieren gecachte Zwischenergebnisse nur im Arbeitsspeicher und gehen beim Beenden der Anwendung verloren. Für einen praktischen Einsatz wäre es jedoch hilfreich, den Zustand des Generatorgraphen auf der Festplatte zu speichern. So könnten bereits berechnete Teile der Welt beim nächsten Start der Anwendung wiederverwendet werden, ohne sie vollständig neu berechnen zu müssen. Dabei stellen sich Fragen zur effizienten Serialisierung großer Graphstrukturen sowie zur Invalidierung gespeicherter Ergebnisse, wenn sich das Template zwischen zwei Sitzungen geändert hat.
 
 = Fazit
 
-In dieser Arbeit wurde gezeigt, dass minimale Neuberechnung für prozedurale Generierung grundsätzlich möglich ist. 
-Die Beispielimplementation zeigt, dass sich ein Generationsalgorithmus als Abhängigkeitsgraph darstellen lässt und Zwischenergebnisse gezielt wiederverwendet werden können. Ändert sich ein Teil des Algorithmus, müssen nur die betroffenen Knoten neu berechnet werden.
+In dieser Arbeit wurde gezeigt, dass minimale Neuberechnung für prozedurale Generierung grundsätzlich möglich ist. Die Beispielimplementierung zeigt, dass sich ein Generationsalgorithmus als Abhängigkeits-Graph darstellen lässt und Zwischenergebnisse gezielt wiederverwendet werden können. Ändert sich ein Teil des Algorithmus, müssen nur die betroffenen Knoten neu berechnet werden.
 
-Jedoch da der Algorithmus als Graph interpretiert wird statt direkt als kompilierten Code ausgeführt zu werden, ist er deutlich langsamer als eine direkte Implementierung. 
-In den Benchmarks war eine optimierte direkte Implementierung etwa 4 - 6x schneller. Dieser Overhead entsteht vor allem durch das rekursive Auflösen der Abhängigkeiten und die polymorphe Natur des Graphen.
-Dazu kommt, dass der Aufwand zur Implementierung aller benötigten Operationen und Datentypen. 
+Da jedoch der Algorithmus als Graph interpretiert wird, statt direkt als kompilierter Code ausgeführt zu werden, ist er deutlich langsamer als eine direkte Implementierung. In den Benchmarks war eine optimierte direkte Implementierung etwa 4–6x schneller. Dieser Overhead entsteht vor allem durch das rekursive Auflösen der Abhängigkeiten und die polymorphe Natur des Graphen. Dazu kommt, dass der Aufwand zur Implementierung aller benötigten Operationen und Datentypen hoch ist.
 
-Trotzdem bietet mein Ansatz mein ein graphisches Interface um Prozedurale Generationsalgorithen interaktiv zu entwickeln. 
-Es bietet eine vereinfachte Abstraktions-Ebene zum testen von Generationslogik die keine Wissen über Programmiersprachen benötigt. 
+Trotzdem bietet mein Ansatz ein grafisches Interface, um prozedurale Generationsalgorithmen interaktiv zu entwickeln. Es bietet eine vereinfachte Abstraktionsebene zum Testen von Generationslogik, die kein Wissen über Programmiersprachen benötigt.
 
-Für einen realen Einsatz in einem Spiel oder einer Simulation würde ist mein Ansatz sinnvoll, wenn der Generationsalgorithmus für eine prozedurale Welt Personen von entwickelt werden soll die nicht umfassend programmieren können und sehr interaktiv jede Änderung testen wollen.
+Für einen realen Einsatz in einem Spiel oder einer Simulation wäre mein Ansatz sinnvoll, wenn der Generationsalgorithmus für eine prozedurale Welt von Personen entwickelt werden soll, die nicht umfassend programmieren können und Änderungen sehr interaktiv testen wollen.
 
 #show bibliography: set heading(numbering: "1")
 #bibliography("citations.bib")
