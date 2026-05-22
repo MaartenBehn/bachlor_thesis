@@ -64,7 +64,19 @@ Ob ein generiertes Gelände zum Beispiel immer einen zugänglichen Weg zwischen 
 Solche Regeln müssen in späteren Generationsschritten überprüft und die Welt gegebenenfalls angepasst werden. 
 Jedoch werden in vielen Generationssystemen diese Fehler toleriert, wenn sie nur selten auftauchen.
 
-Für minimale Neuberechnung sind Noise-basierte Verfahren besonders ungeeignet, da theoretische jede Noise-Ebene Einfluss auf jedes Ergebnis hat. Die Generierungslogik steckt implizit in der Komposition der Funktionen. Ändert man eine Funktion oder ihre Parameter, kann dies zu einer komplett anderen Welt führen.
+#figure({
+    grid(
+    columns: 2,        
+    rows: 1,         
+    gutter: 0.2cm, 
+    trimmed-image("../assets/upside-down-boat-cropped.png", trim: (right: 25%, left: 25%)),
+    trimmed-image("../assets/underground-hell-cropped.png", trim: (right: 25%, left: 25%))
+    )
+  },
+  caption: [ Beispiele für fehlerhaft generierte Welten in Minecraft @wierd_minecraft ],
+) <fig-minecraft>
+
+Für minimale Neuberechnung sind Noise-basierte Verfahren eher ungeeignet, da theoretisch jede Noise-Ebene Einfluss auf jedes Ergebnis hat. Die Generierungslogik steckt implizit in der Komposition der Funktionen. Ändert man eine Funktion oder ihre Parameter, kann dies zu einer komplett anderen Welt führen.
 
 == Example based Model Synthesis 
 
@@ -81,6 +93,12 @@ Dann wird die Zelle mit den wenigsten verbleibenden Möglichkeiten ausgewählt u
 Anschließend werden aus den Nachbarzellen alle Werte entfernt, für die keine gültige Regel mehr existiert. 
 Dieser Bereinigungsschritt wird rekursiv auf alle betroffenen Nachbarzellen ausgeweitet. 
 Der Vorgang wiederholt sich, bis jede Zelle genau einen Wert enthält.
+
+
+#figure(
+  image("assets/example_based_model_synthesis.png", width: 80%),
+  caption: [(a) A model composed of four model pieces, (b) An Inconsistent Model, (c) A Consistent Model (aus "Example-based Model Synthesis" Paper @model_synthesis)],
+) <fig-example_based_model_synthesis>
 
 === Minimale Neuberechnung mit Model Systhesis 
 
@@ -106,6 +124,8 @@ Allerdings wächst dieser Suchraum sehr schnell und führt sowohl in Bezug auf L
 
 Der Vorteil des ursprünglichen Model-Synthesis-Algorithmus liegt darin, dass zu jedem Zeitpunkt alle noch möglichen Kombinationen eine valide Lösung darstellen. Das Finden einer minimalen Erweiterung dieser Mengen, die nach einer Regeländerung wieder eine gültige Lösung ermöglicht, ist jedoch deutlich schwieriger als die ursprüngliche Generierung selbst. 
 
+#todo("In Hauptteil?")
+
 == Graph Grammatiken
 Eine Graph Grammatik ist ein System aus Regeln, die beschreiben, wie ein Graph verändert werden kann. 
 Jede Regel besteht aus zwei Teilen: einem Teilgraph, der gesucht wird, und einem Teilgraph, der ihn ersetzt. 
@@ -122,6 +142,11 @@ Nach wenigen Iterationen entsteht so eine verzweigte Struktur, die wie ein Baum 
 L-Systems eignen sich gut für Vegetation, weil natürliche Strukturen oft selbstähnlich sind. 
 Ein Ast sieht aus wie ein kleiner Baum, ein Zweig wie ein kleiner Ast. 
 Mit wenigen Regeln lassen sich so sehr organisch wirkende Formen erzeugen.
+
+#figure(
+  image("assets/l_system_trees.png", width: 80%),
+  caption: [Mit L-Systems generierte Bäume @l_system_trees_wikipedia],
+) <fig-example_based_model_synthesis>
 
 === Graph-based Model Synthesis
 Graph-based Model Synthesis @garph_based_model_synthesis erweitert das Konzept von Graph Grammatiken, indem Regeln automatisiert aus einem Beispiel abgeleitet werden. 
