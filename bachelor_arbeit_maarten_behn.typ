@@ -49,6 +49,8 @@ Anschließend werden KI-basierte Verfahren diskutiert und warum diese für minim
 Schließlich werden die Systeme von Houdini und Blender Geometry Nodes erklärt, welche den gleichen Ansatz wie diese Arbeit verfolgen, 
 aber für einen anderen Kontext ausgelegt sind.
 
+#todo("Ein bisschen flach")
+
 == Noise & Zufälligkeit <noise_based_generation>
 
 Viele prozedurale Generatoren nutzen Noise-Algorithmen, um Welten zu erzeugen. 
@@ -62,7 +64,7 @@ Minecraft nutzt zum Beispiel Perlin-Noise, um sein Gelände und Höhlen effizien
 Das Problem ist, dass sich mit Noise-Funktionen nur schwer das Einhalten global geltender Regeln garantieren lässt. 
 Ob ein generiertes Gelände zum Beispiel immer einen zugänglichen Weg zwischen zwei Punkten hat, lässt sich aus den Noise-Funktionen allein nicht bestimmen. 
 Solche Regeln müssen in späteren Generationsschritten überprüft und die Welt gegebenenfalls angepasst werden. 
-Jedoch werden in vielen Generationssystemen diese Fehler toleriert, wenn sie nur selten auftauchen.
+In vielen Generationssystemen werden diese Fehler toleriert, wenn sie nur selten auftauchen. Siehe @fig-minecraft für Beispiele von fehlerhafter Generation.
 
 #figure({
     grid(
@@ -80,8 +82,7 @@ Für minimale Neuberechnung sind Noise-basierte Verfahren eher ungeeignet, da th
 
 == Example based Model Synthesis 
 
-Eine relativ neuer Ansatz im Bereich der constraint-basierten Generation ist Paul Merrels "Example-based Model Synthesis".
-@model_synthesis
+Eine relativ neuer Ansatz im Bereich der constraint-basierten Generation ist "Example-based model synthesis" von Paul #cite(<model_synthesis>, form: "author")
 
 Die Grundidee ist hier, aus einem kleinen Eingabedatensatz eine größere Struktur zu erzeugen, die lokal denselben Regeln folgt.
 
@@ -94,37 +95,14 @@ Anschließend werden aus den Nachbarzellen alle Werte entfernt, für die keine g
 Dieser Bereinigungsschritt wird rekursiv auf alle betroffenen Nachbarzellen ausgeweitet. 
 Der Vorgang wiederholt sich, bis jede Zelle genau einen Wert enthält.
 
-
 #figure(
   image("assets/example_based_model_synthesis.png", width: 80%),
-  caption: [(a) A model composed of four model pieces, (b) An Inconsistent Model, (c) A Consistent Model (aus "Example-based Model Synthesis" Paper @model_synthesis)],
+  caption: [(a) A model composed of four model pieces, (b) An Inconsistent Model, (c) A Consistent Model @model_synthesis],
 ) <fig-example_based_model_synthesis>
 
-=== Minimale Neuberechnung mit Model Systhesis 
-
 Da der Bereich, bestehenden Model Systhesis Ereignis an geänderte Regeln anzupassen, bisher unerforscht ist habe ich dies zu Beginn meiner Arbeit aktiv als Kern Thema in Betracht gezogen.
-Nun möchte ich kurz anschaulich erläutern warum ich diesen Ansatz verworfen haben, 
-da man beim Versuch Model Systhesis Ereignis an geänderte Regeln anzupassen, einen entscheiden Vorteil von Model Systhesis verliert.
+In @layz-model-synthesis kurz darauf eingehen warum ich diesen Ansatz verworfen habe.
 
-Angenommen eine vollständiges Ereignis wurde mit dem Model-Synthesis-Algorithmus zu generiert. 
-Wenn sich anschließend die zugrunde liegenden Regeln ändern, kann man grundsätzlich nicht sicherstellen das die Welt den neuen Regeln entspricht. 
-
-Um das Ergebnis an die neuen Regeln anzupassen müssten alle Felder zu identifizieren werden, deren aktuelle Werte gegen die neuen Regeln verstoßen. Für diese Felder müssten anschließend wieder mehrere mögliche Werte zugelassen werden, sodass der Model-Synthesis-Algorithmus erneut eine konsistente Konfiguration finden kann.
-
-Dabei zeigt sich jedoch ein grundlegendes Problem: Wenn einem Feld neue mögliche Werte hinzugefügt werden, sind diese zunächst nicht notwendigerweise mit den aktuellen Werten der Nachbarfelder kompatibel. Damit die lokalen Regeln wieder erfüllt sind, müssten auch den Nachbarfeldern zusätzliche mögliche Werte hinzugefügt werden. Dieser Prozess kann sich wiederum auf deren Nachbarn ausbreiten und so weiter.
-
-Würde man dieses Verfahren naiv implementieren, indem für alle betroffenen Nachbarn wieder sämtliche möglichen Werte zugelassen werden, entstünde im Extremfall erneut ein vollständig unentschiedenes Gitter. In diesem Fall würde der Algorithmus effektiv wieder bei einem normalen Model-Synthesis-Prozess beginnen, wodurch kein Vorteil gegenüber einer vollständigen Neugenerierung entsteht.
-
-Um dennoch einen Nutzen aus diesem Ansatz zu ziehen, müsste man eine Menge an Werten für Felder finden, sodass anschließend wieder eine konsistente Konfiguration existiert. 
-Diese Menge sollte idealerweise minimal sein, damit möglichst große Teile der bestehenden Welt unverändert bleiben können. Gleichzeitig müsste der Aufwand zur Bestimmung dieser Menge deutlich geringer sein als eine komplette Neugenerierung der Welt.
-
-Eine theoretische Möglichkeit bestünde darin, den Raum der möglichen Werteerweiterungen systematisch zu durchsuchen. 
-Beispielsweise könnte eine Breitensuche über den Graphen der möglichen Wertkombinationen durchgeführt werden, um eine minimale Menge an Änderungen zu finden, die wieder zu einer konsistente Konfiguration führt. 
-Allerdings wächst dieser Suchraum sehr schnell und führt sowohl in Bezug auf Laufzeit als auch Speicherverbrauch zu erheblichen Komplexitätsproblemen.
-
-Der Vorteil des ursprünglichen Model-Synthesis-Algorithmus liegt darin, dass zu jedem Zeitpunkt alle noch möglichen Kombinationen eine valide Lösung darstellen. Das Finden einer minimalen Erweiterung dieser Mengen, die nach einer Regeländerung wieder eine gültige Lösung ermöglicht, ist jedoch deutlich schwieriger als die ursprüngliche Generierung selbst. 
-
-#todo("In Hauptteil?")
 
 == Graph Grammatiken
 Eine Graph Grammatik ist ein System aus Regeln, die beschreiben, wie ein Graph verändert werden kann. 
@@ -192,6 +170,7 @@ Dabei werden auch Zwischenergebnisse gespeichert und wiederverwendet, um die Lau
 Beide Systeme sind jedoch auf die interaktive Erstellung einzelner Assets ausgelegt und nicht auf die prozedurale Generierung großer, zusammenhängender Welten mit Tausenden von Elementen.  
 Zudem sind sie geschlossene Programme, die nicht darauf ausgelegt sind, in eine Spiel- oder Simulations-Engine eingebettet zu werden. 
 Das in dieser Arbeit vorgestellte System ist aber genau dafür konzipiert. Der Generationsalgorithmus soll in der Umgebung iterativ weiterentwickelt werden können und Änderungen in einer bereits bestehenden Welt sollen unmittelbar sichtbar werden.
+@houdini @blender
 
 
 = Theoretische Grundlagen 
@@ -263,12 +242,42 @@ Populäre Programme, in denen grafische Programmierung verwendet wird, sind Unit
 
 = Mein Lösungsansatz
 
-Dieses Kapitel beschreibt, wie das Ziel, die Neuberechnungszeit zu verkürzen, erreicht werden kann. Die Komponenten des Systems werden vorgestellt und zentrale Algorithmen werden erklärt.
+Dieses Kapitel beschreibt, wie das Ziel, die Neuberechnungszeit zu verkürzen, erreicht werden kann. 
+Zunächst erkläre ich mich warum ich ein System basierend auf einem Abhängigkeits-Graph gewählt habe. 
+Dann werden die Komponenten des Systems vorgestellt und zentrale Algorithmen werden erklärt.
 Weiterhin werden Besonderheiten des Systems sowie mögliche Probleme diskutiert. 
 
 Mein Lösungsansatz beschreibt, wie prozedurale Generierung strukturiert sein sollte, damit das System automatisch erkennt, welche Teile der Welt es bei einer Änderung im Algorithmus neu berechnen muss.
-Dafür wird der Algorithmus als Abhängigkeits-Graph modelliert. 
+Dafür wird der Algorithmus als Abhängigkeits-Graph modelliert.
 
+
+== Minimale Neuberechnung mit Model Synthesis <layz-model-synthesis> 
+
+Die initiale Idee meiner Arbeit entstand durch die Fragestellung, ob man Model Synthesis eine mit Model Synthesis generiertes Ergebnis, nach Regeländerung minimal neuberechnen kann. 
+Nun möchte ich kurz anschaulich erläutern warum ich diesen Ansatz verworfen haben, 
+da man beim Versuch Model Synthesis Ereignis an geänderte Regeln anzupassen, einen entscheiden Vorteil von Model Systhesis verliert.
+
+Angenommen eine vollständiges Ereignis wurde mit dem Model-Synthesis-Algorithmus zu generiert.
+Dies ist ein Gitter an Felder. Jedem Feld ist ein Wert zugeordnet. Dazu gibt es eine List an validen Nachbarkombinationen.
+
+Wenn sich anschließend die zugrunde liegenden Regeln ändern, kann man grundsätzlich nicht sicherstellen dass das Ereignis den neuen Regeln entspricht. 
+
+Um das Ergebnis an die neuen Regeln anzupassen müssten alle Felder zu identifizieren werden, deren aktuelle Werte gegen die neuen Regeln verstoßen. Für diese Felder müssten anschließend wieder mehrere mögliche Werte zugelassen werden, sodass der Model-Synthesis-Algorithmus erneut eine konsistente Konfiguration finden kann.
+
+Dabei zeigt sich jedoch ein grundlegendes Problem: Wenn einem Feld neue mögliche Werte hinzugefügt werden, sind diese zunächst nicht notwendigerweise mit den aktuellen Werten der Nachbarfelder kompatibel. Damit die lokalen Regeln wieder erfüllt sind, müssten auch den Nachbarfeldern zusätzliche mögliche Werte hinzugefügt werden. Dieser Prozess kann sich wiederum auf deren Nachbarn ausbreiten und so weiter.
+
+Würde man dieses Verfahren naiv implementieren, indem für alle betroffenen Nachbarn wieder sämtliche möglichen Werte zugelassen werden, entstünde im Extremfall erneut ein vollständig unentschiedenes Gitter. In diesem Fall würde der Algorithmus effektiv wieder bei einem normalen Model-Synthesis-Prozess beginnen, wodurch kein Vorteil gegenüber einer vollständigen Neugenerierung entsteht.
+
+Um dennoch einen Nutzen aus diesem Ansatz zu ziehen, müsste man eine Menge an Werten für Felder finden, die hinzugefügt werden sollen, sodass anschließend wieder eine konsistente Konfiguration existiert. 
+Diese Menge sollte idealerweise minimal sein, damit möglichst große Teile der bestehenden Welt unverändert bleiben können. Gleichzeitig müsste der Aufwand zur Bestimmung dieser Menge deutlich geringer sein als eine komplette Neugenerierung der Welt.
+
+Eine theoretische Möglichkeit bestünde darin, den Raum der möglichen Werteerweiterungen systematisch zu durchsuchen. 
+Beispielsweise könnte eine Breitensuche über den Graphen der möglichen Wertkombinationen durchgeführt werden, um eine minimale Menge an Änderungen zu finden, die wieder zu einer konsistente Konfiguration führt. 
+Allerdings wächst dieser Suchraum sehr schnell und führt sowohl in Bezug auf Laufzeit als auch Speicherverbrauch zu erheblichen Komplexitätsproblemen.
+
+Der Vorteil des ursprünglichen Model-Synthesis-Algorithmus liegt darin, dass zu jedem Zeitpunkt alle noch möglichen Kombinationen eine valide Lösung darstellen. Das Finden einer minimalen Erweiterung dieser Mengen, die nach einer Regeländerung wieder eine gültige Lösung ermöglicht, ist jedoch wesentlich komplexer als die ursprüngliche Generierung selbst. 
+
+Daher habe ich für meine Arbeit ein Ansatz basierend auf einem Abhängigkeits-Graph verfolgt.
 
 == Abhängigkeits-Graph
 
@@ -278,7 +287,6 @@ Dabei gilt, dass als Eingangswerte für Knoten die Ergebnisse anderer Knoten im 
 Dies bezeichne ich als Abhängigkeit, weil für die Berechnung eines Knotens alle Ergebnisse, die hierfür Eingangswerte sind, zuvor errechnet werden müssen. 
 Das Ergebnis eines Knotens hängt nur von seinen Eingangswerten ab und hat damit keine Nebeneffekte (siehe Funktionale Programmierung).
 Knoten und deren Ergebnisse, die keine Eingangswerte haben, bezeichne ich als konstant. 
-
 
 == Framework
 
@@ -355,15 +363,15 @@ Innerhalb eines Levels hat die Reihenfolge keine Auswirkung.
 
 === Einen prozeduralen Algorithmus als Template darstellen
 
-Bei der Implementierung habe ich mich entscheiden, dass das finale Ergebnis des Templates ein Volumen als "constructive solid geometry" (CSG) sein soll.
+Bei der Implementierung habe ich mich entscheiden, dass das finale Ergebnis des Templates ein Volumen als "constructive solid geometry" (CSG) ist.
 
 Diese CSG setzt sich aus Remove- und Union-Operationen auf primitiven geometrischen Körper wie Kugeln und Boxen zusammen. 
 
 Einige der Operationen, die ich implementiert habe, sind: 
 - Kugel aus Position und Durchmesser
 - Box aus Position und Seitenlänge
-- alle Positionen auf einem Gitter, die innerhalb eines Volumens sind.
-- eine Menge an zufälligen Positionen innerhalb eines Volumens.
+- Alle Positionen auf einem Gitter, die innerhalb eines Volumens sind, errechnen.
+- Eine Menge an zufälligen Positionen innerhalb eines Volumens errechnen.
 - Addition, Subtraktion, Multiplikation und Division von Positionen und Zahlen
 
 === Generation eines Templates <generation_of_template>
@@ -673,26 +681,15 @@ Auf jeder Insel werden eine Menge an zufälligen Kreuzungs-Punkte generiert.
 Kreuzungs-Punkte die in der Nähe von einander sind werden mit zufällig verlaufenden Wegen verbunden. 
 Danach werden die ungenutzten Flächen der Insel mit zufällig plazierten Bäumen gefüllt.
 
-Dieses Beispiel wird mit diesem aus diesem Editor Graph erzeugt:
-#itodo("Sollte wahrscheinlich in den Anhang?")
+#figure(
+  image("assets/full_graph.png", width: 100%),
+  caption: [ Graph für Insel Beispiel (Hochauflösende Version im Anhang) ],
+)
 
-#context {
-  set figure(placement: top)
 
-  figure({
-    v(18%)
-    block(width: 180%, {
-      rotate(90deg, trimmed-image("../assets/full_graph.png", trim: (right: 50%)))
-    })
-  })
 
-  figure({
-    v(18%)
-    block(width: 180%, {
-      rotate(90deg, trimmed-image("../assets/full_graph.png", trim: (left: 50%)))
-    })
-  })
-}
+
+
 
 = Analyse
 
@@ -888,7 +885,7 @@ Die Datentypen und Operationen sind als Typed Unions implementiert, daher könne
 Jedoch muss die neue Variante an jeder Stelle, wo ein Datentyp oder eine Operation allgemein verwendet wird, implementiert werden, um sie in das bestehende Netz an möglichen Abhängigkeiten zu integrieren.
 
 
-= Future Work
+= Noch offene Fragestellungen
 
 == Nullwerte führen zu leeren Lösungen
 Da der Nullwert per Definition ein valider Wert ist, kann es dazu kommen, dass sich ein Abhängigkeitskreis zu Null als Lösung entwickelt, auch wenn es theoretisch andere Lösungen gäbe. Um dies zu lösen, müsste ein anderer Ansatz zur Lösung von Abhängigkeitskreisen genutzt werden.
@@ -933,10 +930,37 @@ Trotzdem bietet mein Ansatz ein grafisches Interface, um prozedurale Generations
 Für einen realen Einsatz in einem Spiel oder einer Simulation wäre mein Ansatz sinnvoll, wenn der Generationsalgorithmus für eine prozedurale Welt von Personen entwickelt werden soll, die nicht umfassend programmieren können und Änderungen sehr interaktiv testen wollen.
 
 #show bibliography: set heading(numbering: "1")
-#bibliography("citations.bib")
+#bibliography("citations.bib", style: "mla")
 
 #include "./layout/eigenständigkeit.typ"
 
-#include "./layout/ai_disclaimer.typ"
+== Nutzung KI basierte Anwendungen
 
+Neuronale Large Language Modelle wurden zur Erstellung dieser Arbeit in folgenden Bereichen verwendet:
+- Recherche: Um einen Überblick über den Stand der Technik zu erhalten und relevante Arbeiten zu identifizieren, wurden KI-basierte Systeme genutzt, um Empfehlungen für bestehende Literatur zu generieren.
+- Rechtschreib- und Satzbaukorrektur: Eine von mir verfasste Rohfassung wurde mithilfe von KI auf Rechtschreibung, Grammatik und Zeichensetzung überprüft. Dabei wurde die KI gezielt so eingesetzt, dass nur notwendige Korrekturen vorgenommen wurden. Stilistische Änderungen wurden vermieden, um den ursprünglichen Ausdruck beizubehalten. Es wurde darauf geachtet, dass sich der Inhalt durch die vorgeschlagenen Anpassungen nicht ändert.
+
+Bereiche, in denen keine KI verwendet wurde, sind:
+- Programmierung: Es wurde keine KI verwendet, um den Code meiner Implementierung zu schreiben.
+- Textinhalte: KI wurde nicht verwendet, um inhaltliche Aussagen, Argumentationen oder Ergebnisse der Arbeit zu generieren.
+
+
+#context {
+  set page(footer: none)
+  set figure(placement: top)
+
+  figure({
+    v(18.5%)
+    block(width: 195%, {
+      rotate(90deg, trimmed-image("../assets/full_graph.png", trim: (right: 50%)))
+    })
+  })
+
+  figure({
+    v(18.5%)
+    block(width: 195%, {
+      rotate(90deg, trimmed-image("../assets/full_graph.png", trim: (left: 50%)))
+    })
+  })
+}
 

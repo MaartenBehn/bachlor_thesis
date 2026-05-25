@@ -39,24 +39,6 @@ numpages = {16},
 keywords = {inverse procedural modeling, graph grammar, local similarity}
 }
 
-@inproceedings{hierarchical_Semantic_wfc,
-  author = {Alaka, Shaad and Bidarra, Rafael},
-  title = {Hierarchical Semantic Wave Function Collapse},
-  year = {2023},
-  isbn = {9781450398558},
-  publisher = {Association for Computing Machinery},
-  address = {New York, NY, USA},
-  url = {https://doi.org/10.1145/3582437.3587209},
-  doi = {10.1145/3582437.3587209},
-  abstract = {There are few proposals to improve the interactivity and control of wave function collapse (WFC) in a mixed-initiative setting. Moreover, most WFC algorithm variants operate on an simple, unstructured set of tiles. This limitation on the level of control provided to designers hampers their creative work in various ways. We propose Hierarchical Semantic WFC, a generalized approach to WFC that organizes its tile-set into a hierarchy akin to a taxonomy induced by the relation ‘consists-of’. In such a hierarchical structure, abstract tiles (i.e.&nbsp;non-leaf nodes) can represent the first sketchy intentions of a designer (e.g.&nbsp;forest, urban, desert,...) This allows a designer to interactively collapse a given area into abstract tiles, while subsequently, (and repeatedly, if desired) WFC can resolve each area into a variety of particular instances, by further collapsing it into (a valid combination of) its children tiles (whether leaves or not). We identify how this subtle tile-set change affects the whole WFC algorithm, describe a number of novel exploratory and interactive functions that this enables, and showcase these with a variety of examples generated with our prototype implementation. We conclude that these new mixed-initiative content generation methods can considerably reduce design iteration times and improve the assistance given to designers in expressing their creative intent.},
-  booktitle = {Proceedings of the 18th International Conference on the Foundations of Digital Games},
-  articleno = {68},
-  numpages = {10},
-  keywords = {mixed-initiative, object semantics, procedural content generation, wave function collapse},
-  location = {Lisbon, Portugal},
-  series = {FDG '23}
-}
-
 ## L_System
 @book{l_systems,
   author    = {Prusinkiewicz, Przemyslaw and Lindenmayer, Aristid},
@@ -127,7 +109,7 @@ keywords = {inverse procedural modeling, graph grammar, local similarity}
   series = {FDG '25}
 }
 
-@INPROCEEDINGS{Compressing_and_Comparing_the_Generative_Spaces_of_Procedural_Content_Generators,
+@inproceedings{Compressing_and_Comparing_the_Generative_Spaces_of_Procedural_Content_Generators,
   author={Withington, Oliver and Tokarchuk, Laurissa},
   booktitle={2022 IEEE Conference on Games (CoG)}, 
   title={Compressing and Comparing the Generative Spaces of Procedural Content Generators}, 
@@ -139,12 +121,28 @@ keywords = {inverse procedural modeling, graph grammar, local similarity}
   doi={10.1109/CoG51982.2022.9893615}
 }
 
+@software{houdini,
+  author       = {{Side Effects Software Inc.}},
+  title        = {Houdini: 3D Procedural Software for Modeling, Animation, VFX, Look Development, Lighting and Rendering},
+  year         = {2026},
+  url          = {https://www.sidefx.com/},
+  note         = {Abgerufen am 25. Mai 2026}
+}
+
+@software{blender,
+  author       = {{Blender Foundation}},
+  title        = {Blender: Open-source 3D creation suite; Geometry Nodes seit Version 2.92},
+  year         = {2026},
+  url          = {https://www.blender.org},
+}
+
 # Theory
 @book{modern_graph_theory,
   title     = "Modern Graph Theory",
   author    = "Béla Bollobás",
   year      = 2013,
   publisher = "Springer New York",
+
   doi       = "10.1007/978-1-4612-0619-4"
 }
 
@@ -201,9 +199,9 @@ keywords = {inverse procedural modeling, graph grammar, local similarity}
 }
 
 ## SmallVec
-@misc{smallvec_crate,
+@software{smallvec_crate,
   title        = {smallvec: A vector that can store a small number of elements inline},
-  author       = {Servo Project Developers},
+  author       = {{Servo Project developers}},
   year         = {2018},
   url          = {https://crates.io/crates/smallvec},
   note         = {Abgerufen: 07.04.2026}
@@ -221,11 +219,11 @@ keywords = {inverse procedural modeling, graph grammar, local similarity}
   doi     = {10.1145/359576.359585}
 }
 
-@misc{async_channel,
+@software{async_channel,
   title        = {async-channel: Async multi-producer multi-consumer channel},
-  author       = {smol-rs developers},
+  author       = {{smol-rs developers}},
   year         = {2024},
-  url          = {https://docs.rs/async-channel},
+  url          = {https://crates.io/crates/async-channel},
   note         = {Rust crate used by smol for fast message-passing channels}
 }
 
@@ -260,11 +258,9 @@ keywords = {inverse procedural modeling, graph grammar, local similarity}
 }
 
 @misc{l_system_trees_wikipedia,
-  author       = {{Wikipedia contributors}},
-  title        = {Dragon Trees -- L-system illustration},
+  author       = {{Solkoll}},
+  title        = {L-system trees form realistic models of natural patterns},
   year         = {2025},
-  howpublished = {Wikimedia Commons, in: Wikipedia, The Free Encyclopedia,
-                  article ``L-system''},
   url          = {https://en.wikipedia.org/wiki/L-system#/media/File:Dragon_trees.jpg},
   note         = {Abgerufen: am 22.05.2026}
 }
