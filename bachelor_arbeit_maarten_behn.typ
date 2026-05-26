@@ -291,8 +291,8 @@ Knoten und deren Ergebnisse, die keine Eingangswerte haben, bezeichne ich als ko
 == Framework
 
 #figure(
-  image("assets/overview_diagramm.png", width: 100%),
-  caption: [Überblick über Editor, Abhängigkeits-Graph, dessen cache und der Welt. #itodo("Sauber zeichnen")],
+  image("assets/overview_diagramm.svg", width: 100%),
+  caption: [Überblick über Editor, Abhängigkeits-Graph, dessen cache und der Welt. ],
 ) <fig-sphere>
 
 Mein Generationssystem besteht aus drei Bestandteilen: 
@@ -311,7 +311,7 @@ Diese Operationen haben auf ihrer linken Seite eine Liste mit Eingangswerten und
 
 #figure(
   image("assets/sphere.png", width: 80%),
-  caption: [Node um ein Kugel Volumen zu definieren. #itodo("Hintergrund")],
+  caption: [Node um ein Kugel Volumen zu definieren. ],
 ) <fig-sphere>
 
 Die Eingangswerte und Ergebnisse sind je nach Datentyp farbig kodiert und können mit Linien verbunden werden. 
@@ -323,14 +323,14 @@ Damit werden auch komplexe Abhängigkeiten übersichtlich dargestellt.
 
 #figure(
   image("assets/nodes.png", width: 80%),
-  caption: [Eine Kugel dessen Größe ihrer X Position entspricht. #itodo("Hintergrund")],
+  caption: [Eine Kugel dessen Größe ihrer X Position entspricht. ],
 ) <fig-nodes>
 
 == Template 
 
 Das Template $:= (G_"ab", G_"ch")$ besteht aus dem Abhängigkeits-Graphen $G_"ab"$ und einem Cache-Graphen $G_"ch"$. 
 
-$G_"ab"$ ist ein Graph, der die zu generierende Welt als rekursive Formel beschreibt, die aus den oben genannten Operationen besteht. 
+$G_"ab"$ ist ein Graph, der die zu generierende Welt als rekursive Formel beschreibt. 
 
 Die Eingehenden Nachbarn $N^-_G_"ab"$ errechnen die Eingangswerte für eine Operation und die 
 Ausgehenden Nachbarn $N^+_G_"ab"$ sind alle Operationen, die das Ergebnis benötigen. 
@@ -345,8 +345,8 @@ Man findet diese, indem man den Baum der Abhängigkeiten in $G_"ab"$ in allen se
 
 
 #figure(
-  image("assets/cache_graph.png", width: 60%),
-  caption: [ Beispiel eines Abhängigkeites-Graph und dessen Cache-Knoten zur Generierung einer Menge an Bäumen. #itodo("Sauber zeichnen") ],
+  image("assets/cache_graph.svg", width: 50%),
+  caption: [ Beispiel eines Abhängigkeites-Graph und dessen Cache-Knoten zur Generierung einer Menge an Bäumen. ],
 ) <fig-cache_graph>
 
 === Level
@@ -363,13 +363,13 @@ Innerhalb eines Levels hat die Reihenfolge keine Auswirkung.
 
 === Einen prozeduralen Algorithmus als Template darstellen
 
-Bei der Implementierung habe ich mich entscheiden, dass das finale Ergebnis des Templates ein Volumen als "constructive solid geometry" (CSG) ist.
+Bei der Implementierung habe ich mich entscheiden, dass das finale Ergebnis des Templates ein Volumen als "constructive solid geometry" (CSG) sein soll.
 
 Diese CSG setzt sich aus Remove- und Union-Operationen auf primitiven geometrischen Körper wie Kugeln und Boxen zusammen. 
 
 Einige der Operationen, die ich implementiert habe, sind: 
-- Kugel aus Position und Durchmesser
-- Box aus Position und Seitenlänge
+- Eine Kugel aus Position und Durchmesser definiert.
+- Eine Box aus Position und Seitenlänge definiert.
 - Alle Positionen auf einem Gitter, die innerhalb eines Volumens sind, errechnen.
 - Eine Menge an zufälligen Positionen innerhalb eines Volumens errechnen.
 - Addition, Subtraktion, Multiplikation und Division von Positionen und Zahlen
@@ -378,7 +378,7 @@ Einige der Operationen, die ich implementiert habe, sind:
 
 Die Operationen, ein Gitter oder zufällige Positionen zu berechnen, erzeugen eine Menge an Werten (mehrere Positionen). 
 Operationen die diese Mengen verwenden können entweder die Operationen auf die gesamte Menge an wenden, zum Beispiel eine Filter Operation, 
-oder wenden die Operationen auf jedes einzelne Element an separat an. 
+oder wenden die Operationen auf jedes einzelne Element separat an. 
 Zum Beispiel platziere an jede Position ein Baum.
 
 Die Fähigkeit weitere Operationen pro Element auszuführen, ermöglicht es, iterativ immer feiner werdende Details zu generieren 
@@ -387,31 +387,33 @@ In meinem System arbeiten alle Algorithmen nur auf den Knoten des Templates.
 Denn Algorithmen auf dem Template haben einen klaren Laufzeit Unterschied zu Algorithmen auf der generierten Welt. 
 Die Menge an Knoten im Abhängigkeits-Graphen und so auch im Cache-Graphen skaliert mit der Menge an Operationen des Generationsalgorithums.
 Wobei die Menge der Elemente in der generierten Welt mit den Größen der Mengen an rechneten Werten skaliert.
-In anderen Worten: Alle Knoten im Template zu iterieren, ist relativ schnell möglich. Hingegen kann die Laufzeit exponentiell ansteigen, wenn alle Elemente in der Welt zu iterieren werden. 
+In anderen Worten: Alle Knoten im Template zu iterieren, ist relativ schnell möglich. Hingegen kann die Laufzeit exponentiell ansteigen, wenn alle Elemente in der Welt iteriert werden. 
 
 Daher werden die Abhängigkeiten im Template verwendet, um herauszufinden wie die Welt neu generiert werden muss. 
 
 == Generator
 
 Der Generator enthält einen Graphen $G_"gen"$, der dem Cache-Graphen $G_"ch"$ im Template entspricht.
+Jedoch wo $G_"ch"$ nur einen Knoten pro Operation enthält, enthält $G_"gen"$ einen Knoten pro Ergebnis dieser Operation.
+
+#todo("Grafik")
+
 Jeder Knoten $v_"gen" in V(G_"gen")$ speichert, welchem Knoten $v_"ch" in V(G_"ch")$ er entspricht $v_"ch" = $ *cache*$(v_"gen")$.
 Dazu hat ein Knoten $v_"gen" in V(G_"gen")$ das gleiche Level wie sein Cache-Template-Knoten $l(v_"gen") = l($*cache*$(v_"gen"))$.
 
-Jedoch wenn $G_"ch"$ nur einen Knoten pro Operation enthält, enthält $G_"gen"$ einen Knoten pro Ergebnis, welches errechnet werden muss. 
-
-Dafür enthält der Generator $:= (G_"gen", Q_"tasks")$ eine Queue $Q_"tasks"$, die zwei Arten von Aufträgen auf $G_"gen"$ nach ihren Levels sortiert.    
+Zusätzlich enthält der Generator $:= (G_"gen", Q_"tasks")$ eine Queue $Q_"tasks"$, die zwei Arten von Aufträgen auf $G_"gen"$ nach ihren Levels sortiert.    
 $
 "pop"(Q_"tasks") := min_(q in Q_"tasks") (l(q))
 $
 
-Berechnungs-Aufträge ermitteln das Ergebnis eines Knoten in $G_"gen"$. Kind-Update-Aufträge erzeugen oder löschen Kinder, bis ihre Anzahl für das Template geeignet ist.
+Berechnungs-Aufträge ermitteln das Ergebnis eines Knoten in $G_"gen"$. Kind-Update-Aufträge erzeugen oder löschen Kinder, bis ihre Anzahl dem Template entspricht.
 
 === Abhängigkeiten-Werte im Generator-Graph finden
 
 Um einen Knoten in $G_"gen"$ zu errechnen, benötigt man die Ergebnisse der Knoten in $G_"gen"$, von denen dieser Knoten abhängt. 
 Wie in @generation_of_template erläutert, ist es innerhalb einer vertretbaren Laufzeit nicht möglich, diese zum Beispiel mit einer Tiefensuche zu finden.
 
-Stattdessen wird für jeden Template-Knoten $v in V(G_"ch")$ einer der Knoten, von den dieser abhängt, $N^-_G_"ch" (v)$ als Erstellungsknoten $v_c in V(G_"ch")$ im Template markiert $v_c = $*create*$(v)$.    
+Stattdessen wird für jeden Cache-Knoten $v in V(G_"ch")$ einer der Knoten, von den dieser abhängt, $N^-_G_"ch" (v)$ als Erstellungsknoten $v_c in V(G_"ch")$ im Template markiert $v_c = $ *create*$(v)$.    
 
 Um nun für einen Knoten $v_"gen" in V(G_"gen")$ alle weitern Knoten zu finden, von dieser abhängt $N^-_G_"gen" (v_"gen")$, 
 werden die relativen Schritte in $G_"ch"$ ausgehend vom Erstellungsknoten $v_c$ hin zu den weiteren abhängigen Knoten als Baum gespeichert $T_"rel" (v_"gen")$.
@@ -419,7 +421,7 @@ werden die relativen Schritte in $G_"ch"$ ausgehend vom Erstellungsknoten $v_c$ 
 Ein relativer Schritt $v_"step"$ gibt an, dass man 
 beginnend bei einem Knoten $v in V(G_"ch")$ entweder aufwärts (*up*($v_"step"$) = True) in einen Knoten $v_"up" in V(G_"ch")$ gehen soll, von dem $v$ abhängt ($v_"up" in N^-_G_"ch" (v)$),  oder abwärts (*up*($v_"step"$) = False) in einen Knoten $v_"down" in V(G_"ch")$, der von $v$ abhängt ($v_"down" in N^+_G_"ch" (v)$). 
 
-Da ein Knoten $v in V(g_"ch")$ mehr als einen eingehenden oder ausgehenden Nachbarn haben kann, speichert ein relativer Schritt auch, in welchen Nachbarn gegangen werden soll (*cache*($v_"step"$)). Ein relativer Schritt Speicher weiterhin, ob dieser Nachbar eine Abhängigkeit für $v_"gen"$ ist (*deps*($v_"step"$) = True).
+Da ein Knoten $v in V(G_"ch")$ mehr als einen eingehenden oder ausgehenden Nachbarn haben kann, speichert ein relativer Schritt auch, in welchen Nachbarn gegangen werden soll (*cache*($v_"step"$)). Ein relativer Schritt Speicher weiterhin, ob dieser Nachbar eine Abhängigkeit für $v_"gen"$ ist (*deps*($v_"step"$) = True).
 
 Diese relativen Schritte verwenden nur Knoten, die ein kleineres Level als $v_"gen"$ haben. 
 Da im Generator Knoten im Level in aufsteigender Reihenfolge erstellt werden, ist so sichergestellt, dass alle relativen Wege existieren.
@@ -428,8 +430,8 @@ Für einen Knoten im Template kann es mehrere Knoten im Generator geben. Daher k
 auch mehrere Knoten gefunden werden.
 
 #figure(
-  image("assets/relative_schritte.png", width: 100%),
-  caption: [ Beispiel der Anwendung eines Baum an relativen Schritten auf das Template und den Generator. #itodo("Sauber zeichnen") ],
+  image("assets/relative_schritte.svg", width: 110%),
+  caption: [ Beispiel der Anwendung eines Baum an relativen Schritten auf das Template und den Generator. ],
   placement: auto,
 ) <fig-relative_schritte>
 
@@ -478,7 +480,6 @@ auch mehrere Knoten gefunden werden.
 
 
 
-
 === Kind-Update-Aufträge
 
 Kind-Update-Aufträge enthalten den Index des Erstellungsknoten und den Index eines Erstellungseintrags $E_"create" (v_"ch")$ in dessen Template-Knoten. 
@@ -491,6 +492,7 @@ Dazu gibt *valid*$(v_"gen", v_"gen creates")$ an, ob ein Kind $v_"gen"$ für den
 Daraufhin wird die vorhandene Menge an Kindern mit der gewünschten Menge verglichen. Bei Ungleichheit werden neue Kinderknoten erzeugt oder gelöscht. 
 
 Wenn eine neuer Knoten erzeugt wird, werden mit dem Baum an relativen Schritten die Indizes aller abhängige Knoten gesucht und im Knoten gespeichert.
+
 #block(
   breakable: false,
   algorithm-figure(
@@ -568,9 +570,12 @@ Wenn eine neuer Knoten erzeugt wird, werden mit dem Baum an relativen Schritten 
     })
   }))
 
+In UpdateChild $v_"gen"$ ist ein Knoten $in V(G_"gen")$ für den alle Kinder die überprüft werden sollen, 
+welche dem Cache Knoten $v_"ch child"$ entsprechen.
+
 === Berechnungs-Aufträge 
-Berechnungs-Aufträge ermitteln den Wert eines Knotens $v_"gen" in V(G_"gen")$ neu. 
-Dabei wird der Knoten im Abhängigkeits-Graph rekursiv errechnet.
+Berechnungs-Aufträge erechnen den Wert eines Knotens $v_"gen" in V(G_"gen")$ neu. 
+Dabei wird der entspreche Knoten im Abhängigkeits-Graph rekursiv errechnet.
 
 Wenn der Algorithmus auf einen Knoten $v_"ab" in V(G_"ab")$ stößt, welcher einen Cache-Knoten hat $v_"ab" in V(G_"ch")$, werden die Werte der jeweiligen abhängigen Knoten von $v_"gen"$ verwendet. 
 
@@ -589,8 +594,7 @@ $
 $
 
 Die Knoten werden Level für Level erzeugt. So wird sichergestellt, dass alle nicht-geschnittenen Abhängigkeiten bereits errechnet wurden, wenn der Knoten selbst errechnet wird. 
-Hat ein Knoten geschnittene Abhängigkeiten, werden diese für das Errechnen genutzt, sofern sie existieren. Andernfalls wird der Nullwert verwendet. Jeder Knoten, der Nullwerte für seine geschnittenen Abhängigkeiten nutzt, wird erneut errechnet, sobald alle Knoten einmal errechnet wurden. Dies wird so oft wiederholt, bis keine Nullwerte mehr verwendet werden.
-
+Hat ein Knoten geschnittene Abhängigkeiten, werden diese für diese im ersten Durchlauf ihr Nullwert verwendet. Jeder Knoten, der Nullwerte für seine geschnittenen Abhängigkeiten genutzt, wird erneut errechnet, sobald alle Knoten einmal errechnet wurden. Nun können die Ergebnisse des der letzten Generation anstatt der Nullwerte verwendet werden. Dies wird so oft wiederholt, bis keine Nullwerte mehr verwendet werden.
 
 == Implementierung
 
@@ -608,8 +612,7 @@ Weiterhin wird pro Element eine Versionsnummer gespeichert. Bei einem Zugriff wi
 
 Die Versionsnummer wird in den oberen 32 Bit des Indexes gespeichert. Somit können in einer stabilen List $2^32$ Elemente gespeichert werden.
 
-Stabile Listen ermöglichen es, Graphen effizient als Listen darzustellen, indem in den Knoten die Indexe der anderen Knoten gespeichert werden, zu den Kanten existieren. Stabile listen sind dabei wesentlich schneller als HashMaps. @slotmap_crate
-
+Stabile Listen ermöglichen es, Graphen effizient als Listen darzustellen, indem in den Knoten die Indexe der anderen Knoten gespeichert werden, zu den Kanten existieren. Stabile listen sind dabei schneller als HashMaps. @slotmap_crate
 
 === Multi Threading
 
@@ -623,11 +626,11 @@ Die errechnete CSG-Darstellung der Welt wird mit einem weiteren Channel an die S
 
 Für die Zwischenspeicherung der Werte werden Small Vectors verwendet. Diese haben die Eigenschaft, dass die ersten N Elemente direkt auf dem Stack alloziert werden. Sobald diese voll sind, wird ein Array auf dem Heap alloziert. 
 
-Alle Werte müssen hierbei als Liste behandelt werden, da ein Knoten für einen Input immer von mehreren Knoten abhängen kann. Jedoch enthält diese Liste meist nur ein Element. Small Vectoren erlauben es, für diese Fälle, auf das Allozieren des Heap zu verzichten, und bieten eigene bessere Cache-Lokalitäten. @smallvec_crate
+Alle Werte müssen als Liste behandelt werden, da ein Knoten für einen Input immer von mehreren Knoten abhängen kann. Jedoch enthält diese Liste meist nur ein Element. Small Vectoren erlauben es, für diese Fälle, auf das Allozieren des Heap zu verzichten. @smallvec_crate
 
 === Output Datenstruktur <output_datastructure>
 
-Der Kernkonzept, einen sehr großen Graphen, der einen prozeduralen Algorithmus darstellt, zu bearbeiten, indem man die Abhängigkeiten in einem vergleichbaren kleineren Template nutzt, enthält keine konkreten Annahmen über die Art der Geometrie. In meiner Implementation habe ich CSG genutzt, da es einer sehr allgemeine Form ist, Volumen darzustellen, und diese zudem leicht zu bearbeiten sind.
+Das Kernkonzept, einen sehr großen Graphen, der einen prozeduralen Algorithmus darstellt, zu bearbeiten, indem man die Abhängigkeiten in einem vergleichbaren kleineren Template nutzt, enthält keine konkreten Annahmen über die Art der Geometrie. In meiner Implementation habe ich CSG genutzt, da es einer sehr allgemeine Form ist, Volumen darzustellen, und diese zudem leicht zu bearbeiten sind.
 
 Aber gerade CSGs mit vielen Knoten sind jedoch nicht performant zu rendern. Deshalb können sie in meiner Implementation entweder als Sparse Voxel DAGs oder mit Marching Cubes diskretisiert werden.
 
@@ -686,11 +689,6 @@ Danach werden die ungenutzten Flächen der Insel mit zufällig plazierten Bäume
   caption: [ Graph für Insel Beispiel (Hochauflösende Version im Anhang) ],
 )
 
-
-
-
-
-
 = Analyse
 
 Die Bewertung eines Systems zur prozeduralen Generierung ist nicht trivial, da unterschiedliche Systeme häufig unterschiedliche Ziele verfolgen. Während einige Ansätze primär auf maximale Generationsgeschwindigkeit oder realistische Ergebnisse optimiert sind, liegt der Fokus dieser Arbeit auf der effizienten Neuberechnung nach Änderungen am Generationsalgorithmus. Ziel ist es, bei kleinen Änderungen am Generationsprozess möglichst große Teile der bereits berechneten Welt wiederverwenden zu können.
@@ -715,7 +713,7 @@ Ein Knoten im Abhängigkeits-Graph kann mehrere Knoten im Generator haben und je
 Den Faktor der neu zu berechnet Knoten im Generator nennen wir $g_f$.
 
 Somit ist die Laufzeitcomplexit einer Errechnung nach Template-Änderung oder Änderung einer externen Variabel: 
-$ O(((a c_f)^(b_f)) / g_f) = O(a^(b_f)) $
+$ O((g_f c_f a)^(b_f)) = O(a^(b_f)) $
 
 Dagegen ist die Laufzeit ein Template zu berechnet $O(a^2)$. 
 Die quadratische Laufzeit entsteht da pro Cache-Knoten die relativen Pfade berechnet werden müssen. 
@@ -840,16 +838,16 @@ Hierfür wurde zwei weiteren Versionen des Insel-Beispiels implementiert.
   //placement: top,
 )
 
-In der ersten Version würde die Generator-Graph-Verwaltungs-Logik entfernt. 
+In der ersten weiteren Version würde die Generator-Graph-Verwaltungs-Logik entfernt. 
 Hier wird der Abhängigkeits-Graph direkt evaluiert, ohne Zwischenspeicher anzulegen oder zu verwalten. 
 Diese Änderung reduziert zwar die Menge an Code signifikant, hat jedoch keine großen Auswirkungen auf die Laufzeit. 
 Dies hat wahrscheinlich folgende Gründe: 
 Die im Zwischenspeicher genutzten Mengen müssen bei der Evaluation des Graphen ohnehin angelegt werden und werden in diesem Fall nur wieder deallokiert, anstatt weiterhin gespeichert zu bleiben.
 
-Als Zweites wurde eine Version des Generationsalgorithmus ohne Abhängigkeits-Graph direkt implementiert. 
+Als Zweites wurde eine weitere Version des Generationsalgorithmus ohne Abhängigkeits-Graph direkt implementiert. 
 Diese Version ist ca. $4 – 6$x schneller als das Beispiel. Dies hat wahrscheinlich mit dem Overhead durch die Evaluation des Abhängigkeits-Graphen zu tun. 
-Einerseits können durch direkte Kapselung von Loops die Allokierung von Mengen als Vektoren gespart werden. 
-Der Abhängigkeits-Graph benötigt durch seine polymorphe Natur viele Switch-Statements, um zwischen den verschiedenen Funktionen, die einen Wert erzeugen, dynamisch zu unterscheiden. 
+Hier können durch direkte Schachtelung von Loops die Allokierung von Mengen als Vektoren gespart werden. 
+Dazu benötigt Abhängigkeits-Graph durch seine polymorphe Natur viele Switch-Statements, um zwischen den verschiedenen Funktionen, die einen Wert erzeugen, dynamisch zu unterscheiden. 
 Dies fällt bei einer direkten Implementierung weg. 
 Zudem kann der Generationsalgorithmus dadurch stärker durch den Compiler optimiert werden.
 
@@ -949,13 +947,14 @@ Bereiche, in denen keine KI verwendet wurde, sind:
   set page(footer: none)
   set figure(placement: top)
 
+
   figure({
     v(18.5%)
     block(width: 195%, {
       rotate(90deg, trimmed-image("../assets/full_graph.png", trim: (right: 50%)))
     })
   })
-
+  
   figure({
     v(18.5%)
     block(width: 195%, {
