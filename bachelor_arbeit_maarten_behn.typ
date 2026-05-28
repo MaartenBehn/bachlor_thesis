@@ -240,6 +240,22 @@ Populäre Programme, in denen grafische Programmierung verwendet wird, sind Unit
   caption: [ Der grafischen Editor von Unity Shader Graph ],
 ) <fig-sphere>
 
+== Violin Plot <violin_plot> 
+
+Ein Violin Plot ist eine Methode zur Visualisierung der Verteilung von Messwerten. Er kombiniert die Eigenschaften eines Box Plots mit einer Kerneldichte-Schätzung.
+
+Die Kerneldichte-Schätzung schätzt aus einer endlichen Stichprobe eine kontinuierliche Wahrscheinlichkeitsdichtefunktion. 
+Dazu wird um jeden Messpunkt eine Kernelfunktion gelegt. Häufig wird hierfür eine Gaußkurve verwendet.
+Alle Kernelfunktionen werden anschließend aufsummiert. Die Bandbreite der Kernelfunktion bestimmt, wie glatt die resultierende Dichte ist.
+Sie wird mit Scott's Rule automatisch aus der Stichprobengröße und Streuung berechnet @scotts_rule.
+
+In der Darstellung wird die geschätzte Dichte symmetrisch um eine vertikale Achse gespiegelt. So entsteht eine charakteristische geschwungene Form. 
+Die Breite des Violins an einer bestimmten Stelle entspricht der geschätzten Häufigkeit von Messwerten in diesem Bereich. Ein weißer Punkt in der Mitte markiert den Median der Messreihe.
+
+Im Vergleich zu einem Box Plot zeigt ein Violin Plot nicht nur Lage und Streuung, sondern auch die Form der Verteilung. 
+So ist zum Beispiel erkennbar, ob mehrere Häufungspunkte vorliegen oder die Verteilung stark asymmetrisch ist. Dies ist bei Laufzeitmessungen besonders relevant, da diese oft durch gelegentliche Ausreißer nach oben verzerrt sind.
+
+
 = Mein Lösungsansatz
 
 Dieses Kapitel beschreibt, wie das Ziel, die Neuberechnungszeit zu verkürzen, erreicht werden kann. 
@@ -671,22 +687,37 @@ Darüber hinaus können auch Variablen genutzt werden, die von Spielständen abh
 
 Extern kontrollierte Variablen ermöglichen es daher, das System nicht nur für statische Änderungen am Generationsalgorithmus einzusetzen, sondern auch für dynamische Änderungen, auf die Spieler reagieren können.
 
+
+=== Höhlen-Beispiel
+
+#figure(
+  image("assets/cave.png", width: 100%),
+  caption: [ Höhlen-Beispiel ],
+) <fig-cave>
+
+#figure(
+  image("assets/cave_graph.png", width: 100%),
+  caption: [ Graph für Höhlen-Beispiel ],
+) <fig-cave_graph>
+
+
+
 === Insel-Beispiel
 
 #figure(
-  image("assets/full.png", width: 80%),
+  image("assets/full.png", width: 100%),
   caption: [ Insel-Beispiel ],
 )
 
 Dies ist ein komplexeres Beispiel welches den Umfang meiner Implementierung darstellt. 
 In einem rechteckigen Generationsbereich, werden in regelmäßigen Abständen Inseln plaziert. 
 Auf jeder Insel werden eine Menge an zufälligen Kreuzungs-Punkte generiert. 
-Kreuzungs-Punkte die in der Nähe von einander sind werden mit zufällig verlaufenden Wegen verbunden. 
+Kreuzungs-Punkte die in der Nähe von einander sind werden mit zufällig verlaufenden Wegen verbunden (graue Kugeln). 
 Danach werden die ungenutzten Flächen der Insel mit zufällig plazierten Bäumen gefüllt.
 
 #figure(
   image("assets/full_graph.png", width: 100%),
-  caption: [ Graph für Insel Beispiel (Hochauflösende Version im Anhang) ],
+  caption: [ Graph für Insel-Beispiel (Hochauflösende Version im Anhang) ],
 )
 
 = Analyse
@@ -722,15 +753,103 @@ Bei großen Welten mit vielen Details kann $b_f$ wesentlich größer als 2 sein 
 
 == Reduktion der Neuberechnungszeit
 
+Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark sich die Laufzeit im Vergleich zu einer vollständigen Neugenerierung reduziert. 
+
+Hier für habe ich mehrere Knoten im den Beispiel-Graphen ausgewählt welche geändert markiert. 
+Danach wird das Graph neu werden und errechnet. 
+Diese Knoten sind so gewählt, dass immer mehr der Cache Knoten nicht neu errechnet werden müssen. 
+
+Die Neuerrechnung nach Änderung einer Stelle wird automatisiert durch 50 Iterationen aufgewärmt und danach 500 mal zeitlich gemessen.
+Hierfür wird die linux time API genutzt.
+Alle Benchmarks wurden nacheinander auf der gleichen Maschine ausgeführt. 
+Parallel liefen keine weiteren resourcenintesiven Programme.
+Die Verteilungsdichte der Messwerte werden als Violin Plot (siehe @violin_plot) dargestellt. 
+Der weiße Punkt ist der Median der Messwerte. 
+Die Bandbreite zur Kerneldichte-Bestimmung wurde mit Scott's Rule @scotts_rule errechnet.
+
 #import "@preview/lilaq:0.6.0" as lq
 
-Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark sich die Laufzeit im Vergleich zu einer vollständigen Neugenerierung reduziert. 
+#let place_marker(dx: relative, dy: relative, body) = place(alignment.top, dy: dy, dx: dx, 
+  circle(
+    {set align(center + horizon); body},
+    fill: white, 
+    stroke: black, 
+    inset: 1pt,
+  )
+)
+
+#figure(
+  grid(
+    columns: 1,        
+    rows: 1,         
+    gutter: 0.8cm,
+    lq.diagram(
+      lq.hviolin(
+        (17.66, 17.65, 12.94, 16.18, 17.02, 11.67, 10.80, 19.64, 19.07, 13.62, 10.61, 17.53),
+        (8.74, 8.07, 7.58, 14.08, 16.04, 12.76, 11.97, 16.01, 13.56, 10.66, 15.89, 11.94),
+        (11.86, 12.73, 7.33, 12.99, 5.36, 7.17, 6.65, 11.23, 7.12, 6.65, 11.23, 7.23, 7.97, 6.42),
+        y: (3, 2, 1),
+        extrema: false,
+        boxplot: none,
+        trim: false,
+      ),
+      title: [Höhlen-Beispiel (Kreuzungen: $50$)],
+      xlabel: [Neuberechnungszeit (ms)],
+      ylabel: [Geänderte Stelle],
+      yaxis: (
+        ticks: range(1, 5).zip(([C], [B], [A])),
+        subticks: none,
+      ),
+      width: 100%,
+    ),
+    lq.diagram(
+      lq.hviolin(
+        (684, 701, 718, 662, 695, 672, 705, 672, 672, 692, 708, 725, 684, 702, 694, 719, 684, 702, 694, 719, 729),
+        (702, 719, 707, 656, 637, 640, 701, 629, 775, 702, 639, 703, 635, 639, 695, 687, 669, 690, 670),
+        (647, 630, 652, 653, 664, 663, 635, 640, 645, 641, 629, 614, 611, 643, 651, 631),
+        y: (3, 2, 1),
+        extrema: false,
+        boxplot: none,
+        trim: false,
+      ),
+      title: [Höhlen-Beispiel (Kreuzungen: $500$)],
+      xlabel: [Neuberechnungszeit (ms)],
+      ylabel: [Geänderte Stelle],
+      yaxis: (
+        ticks: range(1, 5).zip(([C], [B], [A])),
+        subticks: none,
+      ),
+      width: 100%,
+    ),
+  ),
+  caption: [Unterschied der Neuberechnungszeit zwischen verschiedenen geänderten Stellen im Graph],
+  //placement: auto,
+)
+
+#figure({
+    image("assets/cave_graph.png", width: 100%)
+    place_marker(dy: 1.4cm, dx: 1.7cm, [A])
+    place_marker(dy: 0.6cm, dx: 8.3cm, [B])
+    place_marker(dy: 0.4cm, dx: 11.8cm, [C])
+  },
+  caption: [ Graph für Höhlen-Beispiel ],
+) 
+
+Für diesem Benchmark habe ich folgende Stellen im Höhlen-Graph ausgewählt.
+Stelle A ist das linke Disk-Volumen welches den generation Bereich definiert. 
+Wenn dieses geändert wird muss die gesamte Welt neu errechnet werden.
+Für Stelle B habe ich den Weg Knoten ausgewählt der die Höhlen Tunnel definiert. 
+Hier werden die Positionen der Tunnel-Kreuzungen wiederverwendet.
+Als Stelle C habe ich das Kugel-Volumen gewählt aus welcher die Höhlen tunnel zusammen gesetzt werden. 
+Bei Stelle C können die Wege der Höhlen Tunnel vollständig wiederverwendet werden. 
+
+#todo("Bewertung")
 
 #figure(
   grid(
     columns: 1,        
     rows: 2,         
-    gutter: 0.8cm, 
+    gutter: 0.8cm,
     lq.diagram(
       lq.hviolin(
         (15, 18, 16, 14, 18, 23, 20, 21, 17, 21),
@@ -740,6 +859,7 @@ Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark s
         y: (4, 3, 2, 1),
         extrema: false,
         boxplot: none,
+        trim: false,
       ),
       title: [Insel-Beispiel (Generationsbereich: $2000^2$m)],
       xlabel: [Neuberechnungszeit (ms)],
@@ -759,6 +879,7 @@ Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark s
         y: (4, 3, 2, 1),
         extrema: false,
         boxplot: none,
+        trim: false,
       ),
       title: [Insel-Beispiel (Generationsbereich: $20000^2$m)],
       xlabel: [Neuberechnungszeit (ms)],
@@ -775,16 +896,6 @@ Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark s
   //placement: auto,
 )
 
-#let place_marker(dx: relative, dy: relative, body) = place(alignment.top, dy: dy, dx: dx, 
-  circle(
-    {set align(center + horizon); body},
-    fill: white, 
-    stroke: black, 
-    inset: 1pt,
-  )
-)
-
-
 #figure(
   {
     image("./assets/full_graph.png", width: 100%)
@@ -796,17 +907,14 @@ Um die Reduktion der Neuberechnungszeit zu bewerten wird untersucht, wie stark s
   caption: [Geänderte Stellen im Insel-Beispiel],
 )
 
-#pagebreak()
-
-Ich habe folgende Stellen im Graph für den Benchmark ausgewählt.
+Ich habe folgende Stellen im Graph des Insel-Beispiels für den Benchmark ausgewählt.
 Stelle A ist der 2D Box Knoten der den Generationsbereich definiert.
-Als Stelle B habe ich den Knoten ausgewählt der die Wege auf den Inseln berechnet.
-C ist das Disk Volumen welches als Boden für den Inseln verwendet wird und D ist das Kugel Volumen das als Baumkronen verwendet wird. 
+Als Stelle B habe ich den Knoten ausgewählt der die Wege auf den Inseln berechnet. Hier werden die Positionen der Inseln wiederverwendet.
+C ist das Disk Volumen welches als Boden für den Inseln verwendet wird und D ist das Kugel Volumen das als Baumkronen verwendet wird.
+In beiden Fällen werden die Positionen für die Inseln sowie die Positionen der Bäume und Wege wiederverwendet.
 
-In diesem Benchmark sieht man das Neuberechnungszeit nicht linear abfällt, sonder alle Änderungen wo die Wege und Bäume neu berechnet werden müssen im Durchschnitt 17ms benötigen wohin Änderungen die nur das finale Volumen betreffen um Durchschnitt 5ms benötigen.
-Somit lässt sich davon ausgehen das die Berechnung der Wege und Bäume ca. 12ms benötigt, welche weg fallen wenn die zwischengespeicherten Daten verwendet werden.
-
-#todo("Weitere Beispiele benchmarken")
+In diesem Benchmark sieht man das Neuberechnungszeit nicht linear abfällt, sonder alle Änderungen wo die Wege und Bäume neu berechnet werden müssen im Durchschnitt 17ms und 540ms benötigen wohin Änderungen die nur das finale Volumen betreffen um Durchschnitt 5ms und 230ms benötigen.
+Somit lässt sich davon ausgehen das die Berechnung der Wege und Bäume ca. 12ms und 310ms benötigt, welche weg fallen wenn die zwischengespeicherten Daten verwendet werden.
 
 == Overhead
 
@@ -817,25 +925,49 @@ Ein weiteres wichtiges Kriterium ist der Overhead des Systems. Da der Generation
 Hierfür wurde zwei weiteren Versionen des Insel-Beispiels implementiert. 
 
 #figure(
-  lq.diagram(
-    lq.hviolin(
-      (434, 546, 401, 489, 627, 598, 587, 577, 533, 490, 550, 460, 547, 541, 580, 543, 470, 569, 496, 523),
-      (533, 490, 550, 460, 547, 541, 580, 490, 532, 567, 568, 450, 423, 589, 532,  598, 587, 577, 533, 542),
-      (100, 112, 160, 98, 77, 102, 110, 90, 130),
-      y: (3, 2, 1),
-      extrema: false,
-      boxplot: none,
+  grid(
+    columns: 1,        
+    rows: 2,         
+    gutter: 0.8cm,
+    lq.diagram(
+      lq.hviolin(
+        (684, 701, 718, 662, 697, 672, 705, 675, 672, 692, 708, 645, 684, 702, 694, 719, 684, 702, 694, 719, 729),
+        (694, 719, 684, 702, 694, 719, 729, 672, 692, 608, 645, 684, 682, 694, 719, 684, 702, 694, 719, 679),
+        (180, 150, 174, 166, 132, 178, 184, 153, 162, 180, 200, 170, 177, 182, 160, 158),
+        y: (3, 2, 1),
+        extrema: false,
+        boxplot: none,
+        trim: false,
+      ),
+      title: [Höhlen-Beispiel (Kreuzungen: $500$)],
+      xlabel: [Berechnungszeit (ms)],
+      yaxis: (
+        ticks: range(1, 4).zip(([direkt implementiert], [ohne Generator], [mein System])),
+        subticks: none,
+      ),
+      width: 100%,
     ),
-    title: [Insel-Beispiel (Generationsbereich: $20000^2$m)],
-    xlabel: [Berechnungszeit (ms)],
-    yaxis: (
-      ticks: range(1, 4).zip(([direkt implementiert], [ohne Generator], [mein System])),
-      subticks: none,
+    lq.diagram(
+      lq.hviolin(
+        (434, 546, 401, 489, 627, 598, 587, 577, 533, 490, 550, 460, 547, 541, 580, 543, 470, 569, 496, 523),
+        (533, 490, 550, 460, 547, 541, 580, 490, 532, 567, 568, 450, 423, 589, 532,  598, 587, 577, 533, 542),
+        (100, 112, 160, 98, 77, 102, 110, 90, 130),
+        y: (3, 2, 1),
+        extrema: false,
+        boxplot: none,
+        trim: false,
+      ),
+      title: [Insel-Beispiel (Generationsbereich: $20000^2$m)],
+      xlabel: [Berechnungszeit (ms)],
+      yaxis: (
+        ticks: range(1, 4).zip(([direkt implementiert], [ohne Generator], [mein System])),
+        subticks: none,
+      ),
+      width: 100%,
     ),
-    width: 100%,
+    v(0cm)
   ),
   caption: [Unterschied der Berechnungszeit zwischen meinem System hinzu einer direkten Implementierung],
-  //placement: top,
 )
 
 In der ersten weiteren Version würde die Generator-Graph-Verwaltungs-Logik entfernt. 
@@ -845,7 +977,7 @@ Dies hat wahrscheinlich folgende Gründe:
 Die im Zwischenspeicher genutzten Mengen müssen bei der Evaluation des Graphen ohnehin angelegt werden und werden in diesem Fall nur wieder deallokiert, anstatt weiterhin gespeichert zu bleiben.
 
 Als Zweites wurde eine weitere Version des Generationsalgorithmus ohne Abhängigkeits-Graph direkt implementiert. 
-Diese Version ist ca. $4 – 6$x schneller als das Beispiel. Dies hat wahrscheinlich mit dem Overhead durch die Evaluation des Abhängigkeits-Graphen zu tun. 
+Diese Version ist ca. $3 – 6$x schneller als das Beispiel. Dies hat wahrscheinlich mit dem Overhead durch die Evaluation des Abhängigkeits-Graphen zu tun. 
 Hier können durch direkte Schachtelung von Loops die Allokierung von Mengen als Vektoren gespart werden. 
 Dazu benötigt Abhängigkeits-Graph durch seine polymorphe Natur viele Switch-Statements, um zwischen den verschiedenen Funktionen, die einen Wert erzeugen, dynamisch zu unterscheiden. 
 Dies fällt bei einer direkten Implementierung weg. 
@@ -921,7 +1053,7 @@ In der aktuellen Implementierung existieren gecachte Zwischenergebnisse nur im A
 
 In dieser Arbeit wurde gezeigt, dass minimale Neuberechnung für prozedurale Generierung grundsätzlich möglich ist. Die Beispielimplementierung zeigt, dass sich ein Generationsalgorithmus als Abhängigkeits-Graph darstellen lässt und Zwischenergebnisse gezielt wiederverwendet werden können. Ändert sich ein Teil des Algorithmus, müssen nur die betroffenen Knoten neu berechnet werden.
 
-Da jedoch der Algorithmus als Graph interpretiert wird, statt direkt als kompilierter Code ausgeführt zu werden, ist er deutlich langsamer als eine direkte Implementierung. In den Benchmarks war eine optimierte direkte Implementierung etwa 4–6x schneller. Dieser Overhead entsteht vor allem durch das rekursive Auflösen der Abhängigkeiten und die polymorphe Natur des Graphen. Dazu kommt, dass der Aufwand zur Implementierung aller benötigten Operationen und Datentypen hoch ist.
+Da jedoch der Algorithmus als Graph interpretiert wird, statt direkt als kompilierter Code ausgeführt zu werden, ist er deutlich langsamer als eine direkte Implementierung. In den Benchmarks war eine optimierte direkte Implementierung etwa $3 – 6x$ schneller. Dieser Overhead entsteht vor allem durch das rekursive Auflösen der Abhängigkeiten und die polymorphe Natur des Graphen. Dazu kommt, dass der Aufwand zur Implementierung aller benötigten Operationen und Datentypen hoch ist.
 
 Trotzdem bietet mein Ansatz ein grafisches Interface, um prozedurale Generationsalgorithmen interaktiv zu entwickeln. Es bietet eine vereinfachte Abstraktionsebene zum Testen von Generationslogik, die kein Wissen über Programmiersprachen benötigt.
 
@@ -930,9 +1062,14 @@ Für einen realen Einsatz in einem Spiel oder einer Simulation wäre mein Ansatz
 #show bibliography: set heading(numbering: "1")
 #bibliography("citations.bib", style: "mla")
 
+#context {
+  show heading: none
+  heading[Anhang]
+}
+
 #include "./layout/eigenständigkeit.typ"
 
-== Nutzung KI basierte Anwendungen
+#heading([Nutzung KI basierte Anwendungen], level: 2, outlined: false, numbering: none)
 
 Neuronale Large Language Modelle wurden zur Erstellung dieser Arbeit in folgenden Bereichen verwendet:
 - Recherche: Um einen Überblick über den Stand der Technik zu erhalten und relevante Arbeiten zu identifizieren, wurden KI-basierte Systeme genutzt, um Empfehlungen für bestehende Literatur zu generieren.

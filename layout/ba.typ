@@ -53,7 +53,7 @@
       ][
         #set text(size: 1.5em)
         Bachelorarbeit zur Erlangung des akademischen
-        Grades Bachelor of Science (B.Sc.) in Informatik ][
+        Grades Bachelor of Science in Informatik ][
         #line(angle: 0deg, length: 100%)
       ]
     ]
@@ -81,11 +81,11 @@
     ]
     #align(center + horizon)[
       #stack(spacing: 1em)[
-        FB3
+        Fachbereich 3
       ][
-        Uni Bremen
+        Universität Bremen
       ][
-        SoSe 2026
+        Sommersemester 2026
       ][
         #date
       ]

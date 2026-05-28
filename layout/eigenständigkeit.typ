@@ -24,11 +24,6 @@
   // over the included pages
   #set page(footer: none, header: none, )
   #for p in range(start, count + 1) {
-    if p == start {
-      show heading: none
-      heading[Eigenständigkeitserklärungen]
-    }
-
     // using `page` to ensure each included page is it's own page
     // in the final document
     // using `page.background` to ensure we use the margins too
