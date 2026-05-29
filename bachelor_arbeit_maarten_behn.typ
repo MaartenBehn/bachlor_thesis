@@ -13,11 +13,6 @@
   supervisors: ("Prof. Dr. Gabriel Zachmann", "Prof. Dr. Nico Hochgeschwender")
 )
 
-#import "@preview/cetz:0.4.2": canvas, draw, tree
-
-#import "@preview/algorithmic:1.0.7"
-#import algorithmic: style-algorithm, algorithm-figure
-#show: style-algorithm
 
 
 = Einleitung
@@ -61,11 +56,6 @@ Die Struktur der Welt ergibt sich also nicht aus expliziten Regeln, sondern aus 
 Der praktische Vorteil ist, dass sich dieser Ansatz leicht implementieren lässt und gut auf große Welten skaliert. 
 Minecraft nutzt zum Beispiel Perlin-Noise, um sein Gelände und Höhlen effizient zu generieren.
 
-Das Problem ist, dass sich mit Noise-Funktionen nur schwer das Einhalten global geltender Regeln garantieren lässt. 
-Ob ein generiertes Gelände zum Beispiel immer einen zugänglichen Weg zwischen zwei Punkten hat, lässt sich aus den Noise-Funktionen allein nicht bestimmen. 
-Solche Regeln müssen in späteren Generationsschritten überprüft und die Welt gegebenenfalls angepasst werden. 
-In vielen Generationssystemen werden diese Fehler toleriert, wenn sie nur selten auftauchen. Siehe @fig-minecraft für Beispiele von fehlerhafter Generation.
-
 #figure({
     grid(
     columns: 2,        
@@ -76,7 +66,13 @@ In vielen Generationssystemen werden diese Fehler toleriert, wenn sie nur selten
     )
   },
   caption: [ Beispiele für fehlerhaft generierte Welten in Minecraft @wierd_minecraft ],
+  placement: auto,
 ) <fig-minecraft>
+
+Das Problem ist, dass sich mit Noise-Funktionen nur schwer das Einhalten global geltender Regeln garantieren lässt. 
+Ob ein generiertes Gelände zum Beispiel immer einen zugänglichen Weg zwischen zwei Punkten hat, lässt sich aus den Noise-Funktionen allein nicht bestimmen. 
+Solche Regeln müssen in späteren Generationsschritten überprüft und die Welt gegebenenfalls angepasst werden. 
+In vielen Generationssystemen werden diese Fehler toleriert, wenn sie nur selten auftauchen. Siehe @fig-minecraft für Beispiele von fehlerhafter Generation.
 
 Für minimale Neuberechnung sind Noise-basierte Verfahren eher ungeeignet, da theoretisch jede Noise-Ebene Einfluss auf jedes Ergebnis hat. Die Generierungslogik steckt implizit in der Komposition der Funktionen. Ändert man eine Funktion oder ihre Parameter, kann dies zu einer komplett anderen Welt führen.
 
@@ -92,14 +88,15 @@ Diese Liste enthält die Regeln, nach denen ein neues Modell erzeugt wird.
 Der Generationsalgorithmus läuft dabei wie folgt ab: Zunächst werden allen Zellen des neuen Gitters sämtliche möglichen Werte zugeordnet.
 Dann wird die Zelle mit den wenigsten verbleibenden Möglichkeiten ausgewählt und auf einen einzelnen Wert festgelegt. 
 Anschließend werden aus den Nachbarzellen alle Werte entfernt, für die keine gültige Regel mehr existiert. 
-Dieser Bereinigungsschritt wird rekursiv auf alle betroffenen Nachbarzellen ausgeweitet. 
-Der Vorgang wiederholt sich, bis jede Zelle genau einen Wert enthält.
+Dieser Bereinigungsschritt wird rekursiv auf alle betroffenen Nachbarzellen ausgeweitet.
 
 #figure(
   image("assets/example_based_model_synthesis.png", width: 80%),
   caption: [(a) A model composed of four model pieces, (b) An Inconsistent Model, (c) A Consistent Model @model_synthesis],
+  placement: auto,
 ) <fig-example_based_model_synthesis>
 
+Der Vorgang wiederholt sich, bis jede Zelle genau einen Wert enthält.
 Da der Bereich, bestehenden Model Systhesis Ereignis an geänderte Regeln anzupassen, bisher unerforscht ist habe ich dies zu Beginn meiner Arbeit aktiv als Kern Thema in Betracht gezogen.
 In @layz-model-synthesis kurz darauf eingehen warum ich diesen Ansatz verworfen habe.
 
@@ -124,7 +121,10 @@ Mit wenigen Regeln lassen sich so sehr organisch wirkende Formen erzeugen.
 #figure(
   image("assets/l_system_trees.png", width: 80%),
   caption: [Mit L-Systems generierte Bäume @l_system_trees_wikipedia],
+  placement: auto,
 ) <fig-example_based_model_synthesis>
+
+#pagebreak()
 
 === Graph-based Model Synthesis
 Graph-based Model Synthesis @garph_based_model_synthesis erweitert das Konzept von Graph Grammatiken, indem Regeln automatisiert aus einem Beispiel abgeleitet werden. 
@@ -171,7 +171,6 @@ Beide Systeme sind jedoch auf die interaktive Erstellung einzelner Assets ausgel
 Zudem sind sie geschlossene Programme, die nicht darauf ausgelegt sind, in eine Spiel- oder Simulations-Engine eingebettet zu werden. 
 Das in dieser Arbeit vorgestellte System ist aber genau dafür konzipiert. Der Generationsalgorithmus soll in der Umgebung iterativ weiterentwickelt werden können und Änderungen in einer bereits bestehenden Welt sollen unmittelbar sichtbar werden.
 @houdini @blender
-
 
 = Theoretische Grundlagen 
 
@@ -237,7 +236,7 @@ Populäre Programme, in denen grafische Programmierung verwendet wird, sind Unit
 
 #figure(
   image("assets/Shader Graph.png", width: 100%),
-  caption: [ Der grafischen Editor von Unity Shader Graph ],
+  caption: [ Der grafische Editor von Unity Shader Graph @shadergraph_exmaple ],
 ) <fig-sphere>
 
 == Violin Plot <violin_plot> 
@@ -309,14 +308,15 @@ Knoten und deren Ergebnisse, die keine Eingangswerte haben, bezeichne ich als ko
 #figure(
   image("assets/overview_diagramm.svg", width: 100%),
   caption: [Überblick über Editor, Abhängigkeits-Graph, dessen cache und der Welt. ],
-) <fig-sphere>
+) <fig-overview>
 
 Mein Generationssystem besteht aus drei Bestandteilen: 
 1. Ein graphischer Editor,  mit dem ein Nutzer einen Abhängigkeits-Graph erstellen und bearbeiten kann. 
 
-2. Das Template ist eine Datenstruktur, die vom Editor erstellt wird. Es enthält den Abhängigkeits-Graph sowie Anleitungen wie dieser generiert und zwischengespeichert werden soll.  
+2. Das Template ist eine Datenstruktur, die vom Editor erstellt wird. Es enthält den Abhängigkeits-Graph sowie Anleitungen wie dieser generiert und zwischengespeichert werden soll (Cache Graph).  
 
 3. Der Generator vergleicht das aktuelle Template mit dem neuen Template und generiert jene Bestandteile der Welt neu, die nicht dem neuen Template entsprechen.
+
 
 == Graphischer Editor
 
@@ -338,9 +338,12 @@ Parallele Stränge werden übereinander angeordnet.
 Damit werden auch komplexe Abhängigkeiten übersichtlich dargestellt.  
 
 #figure(
-  image("assets/nodes.png", width: 80%),
+  image("assets/nodes.png", width: 100%),
   caption: [Eine Kugel dessen Größe ihrer X Position entspricht. ],
+  placement: auto
 ) <fig-nodes>
+
+#pagebreak()
 
 == Template 
 
@@ -358,12 +361,15 @@ Bei der Entscheidung, wie groß diese Untermenge sein soll, müssen der "Overhea
 
 Die Eingehenden Nachbarn $N^-_G_"ch"$ sind alle Caches, von denen der Knoten abhängt. 
 Man findet diese, indem man den Baum der Abhängigkeiten in $G_"ab"$ in allen seinen Verzweigungen rekursiv durchsucht, bis man jeweils auf einen Knoten in $G_"ch"$ stößt.
+Zur Veranschaulichung betrachte @fig-overview und @fig-cache_graph.
 
 
 #figure(
   image("assets/cache_graph.svg", width: 50%),
   caption: [ Beispiel eines Abhängigkeites-Graph und dessen Cache-Knoten zur Generierung einer Menge an Bäumen. ],
 ) <fig-cache_graph>
+
+#pagebreak()
 
 === Level
 
@@ -407,10 +413,13 @@ In anderen Worten: Alle Knoten im Template zu iterieren, ist relativ schnell mö
 
 Daher werden die Abhängigkeiten im Template verwendet, um herauszufinden wie die Welt neu generiert werden muss. 
 
+#pagebreak()
+
 == Generator
 
 Der Generator enthält einen Graphen $G_"gen"$, der dem Cache-Graphen $G_"ch"$ im Template entspricht.
 Jedoch wo $G_"ch"$ nur einen Knoten pro Operation enthält, enthält $G_"gen"$ einen Knoten pro Ergebnis dieser Operation.
+Zur Veranschaulichung betrachte @fig-overview.
 
 #todo("Grafik")
 
@@ -445,60 +454,150 @@ Da im Generator Knoten im Level in aufsteigender Reihenfolge erstellt werden, is
 Für einen Knoten im Template kann es mehrere Knoten im Generator geben. Daher können dort pro Abhängigkeit eines Cache-Knoten 
 auch mehrere Knoten gefunden werden.
 
+@fig-relative_schritte veranschaulicht wie @algo-find-deps die Abhängigen Werte im Generator mit Hilfe der relativen Schritte auf dem Template sucht.
+
 #figure(
   image("assets/relative_schritte.svg", width: 110%),
   caption: [ Beispiel der Anwendung eines Baum an relativen Schritten auf das Template und den Generator. ],
   placement: auto,
 ) <fig-relative_schritte>
 
-#block(
+#import "@preview/algorithmic:1.0.7"
+#import algorithmic: style-algorithm, algorithm-figure
+#show: style-algorithm.with(
   breakable: false,
-  algorithm-figure(
-    "Finde abhänige Knoten in " + $G_"gen"$,
-    vstroke: .5pt + luma(200),
-    {
-    import algorithmic: *
+)
 
-    Procedure("FindDeps", ($v_"gen"$, $v_"gen creates"$), {
-      Assign($T$, $T_"rel" (v_"gen")$)
-      Assign($D$, $nothing$)
-      Assign($Q$, $nothing$)
-      Line[*push*($Q$ , $(v_"root" in T, v_"gen creates")$)] 
+#algorithm-figure(
+  "Finde abhänige Knoten in " + $G_"gen"$,
+  vstroke: .5pt + luma(200),
+  {
+  import algorithmic: *
+
+  Procedure("FindDeps", ($v_"gen"$, $v_"gen creates"$), {
+    Assign($T$, $T_"rel" (v_"gen")$)
+    Assign($D$, $nothing$)
+    Assign($Q$, $nothing$)
+    Line[*push*($Q$ , $(v_"root" in T, v_"gen creates")$)] 
+    LineBreak
+
+    While($Q != nothing$, {
+      Assign($(v_"step", v_"gen")$, [*pop*($Q$)])
       LineBreak
 
-      While($Q != nothing$, {
-        Assign($(v_"step", v_"gen")$, [*pop*($Q$)])
-        LineBreak
-
-        If([*deps*($v_"step"$)], { 
-          Line[*push*($D$ , $v_"gen"$)] 
-        })
-        LineBreak
-
-        For($v_"child step" in N^+_T (v_"step")$, {
-
-          
-          Assign($N$, IfElseInline([*up*($v_"child step"$)], $N^-_G_"gen" (v_"gen")$, $N^+_G_"gen" (v_"gen")$))
-          LineBreak
-
-          For($v in N$, {
-            If([*cache*($v_"child step"$) = *cache*($v$)], {
-              Line[*push*($Q, (v_"child step", v)$)] 
-            })
-          })
-
-
-        })
+      If([*deps*($v_"step"$)], { 
+        Line[*push*($D$ , $v_"gen"$)] 
       })
-      Return($D$)
+      LineBreak
+
+      For($v_"child step" in N^+_T (v_"step")$, {
+
+
+        Assign($N$, IfElseInline([*up*($v_"child step"$)], $N^-_G_"gen" (v_"gen")$, $N^+_G_"gen" (v_"gen")$))
+        LineBreak
+
+        For($v in N$, {
+          If([*cache*($v_"child step"$) = *cache*($v$)], {
+            Line[*push*($Q, (v_"child step", v)$)] 
+          })
+        })
+
+
+      })
     })
-  }))
+    Return($D$)
+  })
+},
+  supplement: [Algorithmus],
+) <algo-find-deps>
 
-
+#pagebreak()
 
 === Kind-Update-Aufträge
 
 Kind-Update-Aufträge enthalten den Index des Erstellungsknoten und den Index eines Erstellungseintrags $E_"create" (v_"ch")$ in dessen Template-Knoten. 
+
+
+
+
+
+#algorithm-figure(
+  "Kinder updaten",
+  vstroke: .5pt + luma(200),
+  {
+  import algorithmic: *
+  let create = Call.with("Create")
+  let delete = Call.with("Delete")
+  let findDeps = Call.with("FindDeps")
+  let addtask = Call.with("AddTask")
+
+  Procedure("UpdateChild", ($v_"gen"$, $v_"ch child"$), {
+    LineBreak
+    Assign($C$, ${v in N^+_G_"gen" (v_"gen") | "cache"(v) = v_"ch child"}$)
+
+    LineBreak
+    Assign($C_"to delete"$, ${v in C | not "valid"(v, v_"gen") }$)
+
+    LineBreak
+    For($v in C_"to delete"$, {
+      LineBreak
+      Line(delete(($v$)))
+    })
+
+    LineBreak
+    Assign($n$, [*num*($v_"ch child", v_"gen"$)])
+    Assign($i$, $0$)
+
+    For($i < n - |C \\ C_"to delete"|$, {
+      LineBreak
+      Line(create(($v_"ch child"$, $v_"gen"$)))
+    })
+  })
+  LineBreak
+
+  Procedure("Create", ($v_"ch"$, $v_"gen creates"$), {
+
+    Line([*push*($V(G_"gen"), v_"new"$)])
+    LineBreak
+
+    Assign([*cache*($v_"new"$)], $v_"ch"$)
+    LineBreak
+
+    Assign($D$, findDeps(($v_"new"$, $v_"gen creates"$)))
+    LineBreak
+
+    Assign($N^-_G_"gen" (v_"new")$, $D$)  
+    LineBreak
+
+    For($v in D$, {
+      Line([*push*($N^+_G_"gen" (v)$, $v_"new"$)])
+    })
+    LineBreak
+
+    Line([*pushCalculate*($Q_"task"$, $v_"new"$)])
+  })
+  LineBreak
+
+  Procedure("Delete", ($v_"gen"$), {
+    LineBreak
+
+    For($v in N^-_G_"gen" (v_"gen")$, {
+      LineBreak
+      Line([*remove*($N^+_G_"gen" (v)$, $v_"gen"$)])
+    })
+    LineBreak
+
+    For($v in N^+_G_"gen" (v_"gen")$, {
+      LineBreak
+      Line(delete(($v$)))
+    })
+
+    Line([*remove*($V(G_"gen")$, $v_"gen"$)])
+  })
+},
+  supplement: [Algorithmus],
+  placement: auto,
+) <algo-children>
 
 Dieser Erstellungseintrag definiert, wie viele Kinder es geben soll *num*$(v_"ch", v_"gen creates")$. 
 Dies sind entweder genau $n$ pro Erstellungsknoten oder hängen von dem Wert des Erstellungsknotens $v_"gen creates"$ ab, 
@@ -506,85 +605,8 @@ wie z.B. einer Positionsmenge.
 Dazu gibt *valid*$(v_"gen", v_"gen creates")$ an, ob ein Kind $v_"gen"$ für den Erstellungsknoten $v_"gen creates"$ noch valide ist, also ob beispielsweise eine Position noch in der Menge an Positionen ist. 
 
 Daraufhin wird die vorhandene Menge an Kindern mit der gewünschten Menge verglichen. Bei Ungleichheit werden neue Kinderknoten erzeugt oder gelöscht. 
-
 Wenn eine neuer Knoten erzeugt wird, werden mit dem Baum an relativen Schritten die Indizes aller abhängige Knoten gesucht und im Knoten gespeichert.
-
-#block(
-  breakable: false,
-  algorithm-figure(
-    "Kinder updaten",
-    vstroke: .5pt + luma(200),
-    {
-    import algorithmic: *
-    let create = Call.with("Create")
-    let delete = Call.with("Delete")
-    let findDeps = Call.with("FindDeps")
-    let addtask = Call.with("AddTask")
-
-    Procedure("UpdateChild", ($v_"gen"$, $v_"ch child"$), {
-      LineBreak
-      Assign($C$, ${v in N^+_G_"gen" (v_"gen") | "cache"(v) = v_"ch child"}$)
-
-      LineBreak
-      Assign($C_"to delete"$, ${v in C | not "valid"(v, v_"gen") }$)
-
-      LineBreak
-      For($v in C_"to delete"$, {
-        LineBreak
-        Line(delete(($v$)))
-      })
-
-      LineBreak
-      Assign($n$, [*num*($v_"ch child", v_"gen"$)])
-      Assign($i$, $0$)
-
-      For($i < n - |C \\ C_"to delete"|$, {
-        LineBreak
-        Line(create(($v_"ch child"$, $v_"gen"$)))
-      })
-    })
-    LineBreak
-
-    Procedure("Create", ($v_"ch"$, $v_"gen creates"$), {
-      
-      Line([*push*($V(G_"gen"), v_"new"$)])
-      LineBreak
-      
-      Assign([*cache*($v_"new"$)], $v_"ch"$)
-      LineBreak
-
-      Assign($D$, findDeps(($v_"new"$, $v_"gen creates"$)))
-      LineBreak
-
-      Assign($N^-_G_"gen" (v_"new")$, $D$)  
-      LineBreak
-
-      For($v in D$, {
-        Line([*push*($N^+_G_"gen" (v)$, $v_"new"$)])
-      })
-      LineBreak
-      
-      Line([*pushCalculate*($Q_"task"$, $v_"new"$)])
-    })
-    LineBreak
-
-    Procedure("Delete", ($v_"gen"$), {
-      LineBreak
-        
-      For($v in N^-_G_"gen" (v_"gen")$, {
-        LineBreak
-        Line([*remove*($N^+_G_"gen" (v)$, $v_"gen"$)])
-      })
-        LineBreak
-
-      For($v in N^+_G_"gen" (v_"gen")$, {
-        LineBreak
-        Line(delete(($v$)))
-      })
-      
-      Line([*remove*($V(G_"gen")$, $v_"gen"$)])
-    })
-  }))
+@algo-children veranschaulicht mit Pseudo-Code diesen Update-Process.
 
 In UpdateChild $v_"gen"$ ist ein Knoten $in V(G_"gen")$ für den alle Kinder die überprüft werden sollen, 
 welche dem Cache Knoten $v_"ch child"$ entsprechen.
@@ -612,6 +634,7 @@ $
 Die Knoten werden Level für Level erzeugt. So wird sichergestellt, dass alle nicht-geschnittenen Abhängigkeiten bereits errechnet wurden, wenn der Knoten selbst errechnet wird. 
 Hat ein Knoten geschnittene Abhängigkeiten, werden diese für diese im ersten Durchlauf ihr Nullwert verwendet. Jeder Knoten, der Nullwerte für seine geschnittenen Abhängigkeiten genutzt, wird erneut errechnet, sobald alle Knoten einmal errechnet wurden. Nun können die Ergebnisse des der letzten Generation anstatt der Nullwerte verwendet werden. Dies wird so oft wiederholt, bis keine Nullwerte mehr verwendet werden.
 
+#pagebreak()
 == Implementierung
 
 Für meine Implementierung habe ich Rust als Programmiersprache gewählt, da sie erlaubt, speichersicheren Lowlevel-Code zu schreiben, um die Laufzeit von Algorithm effektiv zu verbessern. Zudem hat sie einen (im Gegensatz zu C++) umfassenden und einfach zu nutzenden Package-Manager.  
@@ -653,6 +676,7 @@ Aber gerade CSGs mit vielen Knoten sind jedoch nicht performant zu rendern. Desh
 Voxel-Datenstrukturen können relativ effizient mit Ray Marching gerendert werden. @dda @nvidia_octree
 Mit Hilfe von Marching Cubes kann ein CSG als Mesh approximiert werden. @marching_cubes
 
+#pagebreak()
 == Beispiele 
 
 Im Folgenden werden mehrere Beispiele vorgestellt, die die Funktionsweise des Systems demonstrieren. 
@@ -666,7 +690,7 @@ Wenn nun die Form oder Größe der Baumkrone verändert wird, betrifft diese Än
 
 #figure(
   image("./assets/trees.png", width: 80%),
-  caption: [ Baum-Mengen-Beispiel #itodo("Besseres Bild")],
+  caption: [ Baum-Mengen-Beispiel ] 
 ) <fig-trees>
 
 === Extern kontrollierte Variable
@@ -694,6 +718,12 @@ Extern kontrollierte Variablen ermöglichen es daher, das System nicht nur für 
   image("assets/cave.png", width: 100%),
   caption: [ Höhlen-Beispiel ],
 ) <fig-cave>
+
+Dieses Beispiel zeigt wie simple zufällige Höhlen-Tunnle generiert werden können. 
+Hierbei werden mehrere Kreuzungs-Punkte in einem Disk Volumen zufällig gewählt.
+Kreuzungs-Punkt-Paare werden dann mit zum End-Punkt gerichteten random walks verbunden. 
+Dabei wird pro Schritt der Normalvektor zum End-Punkt mit einem Vektor addiert. 
+Mit der Gewichtung der beiden Vektoren lässt sich die stärke des random Walks steuern. 
 
 #figure(
   image("assets/cave_graph.png", width: 100%),
@@ -733,7 +763,7 @@ Gleichzeitig erhöht dieser Ansatz jedoch auch die Komplexität des Systems. Wä
 
 Im dritten Abschnitt sollte der Aufwand zur Erweiterung des Systems betrachtet werden. Meine Implementierung nutzt nur einfache Operationen auf CSGs. Dies entspricht nicht den tatsächlichen Datenstrukturen und Problemen in Spielen oder Simulationen. Daher würde eine große Menge an weiteren Operationen und Datentypen implementiert werden müssen.
 
-== Theoretische Laufzeit
+== Theoretische Laufzeit <theo_runtime>
 
 Die Kern Idee des System ist, dass der Generationsalgorithmus der Welt als Abhängigkeits-Graph definiert ist. 
 Angenommen der Abhängigkeits-Graph hat $a$ Knoten. 
@@ -759,13 +789,12 @@ Hier für habe ich mehrere Knoten im den Beispiel-Graphen ausgewählt welche ge�
 Danach wird das Graph neu werden und errechnet. 
 Diese Knoten sind so gewählt, dass immer mehr der Cache Knoten nicht neu errechnet werden müssen. 
 
-Die Neuerrechnung nach Änderung einer Stelle wird automatisiert durch 50 Iterationen aufgewärmt und danach 500 mal zeitlich gemessen.
+=== Höhlen-Beispiel 
+
+Die Neuerrechnung nach Änderung eines Knoten wird automatisiert durch 50 Iterationen aufgewärmt und danach 500 mal zeitlich gemessen.
 Hierfür wird die linux time API genutzt.
 Alle Benchmarks wurden nacheinander auf der gleichen Maschine ausgeführt. 
 Parallel liefen keine weiteren resourcenintesiven Programme.
-Die Verteilungsdichte der Messwerte werden als Violin Plot (siehe @violin_plot) dargestellt. 
-Der weiße Punkt ist der Median der Messwerte. 
-Die Bandbreite zur Kerneldichte-Bestimmung wurde mit Scott's Rule @scotts_rule errechnet.
 
 #import "@preview/lilaq:0.6.0" as lq
 
@@ -777,6 +806,8 @@ Die Bandbreite zur Kerneldichte-Bestimmung wurde mit Scott's Rule @scotts_rule e
     inset: 1pt,
   )
 )
+
+
 
 #figure(
   grid(
@@ -795,7 +826,7 @@ Die Bandbreite zur Kerneldichte-Bestimmung wurde mit Scott's Rule @scotts_rule e
       ),
       title: [Höhlen-Beispiel (Kreuzungen: $50$)],
       xlabel: [Neuberechnungszeit (ms)],
-      ylabel: [Geänderte Stelle],
+      ylabel: [Geänderte Knoten],
       yaxis: (
         ticks: range(1, 5).zip(([C], [B], [A])),
         subticks: none,
@@ -814,7 +845,7 @@ Die Bandbreite zur Kerneldichte-Bestimmung wurde mit Scott's Rule @scotts_rule e
       ),
       title: [Höhlen-Beispiel (Kreuzungen: $500$)],
       xlabel: [Neuberechnungszeit (ms)],
-      ylabel: [Geänderte Stelle],
+      ylabel: [Geänderte Knoten],
       yaxis: (
         ticks: range(1, 5).zip(([C], [B], [A])),
         subticks: none,
@@ -822,9 +853,22 @@ Die Bandbreite zur Kerneldichte-Bestimmung wurde mit Scott's Rule @scotts_rule e
       width: 100%,
     ),
   ),
-  caption: [Unterschied der Neuberechnungszeit zwischen verschiedenen geänderten Stellen im Graph],
-  //placement: auto,
+  caption: [ Unterschied der Neuberechnungszeit zwischen verschiedenen geänderten Knoten im Höhlen-Beispiel ],
+  placement: auto,
 )
+
+Die Verteilungsdichte der Messwerte werden als Violin Plot (siehe @violin_plot) dargestellt. 
+Der weiße Punkt ist der Median der Messwerte.
+
+Die Bandbreite zur Kerneldichte-Bestimmung wurde mit Scott's Rule @scotts_rule errechnet.
+
+Für diesem Benchmark habe ich folgende Knoten im Höhlen-Graph ausgewählt.
+Knoten A ist das linke Disk-Volumen welches den generation Bereich definiert. 
+Wenn dieses geändert wird muss die gesamte Welt neu errechnet werden.
+Für B habe ich den Weg Knoten ausgewählt der die Höhlen Tunnel definiert. 
+Hier werden die Positionen der Tunnel-Kreuzungen wiederverwendet.
+Als Knoten C habe ich das Kugel-Volumen gewählt aus welcher die Höhlen tunnel zusammen gesetzt werden. 
+Bei Knoten C können die Wege der Höhlen Tunnel vollständig wiederverwendet werden.
 
 #figure({
     image("assets/cave_graph.png", width: 100%)
@@ -832,69 +876,71 @@ Die Bandbreite zur Kerneldichte-Bestimmung wurde mit Scott's Rule @scotts_rule e
     place_marker(dy: 0.6cm, dx: 8.3cm, [B])
     place_marker(dy: 0.4cm, dx: 11.8cm, [C])
   },
-  caption: [ Graph für Höhlen-Beispiel ],
+  caption: [ Geänderte Knoten im Höhlen-Beispiel-Graph ],
 ) 
 
-Für diesem Benchmark habe ich folgende Stellen im Höhlen-Graph ausgewählt.
-Stelle A ist das linke Disk-Volumen welches den generation Bereich definiert. 
-Wenn dieses geändert wird muss die gesamte Welt neu errechnet werden.
-Für Stelle B habe ich den Weg Knoten ausgewählt der die Höhlen Tunnel definiert. 
-Hier werden die Positionen der Tunnel-Kreuzungen wiederverwendet.
-Als Stelle C habe ich das Kugel-Volumen gewählt aus welcher die Höhlen tunnel zusammen gesetzt werden. 
-Bei Stelle C können die Wege der Höhlen Tunnel vollständig wiederverwendet werden. 
+Im Benchmark ist ersichtlich, dass die verschiedenen Neugenerationszeiten sich nicht stark unterscheiden. 
+Sie skalieren vor allem mit der Menge an Kreuzungen. 
+Welcher hier direkten Einfluss auf den in @theo_runtime besprochenen Branche-Faktor hat.
+Es lässt sich vermuten, dass in diesem Benchmark ein Großteil der Berechnungszeit für das erstellen des finalen Volumen benötigt wird. 
 
-#todo("Bewertung")
+
+=== Insel-Beispiel 
 
 #figure(
-  grid(
-    columns: 1,        
-    rows: 2,         
-    gutter: 0.8cm,
-    lq.diagram(
-      lq.hviolin(
-        (15, 18, 16, 14, 18, 23, 20, 21, 17, 21),
-        (11, 17, 16, 18, 22, 18, 14, 18, 17),
-        (5, 4.5, 6.1, 5.4, 4, 5, 5.8, 4.6, 6),
-        (4, 5, 4.9, 7.7, 4.6, 4.4, 9, 4.5, 5.3, 5.5),
-        y: (4, 3, 2, 1),
-        extrema: false,
-        boxplot: none,
-        trim: false,
-      ),
-      title: [Insel-Beispiel (Generationsbereich: $2000^2$m)],
-      xlabel: [Neuberechnungszeit (ms)],
-      ylabel: [Geänderte Stelle],
-      yaxis: (
-        ticks: range(1, 5).zip(([D], [C], [B], [A])),
-        subticks: none,
-      ),
-      width: 100%,
+  lq.diagram(
+    lq.hviolin(
+      (15, 18, 16, 14, 18, 23, 20, 21, 17, 21),
+      (11, 17, 16, 18, 22, 18, 14, 18, 17),
+      (5, 4.5, 6.1, 5.4, 4, 5, 5.8, 4.6, 6),
+      (4, 5, 4.9, 7.7, 4.6, 4.4, 9, 4.5, 5.3, 5.5),
+      y: (4, 3, 2, 1),
+      extrema: false,
+      boxplot: none,
+      trim: false,
     ),
-    lq.diagram(
-      lq.hviolin(
-        (547, 541, 580, 543, 470, 569, 496, 523),
-        (535, 527, 518, 544, 553, 512, 562, 470),
-        (239, 243, 235, 228, 229, 232, 223, 221, 227, 234),
-        (223, 227, 228, 224, 224, 224, 229, 237, 221),
-        y: (4, 3, 2, 1),
-        extrema: false,
-        boxplot: none,
-        trim: false,
-      ),
-      title: [Insel-Beispiel (Generationsbereich: $20000^2$m)],
-      xlabel: [Neuberechnungszeit (ms)],
-      ylabel: [Geänderte Stelle],
-      yaxis: (
-        ticks: range(1, 5).zip(([D], [C], [B], [A])),
-        subticks: none,
-      ),
-      width: 100%,
+    title: [Insel-Beispiel (Generationsbereich: $2000^2$m)],
+    xlabel: [Neuberechnungszeit (ms)],
+    ylabel: [Geänderte Knoten],
+    yaxis: (
+      ticks: range(1, 5).zip(([D], [C], [B], [A])),
+      subticks: none,
     ),
-    v(0cm)
+    width: 100%,
   ),
-  caption: [Unterschied der Neuberechnungszeit zwischen verschiedenen geänderten Stellen im Graph],
-  //placement: auto,
+  placement: auto,
 )
+
+#figure(
+  lq.diagram(
+    lq.hviolin(
+      (547, 541, 580, 543, 470, 569, 496, 523),
+      (535, 527, 518, 544, 553, 512, 562, 470),
+      (239, 243, 235, 228, 229, 232, 223, 221, 227, 234),
+      (223, 227, 228, 224, 224, 224, 229, 237, 221),
+      y: (4, 3, 2, 1),
+      extrema: false,
+      boxplot: none,
+      trim: false,
+    ),
+    title: [Insel-Beispiel (Generationsbereich: $20000^2$m)],
+    xlabel: [Neuberechnungszeit (ms)],
+    ylabel: [Geänderter Knoten],
+    yaxis: (
+      ticks: range(1, 5).zip(([D], [C], [B], [A])),
+      subticks: none,
+    ),
+    width: 100%,
+  ),
+  caption: [Unterschied der Neuberechnungszeit zwischen verschiedenen geänderten Knoten im Insel-Beispiel],
+  placement: auto,
+)
+
+Ich habe folgende Knoten im Graph des Insel-Beispiels für den Benchmark ausgewählt.
+Knoten A ist das 2D Box Volumen das den Generationsbereich definiert.
+Für B habe ich den Knoten ausgewählt der die Wege auf den Inseln berechnet. Hier werden die Positionen der Inseln wiederverwendet.
+C ist das Disk Volumen welches als Boden für den Inseln verwendet wird und D ist das Kugel Volumen das als Baumkronen verwendet wird.
+In beiden Fällen werden die Positionen für die Inseln sowie die Positionen der Bäume und Wege wiederverwendet.
 
 #figure(
   {
@@ -904,17 +950,12 @@ Bei Stelle C können die Wege der Höhlen Tunnel vollständig wiederverwendet we
     place_marker(dy: 2.6cm, dx: 4.7cm, [C])
     place_marker(dy: 0.6cm, dx: 12cm, [D])
   },
-  caption: [Geänderte Stellen im Insel-Beispiel],
+  caption: [ Geänderte Knoten im Insel-Beispiel-Graph ],
+  placement: auto,
 )
 
-Ich habe folgende Stellen im Graph des Insel-Beispiels für den Benchmark ausgewählt.
-Stelle A ist der 2D Box Knoten der den Generationsbereich definiert.
-Als Stelle B habe ich den Knoten ausgewählt der die Wege auf den Inseln berechnet. Hier werden die Positionen der Inseln wiederverwendet.
-C ist das Disk Volumen welches als Boden für den Inseln verwendet wird und D ist das Kugel Volumen das als Baumkronen verwendet wird.
-In beiden Fällen werden die Positionen für die Inseln sowie die Positionen der Bäume und Wege wiederverwendet.
-
 In diesem Benchmark sieht man das Neuberechnungszeit nicht linear abfällt, sonder alle Änderungen wo die Wege und Bäume neu berechnet werden müssen im Durchschnitt 17ms und 540ms benötigen wohin Änderungen die nur das finale Volumen betreffen um Durchschnitt 5ms und 230ms benötigen.
-Somit lässt sich davon ausgehen das die Berechnung der Wege und Bäume ca. 12ms und 310ms benötigt, welche weg fallen wenn die zwischengespeicherten Daten verwendet werden.
+Somit lässt sich davon ausgehen das die Berechnung der Wege und Bäume ca. 12ms und 310ms benötigt, welche weg fallen wenn die zwischengespeicherten Daten verwendet werden. 
 
 == Overhead
 
@@ -922,7 +963,7 @@ Ein weiteres wichtiges Kriterium ist der Overhead des Systems. Da der Generation
 - die Verwaltung und Modifikation der Graphstruktur,
 - das rekursive Auflösen der Abhängigkeiten während der Berechnung.
 
-Hierfür wurde zwei weiteren Versionen des Insel-Beispiels implementiert. 
+Hierfür wurde zwei weiteren Versionen des Höhlen-Beispiel und Insel-Beispiels implementiert. 
 
 #figure(
   grid(
@@ -968,6 +1009,7 @@ Hierfür wurde zwei weiteren Versionen des Insel-Beispiels implementiert.
     v(0cm)
   ),
   caption: [Unterschied der Berechnungszeit zwischen meinem System hinzu einer direkten Implementierung],
+  placement: auto,
 )
 
 In der ersten weiteren Version würde die Generator-Graph-Verwaltungs-Logik entfernt. 
@@ -982,6 +1024,8 @@ Hier können durch direkte Schachtelung von Loops die Allokierung von Mengen als
 Dazu benötigt Abhängigkeits-Graph durch seine polymorphe Natur viele Switch-Statements, um zwischen den verschiedenen Funktionen, die einen Wert erzeugen, dynamisch zu unterscheiden. 
 Dies fällt bei einer direkten Implementierung weg. 
 Zudem kann der Generationsalgorithmus dadurch stärker durch den Compiler optimiert werden.
+
+#pagebreak()
 
 == Nutzerfreundlichkeit
 
@@ -1074,6 +1118,8 @@ Für einen realen Einsatz in einem Spiel oder einer Simulation wäre mein Ansatz
 Neuronale Large Language Modelle wurden zur Erstellung dieser Arbeit in folgenden Bereichen verwendet:
 - Recherche: Um einen Überblick über den Stand der Technik zu erhalten und relevante Arbeiten zu identifizieren, wurden KI-basierte Systeme genutzt, um Empfehlungen für bestehende Literatur zu generieren.
 - Rechtschreib- und Satzbaukorrektur: Eine von mir verfasste Rohfassung wurde mithilfe von KI auf Rechtschreibung, Grammatik und Zeichensetzung überprüft. Dabei wurde die KI gezielt so eingesetzt, dass nur notwendige Korrekturen vorgenommen wurden. Stilistische Änderungen wurden vermieden, um den ursprünglichen Ausdruck beizubehalten. Es wurde darauf geachtet, dass sich der Inhalt durch die vorgeschlagenen Anpassungen nicht ändert.
+
+#todo("Prompts and geben")
 
 Bereiche, in denen keine KI verwendet wurde, sind:
 - Programmierung: Es wurde keine KI verwendet, um den Code meiner Implementierung zu schreiben.
