@@ -37,14 +37,12 @@ Dieses verwendet Zwischenergebnisse für diejenigen Teile des Graphen, die sich 
 = Stand der Technik
 
 Dieses Kapitel gibt einen Überblick über bestehende Ansätze zur prozeduralen Generierung und bewertet, inwieweit sich diese zur minimalen Neuberechnung eignen.
-Zunächst werden Noise-basierte Verfahren betrachtet. 
-Diese sind in der Praxis weit verbreitet, bieten aber kaum Möglichkeiten zur gezielten Teilneuberechnung. 
-Danach werden L-Systems und Graph-basierte Ansätze untersucht, die durch ihre explizite Regelstruktur besser für eine solche Analyse geeignet wären, es jedoch keine konkreten Ansätze gibt.  
-Anschließend werden KI-basierte Verfahren diskutiert und warum diese für minimale Neuberechnung grundsätzlich nicht geeignet sind. 
-Schließlich werden die Systeme von Houdini und Blender Geometry Nodes erklärt, welche den gleichen Ansatz wie diese Arbeit verfolgen, 
-aber für einen anderen Kontext ausgelegt sind.
 
-#todo("Ein bisschen flach")
+Zunächst werden Noise-basierte Verfahren betrachtet. 
+Diese sind in der Praxis weit verbreitet, bieten jedoch kaum Ansatzpunkte für gezielte Teilneuberechnung. 
+Graph-basierte Ansätze wie L-Systems haben durch ihre explizite Regelstruktur zwar theoretisches Potential, konkrete Arbeiten zur minimalen Neuberechnung existieren hier jedoch nicht.
+Anschließend werden KI-basierte Verfahren diskutiert und warum diese für minimale Neuberechnung grundsätzlich nicht geeignet sind. 
+Houdini und Blender Geometry Nodes verfolgen einen ähnlichen Ansatz wie diese Arbeit, sind aber für einen anderen Anwendungskontext konzipiert.
 
 == Noise & Zufälligkeit <noise_based_generation>
 
@@ -134,7 +132,12 @@ Durch wiederholtes Anwenden dieser Regeln entstehen neue Modelle, die lokal die 
 Im Vergleich zu L-Systems können Regeln hier auf beliebige Graphstrukturen verweisen und komplexere räumliche Bedingungen beschreiben. Außerdem ist das Verfahren nicht auf lineare Symbolsequenzen beschränkt, wodurch es sich besser für dreidimensionale Strukturen eignet.
 
 === Minimale Neuberechnung
-Keiner dieser Ansätze unterstützt minimale Neuberechnung. Bei L-Systems baut jede Iteration direkt auf der vorherigen auf. Eine Regeländerung macht damit alle folgenden Iterationen ungültig, unabhängig davon, wie klein die Änderung ist. Bei Graph-based Model Synthesis ist das Problem ein anderes: Die Regeln werden aus einem Beispiel abgeleitet und beschreiben lokale Nachbarschaftsbedingungen. Ändert sich eine Regel, ist nicht klar welche Teile des generierten Modells diese Bedingung noch erfüllen, ohne die gesamte Struktur neu zu prüfen. In beiden Fällen fehlt eine explizite Darstellung, welche Teile des Ergebnisses von welchen Regeln abhängen. Genau das ist jedoch die Voraussetzung für minimale Neuberechnung.
+
+Das zentrale Problem bei L-Systems ist, dass jede Iteration unmittelbar auf der vorherigen aufbaut.
+Eine Regeländerung macht damit alle folgenden Iterationen ungültig, unabhängig davon, wie klein die Änderung ist.
+Bei Graph-based Model beschreiben die Regeln lokale Nachbarschaftsbedingungen. 
+Daher lässt sich ohne vollständige Neuprüfung nicht bestimmen, welche Teile eines generierten Modells nach einer Regeländerung noch gültig sind. 
+In beiden Fällen fehlt eine explizite Darstellung, welche Teile des Ergebnisses von welchen Regeln abhängen. 
 
 == KI basierte prozedurale Generation
 Neuronale Netzwerke können genutzt werden, um aus einen Trainingsdatensatz, der eine Menge an Beispielen enthält, ein weiteres ähnliches Beispiel zu erzeugen. 
@@ -155,13 +158,11 @@ Ein Nachteil ist jedoch, dass das Verhalten des Systems stark vom Trainingsdaten
 
 === Minimale Neuberechnung
 
-KI-basierte Ansätze teilen ein grundlegendes Problem: 
-Die internen Repräsentationen neuronaler Modelle sind nicht interpretierbar. 
-Es kann also nicht nachvollzogen werden, welche Teile der Eingabe oder welche Gewichte des Modells in einer bestimmten Weise zum generierten Ergebnis beitragen. 
-Ändert sich ein Parameter oder eine Eingabe, kann man daraus nicht ableiten, welche Teile einer bereits generierten Welt noch gültig sind. 
-Die minimale Neuberechnung erfordert jedoch genau diese Nachvollziehbarkeit. 
-Aus diesem Grund werden KI-basierte Ansätze in dieser Arbeit nicht weiter betrachtet.
-
+Bei neuronalen Modellen lässt sich nicht nachvollziehen, welche Eingaben oder Gewichte zu einem bestimmten Ausgabewert geführt haben. 
+Ändert sich ein Parameter, gibt es keine Möglichkeit daraus abzuleiten, welche Teile einer generierten Welt noch gültig sind.
+Dazu ist ein Ziel dieser Arbeit ein Generationssystem zu entwickeln in dem die Regeln in jedem Fall eingehalten werden. 
+Alleine dies kann man mit  neuronalen Modellen, die wie eine Black Box fungieren nicht grundsätzlich sicherstellen. 
+Aus diesen Gründen wurden KI-basierte Ansätze für diese Arbeit nicht weiter betrachtet.
 
 == Houdini & Blender Geometry Nodes
 
@@ -174,9 +175,11 @@ Das in dieser Arbeit vorgestellte System ist aber genau dafür konzipiert. Der G
 
 = Theoretische Grundlagen 
 
-Dieses Kapitel beschreibt die technischen Konzepte, auf denen das in dieser Arbeit vorgestellte System basiert. 
-Dazu zählen Lazy Computation als Grundprinzip der minimalen Neuberechnung, 
-Graphen als zentrale Datenstruktur, Constructive Solid Geometry zur Darstellung von Geometrie sowie Grafische Programmierung als Grundlage des Editors.
+Dieses Kapitel beschreibt die technischen Konzepte, auf denen das in dieser Arbeit vorgestellte System basiert.
+Lazy Computation aus der funktionalen Programmierung liefert ist das Grundkonzept der minimalen Neuberechnung.
+Die Datenstrukturen in dieser Arbeit basieren auf mathematischen Graphen. 
+Daher wird hier die genutzte Notationen erklärt.
+Constructive Solid Geometry wird zur Darstellung der generierten Geometrie genutzt und Grafische Programmierung bildet schließlich die Grundlage für den Editor.
 
 == Minimales Berechnen (Lazy computation)
 
@@ -188,16 +191,13 @@ In funktionalen Programmiersprachen wie Haskell findet dieses Konzept viel Anwen
 
 == Graphen
 
-Die Datenstrukturen in dieser Arbeit basieren auf mathematischen Graphen. 
-Daher erklärt dieser Abschnitt die hier genutzten Notationen.
-
 Ein Graph G := (V, E) besteht aus einer Menge von Knoten V und einer Menge von Kanten E.
 Die Funktionen V(G) = V und E(G) = E werden als verkürzte Notationen verwendet.
 
 Ein einzelner Knoten wird als $v in V$ und eine einzelne Kante als $e in E$ geschrieben.
 
 Eine Kante ist ein Tupel zweier Knoten $e := (v_a, v_b)$. 
-In dieser Arbeit sind Kanten grundsätzlich gerichtet von $v_a$ nach $v_b$.
+In dieser Arbeit sind Kanten grundsätzlich von $v_a$ nach $v_b$ gerichtet.
 
 Die Menge aller eingehenden bzw. ausgehender Kanten eines Knoten $v$ wird als $E^-_G (v)$ bzw. $E^+_G (v)$ geschrieben.
 
@@ -206,7 +206,7 @@ In "directed acyclic graphs" (DAG) und damit auch Bäumen werden ausgehende Nach
 
 Die Notationen basieren auf den Notationen in "Modern Graph Theory" von Béla Bollobás @modern_graph_theory.
 
-== Constructive Solid Geometry (CSG)
+== Constructive Solid Geometry
 
 Constructive Solid Geometry (CSG) ist eine Methode zur Darstellung von Volumen, bei der komplexe Geometrien durch die Kombination primitiver Geometrien (Box, Kugel etc.) dargestellt werden.
 
@@ -808,7 +808,6 @@ Parallel liefen keine weiteren resourcenintesiven Programme.
 )
 
 
-
 #figure(
   grid(
     columns: 1,        
@@ -1045,11 +1044,13 @@ Für weniger erfahrene Nutzer oder für Anwender, die primär konzeptionell arbe
 kann ein grafischer Editor hingegen zugänglicher sein. 
 
 Die visuelle Darstellung der Abhängigkeiten erleichtert das Verständnis des Systems und erlaubt es, Generationslogik zu definieren, ohne sich stark mit den Details einer Programmiersprache beschäftigen zu müssen. 
-
 Allerdings kann ein solcher Editor auch einschränkend wirken, da nur die im System vorgesehenen Operationen und Strukturen genutzt werden können.
 
-Insgesamt bietet der grafische Ansatz insbesondere für komplexe prozedurale Systeme Vorteile, da er eine bessere Übersicht über den Generationsprozess ermöglicht und iterative Änderungen am Algorithmus erleichtert, während klassische Code-basierte Ansätze weiterhin mehr Flexibilität für erfahrene Entwickler bieten.
-
+Der grafische Ansatz ist kein Ersatz für klassische Programmierung von prozeduralen Generationsalgorithmen. 
+Stattdessen eröffnet er die Entwicklung zu einem neuen Nutzerkreis. 
+Wer einen Generationsalgorithmus iterativ entwickeln und dabei keine umfassende Programmiererfahrung hat, 
+profitiert von der direkten Sichtbarkeit der Abhängigkeiten. 
+Für erfahrene Entwickler dürfte der Editor dagegen eher einschränkend wirken.
 
 == Erweiterbarkeit
 Um das System um weitere Operationen oder Datentypen zu erweitern, wird ein gutes Verständnis der Codestruktur benötigt. 
@@ -1116,12 +1117,30 @@ Für einen realen Einsatz in einem Spiel oder einer Simulation wäre mein Ansatz
 #heading([Nutzung KI basierte Anwendungen], level: 2, outlined: false, numbering: none)
 
 Neuronale Large Language Modelle wurden zur Erstellung dieser Arbeit in folgenden Bereichen verwendet:
-- Recherche: Um einen Überblick über den Stand der Technik zu erhalten und relevante Arbeiten zu identifizieren, wurden KI-basierte Systeme genutzt, um Empfehlungen für bestehende Literatur zu generieren.
-- Rechtschreib- und Satzbaukorrektur: Eine von mir verfasste Rohfassung wurde mithilfe von KI auf Rechtschreibung, Grammatik und Zeichensetzung überprüft. Dabei wurde die KI gezielt so eingesetzt, dass nur notwendige Korrekturen vorgenommen wurden. Stilistische Änderungen wurden vermieden, um den ursprünglichen Ausdruck beizubehalten. Es wurde darauf geachtet, dass sich der Inhalt durch die vorgeschlagenen Anpassungen nicht ändert.
 
-#todo("Prompts and geben")
+#heading([Recherche], level: 3, outlined: false, numbering: none)
+Um einen Überblick über den Stand der Technik zu erhalten und relevante Arbeiten zu identifizieren, wurden KI-basierte Systeme genutzt, um Empfehlungen für bestehende Literatur zu generieren.
 
-Bereiche, in denen keine KI verwendet wurde, sind:
+Es wurden folgende Prompts genutzt:
+
+- "Ich habe für meine Bachelor Arbeit folgende Idee \<Idee\>. Suche Wissenschaftlichen Arbeiten die sich mit der Idee beschäftigen."
+- "Konzept \<X\> finde ich spannend. Suche nach Wissenschaftlichen Arbeiten die dies tiefer in Richtung \<Y\> erweitern."
+
+#heading([Rechtschreib- und Satzbaukorrektur], level: 3, outlined: false, numbering: none)
+Eine von mir verfasste Rohfassung wurde mithilfe von KI auf Rechtschreibung, Grammatik und Zeichensetzung überprüft. 
+Dabei wurde die KI gezielt so eingesetzt, dass nur notwendige Korrekturen vorgenommen wurden. 
+Stilistische Änderungen wurden vermieden, um den ursprünglichen Ausdruck beizubehalten. 
+Es wurde darauf geachtet, dass sich der Inhalt durch die vorgeschlagenen Anpassungen nicht ändert.
+
+Es wurden folgende Prompts genutzt:
+
+- "\<Textausschnitt\> gehe diesen Text sorgfältig durch. Und Liste alle Rechtschreib- und Statzbaufehler auf. Verändere dabei den Inhalt oder die Aussage nicht. Gib Verbesserungsvorschläge an."
+
+#heading([Genutzte Tools], level: 3, outlined: false, numbering: none)
+- Chat GPT: https://chatgpt.com Zuletzt zugegriffen am 29.05.2026
+- Claude: https://claude.ai Zuletzt zugegriffen am 29.05.2026
+
+#heading([Bereiche, in denen keine KI verwendet wurde, sind:], level: 3, outlined: false, numbering: none)
 - Programmierung: Es wurde keine KI verwendet, um den Code meiner Implementierung zu schreiben.
 - Textinhalte: KI wurde nicht verwendet, um inhaltliche Aussagen, Argumentationen oder Ergebnisse der Arbeit zu generieren.
 
