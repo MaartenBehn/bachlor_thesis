@@ -882,9 +882,8 @@ Bei Knoten C können die Wege der Höhlen-Tunnel vollständig wiederverwendet we
 ) 
 
 Aus dem Benchmark ist ersichtlich, dass sich die verschiedenen Neugenerationszeiten nicht stark unterscheiden. 
-Sie skalieren vor allem mit der Menge an Kreuzungen. 
-Welcher hier direkten Einfluss auf den in @theo_runtime besprochenen Branche-Faktor hat.
-Es lässt sich vermuten, dass in diesem Benchmark ein Großteil der Berechnungszeit für das erstellen des finalen Volumen benötigt wird. 
+Sie skalieren vor allem mit der Menge an Kreuzungen, welcher hier direkten Einfluss auf den in @theo_runtime besprochenen Branche-Faktor hat.
+Es ist wahrscheinlich, dass in diesem Benchmark ein Großteil der Berechnungszeit für das erstellen des finalen Volumens benötigt wird. 
 
 
 === Insel-Beispiel 
