@@ -1,0 +1,67 @@
+pub mod magica_voxel;
+pub mod remove_trait;
+
+use std::{fmt::Debug, marker::PhantomData};
+
+use octa_force::glam::{vec4, IVec3, UVec3, Vec2, Vec3, Vec3A, Vec4, Vec4Swizzles};
+
+use crate::util::{aabb::AABB, math_config::MC, number::Nu, vector::Ve};
+
+pub trait VolumeBounds<V: Ve<T, D>, T: Nu, const D: usize> {
+    fn calculate_bounds(&mut self);
+    fn get_bounds(&self) -> AABB<V, T, D>;
+    fn get_offset(&self) -> V {
+        self.get_bounds().min()
+    }
+    fn get_size(&self) -> V {
+        self.get_bounds().size()
+    }
+}
+
+pub trait VolumeChangeBounds<V: Ve<T, D>, T: Nu, const D: usize>: VolumeBounds<V, T, D> {
+    fn calculate_change_bounds(&mut self);
+    fn get_change_bounds(&self) -> AABB<V, T, D>;
+}
+
+pub trait VolumeGradient<V: Ve<f32, D>, const D: usize> {
+    fn get_gradient_at_position(&self, pos: V) -> V;
+}
+
+pub trait VolumeQureyPosValid<V: Ve<T, D>, T: Nu, const D: usize>: VolumeBounds<V, T, D> + Sized {
+    fn is_position_valid(&self, pos: V) -> bool;
+     
+    fn get_grid_positions(&self, step: T) -> impl Iterator<Item = V> {
+        let aabb = self.get_bounds(); 
+        aabb.get_sampled_positions(step).into_iter()
+            .filter(move |p| self.is_position_valid(*p))
+    }
+}
+
+pub trait VolumeQureyPosValue<V: Ve<T, D>, T: Nu, const D: usize>: VolumeBounds<V, T, D> {
+    fn get_value(&self, pos: V) -> u8;
+}
+
+#[derive(Copy, Clone, Debug)]
+pub enum VolumeQureyAABBResult {
+    Full(u8),
+    Mixed,
+}
+
+pub trait VolumeQureyAABB<V: Ve<T, D>, T: Nu, const D: usize>: VolumeQureyPosValue<V, T, D> {
+    fn get_aabb_value(&self, aabb: AABB<V, T, D>) -> VolumeQureyAABBResult;
+}
+
+impl VolumeQureyAABBResult {
+    pub fn get_value(self) -> u8 {
+        match self {
+            VolumeQureyAABBResult::Full(v) => v,
+            VolumeQureyAABBResult::Mixed => unreachable!(),
+        }
+    }
+}
+
+
+
+
+
+

@@ -1,0 +1,103 @@
+[package]
+name = "dynamic_voxels"
+version = "0.1.0"
+edition = "2024"
+build = "build.rs"
+
+[lints.rust]
+unused = "allow"
+
+[profile.dev-fast]
+inherits = "dev"
+debug = 0
+strip = "debuginfo"
+opt-level = 3  
+
+[profile.release]
+debug = 1
+
+[lib]
+name = "reload"
+path = "src/reload.rs"
+crate-type = ["rlib", "dylib"]
+
+[[bench]]
+name = "dag64_build_fall_tree"
+harness = false
+
+[[bench]]
+name = "dag64_compare_int_float"
+harness = false
+
+[[bench]]
+name = "dag64_compare_parallel"
+harness = false
+
+[[bench]]
+name = "query_large_union"
+harness = false
+
+[features]
+graph = []
+game = []
+
+[dependencies]
+
+# Just very usefull
+enum_dispatch = "0.3.13"
+slotmap = "1.1.1"
+sharded-slab = "0.1.7"
+bitvec = "1"
+envparse = "0.1.0"
+
+octa-force = { path = "../octa-force-rs" }
+# octa-force = { version = "0.3.3", git = "https://github.com/MaartenBehn/octa-force-rs" }
+
+spirq= "0.2.2"
+spirv-struct-layout = "0.1.2"
+
+fastrand = "2.2.0"
+simple-easing = "1.0.1"
+
+# fast_poisson = { path="../fast_poisson", features = ["single_precision"]}
+# fast_poisson = { git="https://github.com/MaartenBehn/fast_poisson.git", version = "1.0.3", features = ["single_precision"]}
+# kiddo = "5.0.3"
+
+half = "2.6.0"
+
+## For own DAG64 implementation
+rayon = "1.10"
+hashbrown = { version = "0.15", features = [ "rayon" ] }
+fnv = "1.0.7"
+parking_lot = { version = "0.12" }
+dashmap = "6.1.0"
+nohash-hasher = "0.2.0"
+
+# For importing magica voxel models
+dot_vox = "5"
+
+
+# for async workers
+smol = "2.0"
+oneshot = "0.1"
+itertools = "0.14"
+smallvec = {version = "1.15", features = [ "union", "const_new", "const_generics" ]}
+
+# Depth and Heat map ranges in ui
+egui_double_slider = "0.9"
+
+# Graph editor
+egui-snarl = { version = "0.8.0", features = [ "serde" ] }
+egui-probe = "0.9.0"
+serde = "*"
+serde_json = "*"
+quasi-rd = "0.1.0"
+egui_extras = "0.32.0"
+
+
+
+[dev-dependencies]
+proptest = "0.9.6"
+criterion = { version = "0.5", features = ["html_reports"] }
+tree64 = { git="https://github.com/expenses/tree64.git", version = "0.1.0" }
+

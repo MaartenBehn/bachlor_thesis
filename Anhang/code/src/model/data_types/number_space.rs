@@ -1,0 +1,105 @@
+use std::iter;
+
+use egui_snarl::OutPinId;
+use itertools::{iproduct, Itertools};
+use octa_force::{log::debug, OctaResult};
+use smallvec::SmallVec;
+
+use crate::{model::{collapse::{add_nodes::GetValueData, collapser::Collapser, template_changed::MatchValueData}, composer::{ModelComposer, graph::ComposerGraph, make_template::MakeTemplateData, nodes::ComposeNode}, data_types::{data_type::{CollapseValue, ComposeNodeType,  TemplateValue}, number::ValueIndexNumber}, template::{self, Template, value::ValueIndex}}, util::{default_types::T, number::Nu, vector::Ve}};
+
+use super::{number::NumberValue};
+
+pub type ValueIndexNumberSpace = usize;
+
+#[derive(Debug, Clone, Copy)]
+pub enum NumberSpaceValue {
+    NumberRange {
+        min: ValueIndexNumber,
+        max: ValueIndexNumber,
+        step: ValueIndexNumber,
+    }
+}
+
+impl ComposerGraph {
+    pub fn make_number_space(
+        &self, 
+        original_node: &ComposeNode, 
+        in_index: usize, 
+        data: &mut MakeTemplateData,
+    ) -> ValueIndexNumberSpace {
+        let node_id = self.get_input_remote_node_id(original_node, in_index);
+
+        if let Some(value_index) = data.get_value_index_from_node_id(node_id) {
+            data.add_depends_of_value(value_index);
+            return value_index;
+        }
+
+        let node = self.snarl.get_node(node_id).expect("Node of remote not found");
+        let value = match &node.t {
+            ComposeNodeType::NumberRange => {
+                let min = self.make_number(node, 0, data);
+                let max = self.make_number(node, 1, data);
+                let step = self.make_number(node, 2, data);
+                NumberSpaceValue::NumberRange { min, max, step }
+            },
+            _ => unreachable!(),
+        };
+
+        data.set_value(node_id, TemplateValue::NumberSet(value))
+    }
+}
+
+
+impl NumberSpaceValue {
+    pub fn match_value(
+        &self, 
+        other: &NumberSpaceValue,
+        data: MatchValueData
+    ) -> bool {
+
+        match self {
+            NumberSpaceValue::NumberRange { min: min1, max: max1, step: step1 } => match other {
+                NumberSpaceValue::NumberRange { min: min2, max: max2, step: step2 } => {
+                    data.match_two_numbers(*min1, *min2)
+                    && data.match_two_numbers(*max1, *max2)
+                    && data.match_two_numbers(*step1, *step2)
+                }
+                _ => false,
+            },
+        } 
+    }
+
+    pub fn get_value(
+        &self,
+        get_value_data: GetValueData,
+        collapser: &Collapser,
+    ) -> (impl Iterator<Item = T>, bool) {
+        match &self {
+            NumberSpaceValue::NumberRange { min, max, step } => {
+                let (min, r_0) = collapser.template
+                    .get_number_value(*min)
+                    .get_value(get_value_data, collapser);
+
+                let (max, r_1) =  collapser.template
+                    .get_number_value(*max)
+                    .get_value(get_value_data, collapser);
+
+                let (step, r_2) =  collapser.template
+                    .get_number_value(*step)
+                    .get_value(get_value_data, collapser);
+
+                let v = iproduct!(min, max, step)
+                    .map(|(min, max, step)| {
+                        let options = ((max - min) / step).to_usize();
+                        let i = fastrand::usize(0..options);
+                        let v = min + step * T::from_usize(i);
+                        v
+                    });
+
+                (v, r_0 || r_1 || r_2)
+            },
+        }
+    }
+}
+
+

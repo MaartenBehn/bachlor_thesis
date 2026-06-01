@@ -1,0 +1,84 @@
+use std::fmt::Debug;
+
+use crate::{bvh::{Bvh, node::BHNode, shape::{BHShape, Shapes}}, csg::primitves::{CSGPrimitive, r#box::CSGBox, cylinder::CSGCylinder, sphere::CSGSphere}, util::{aabb::AABB, math_config::MC, number::Nu, vector::Ve}, volume::{VolumeBounds, VolumeQureyPosValid}};
+
+use super::tree::{CSGTreeNode, CSGTreeNodeData, CSGTree, CSGTreeIndex};
+
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct BVHNodeCSGUnion<V: Ve<T, D>, T: Nu, const D: usize> {
+    pub aabb: AABB<V, T, D>,
+    pub exit: usize,
+    pub leaf: Option<usize>,
+}
+
+#[derive(Debug, Clone)]
+pub struct CSGTreeUnion<V: Ve<T, D>, T: Nu, const D: usize> {
+    pub indecies: Vec<CSGTreeIndex>,
+    pub bvh: Bvh<BVHNodeCSGUnion<V, T, D>, (), V::VectorF, f32, D>,
+    pub needs_bounds_recompute: bool,
+}
+
+impl<V: Ve<T, D>, T: Nu, const D: usize> CSGTreeUnion<V, T, D> {
+    pub fn new(indecies: Vec<CSGTreeIndex>) -> Self { 
+        Self {
+            indecies,
+            bvh: Bvh::empty(),
+            needs_bounds_recompute: true,
+        }
+    }
+
+    pub fn add_node(&mut self, index: CSGTreeIndex) {
+        self.indecies.push(index);
+        self.needs_bounds_recompute = true;
+    }
+
+    pub fn shift_indecies(&mut self, ammount: usize) {
+        for index in self.indecies.iter_mut() {
+            *(index) += ammount;
+        }
+    }
+} 
+
+impl<V: Ve<T, D>, T: Nu, const D: usize> BHNode<(), V::VectorF, f32, D> for BVHNodeCSGUnion<V, T, D> {
+    fn new<S>(aabb: AABB<V::VectorF, f32, D>, exit_index: usize, shape_index: Option<(usize, ())>) -> Self {
+        Self {
+            aabb: AABB::from_f(aabb),
+            exit: exit_index,
+            leaf: shape_index.map(|(i, _)| i),
+        }
+    }
+}
+
+impl<M, V: Ve<T, D>, T: Nu, const D: usize> BHShape<(), V::VectorF, f32, D> for CSGTreeNode<M, V, T, D> {
+    fn aabb(&self, shapes: &Shapes<(), Self, V::VectorF, f32, D>) -> AABB<V::VectorF, f32, D> {
+        match &self.data {
+            CSGTreeNodeData::None => AABB::default(),
+            CSGTreeNodeData::Union(d) => d.get_bounds().to_f(),
+            CSGTreeNodeData::Cut(csgtree_remove) => {
+                let base = csgtree_remove.base;
+                shapes.aabb(base)
+            },
+            CSGTreeNodeData::Box(d) 
+                => <CSGPrimitive<CSGBox, M, V::VectorF, D> as VolumeBounds<V, T, D>>::get_bounds(d).to_f(),
+            CSGTreeNodeData::Sphere(d) 
+                => <CSGPrimitive<CSGSphere, M, V::VectorF, D> as VolumeBounds<V, T, D>>::get_bounds(d).to_f(),
+            CSGTreeNodeData::Cylinder(d) 
+                => <CSGPrimitive<CSGCylinder, M, V::VectorF, D> as VolumeBounds<V, T, D>>::get_bounds(d).to_f(),
+            CSGTreeNodeData::OffsetVoxelGrid(d) => d.get_bounds(),
+            CSGTreeNodeData::SharedVoxelGrid(d) => d.get_bounds(),
+        }
+    }
+
+    fn extra_data(&self, shapes: &Shapes<(), Self, V::VectorF, f32, D>) -> () { () }
+}
+
+impl<V: Ve<T, D>, T: Nu, const D: usize> Default for CSGTreeUnion<V, T, D> {
+    fn default() -> Self {
+        Self { 
+            indecies: Default::default(), 
+            bvh: Bvh::empty(), 
+            needs_bounds_recompute: Default::default() 
+        }
+    }
+}

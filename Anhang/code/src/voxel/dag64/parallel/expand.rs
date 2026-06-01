@@ -1,0 +1,42 @@
+use octa_force::{OctaResult, glam::{IVec3, UVec3}};
+
+use crate::{util::{aabb::AABB, math_config::MC, number::Nu, vector::Ve}, voxel::dag64::{entry::{DAG64Entry, DAG64EntryKey}, lod_heuristic::LODHeuristicT, node::VoxelDAG64Node, util::get_voxel_size}};
+use super::ParallelVoxelDAG64;
+
+impl ParallelVoxelDAG64 {
+    pub(super) fn expand_to_include_aabb<V: Ve<T, 3>, T: Nu>(
+        &mut self, 
+        based_on_entry: DAG64EntryKey, 
+        aabb: AABB<V, T, 3>
+    ) -> DAG64Entry {
+        let mut entry_data = self.entry_points.lock()[based_on_entry].to_owned(); 
+
+        let mut size = get_voxel_size(entry_data.levels);
+        let mut tree_aabb = AABB::new(V::ve_from(entry_data.offset), V::ve_from(entry_data.offset + size));
+
+        let model_center = aabb.center();
+
+        // Increase the Tree if the model does not fit.
+        // MAYBE If the model_aabb is not to big for the tree_aabb but just sticking out.
+        // It would be possible to move the tree_aabb. 
+        // But this would mean the entire tree would need to be regenerated. 
+        while !tree_aabb.contains_aabb(aabb) {
+
+            // The + 2 says that the 3rd cell is the center so the old tree will placed in the
+            // middle of the new level.
+            let diff: IVec3 = (model_center - tree_aabb.min()).ve_into(); 
+            let child_pos = (diff / size) + 2;
+            let child_index = child_pos.as_uvec3().dot(UVec3::new(1, 4, 16));
+
+            let new_root = VoxelDAG64Node::single(false, entry_data.root_index, 1 << child_index as u64);
+            entry_data.root_index = self.nodes.push(&[new_root]);
+            
+            entry_data.offset = entry_data.offset - child_pos * size; 
+            entry_data.levels += 1;
+            size = get_voxel_size(entry_data.levels);
+            tree_aabb = AABB::new(V::ve_from(entry_data.offset), V::ve_from(entry_data.offset + size));
+        }
+        
+        entry_data
+    }
+}

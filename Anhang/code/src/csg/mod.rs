@@ -1,0 +1,18 @@
+use core::fmt;
+use std::fmt::Debug;
+use crate::voxel::palette::palette::MATERIAL_ID_BASE;
+
+pub mod csg_tree;
+pub mod primitves;
+
+pub trait Base: Copy + Default + fmt::Debug + 'static {
+    fn base() -> Self;
+}
+
+impl Base for () {
+    fn base() -> Self { () }
+}
+
+impl Base for u8 {
+    fn base() -> Self { MATERIAL_ID_BASE }
+}

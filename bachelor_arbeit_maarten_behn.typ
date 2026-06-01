@@ -10,10 +10,14 @@
       email: "behn@uni-bremen.de"
     )
   ),
-  supervisors: ("Prof. Dr. Gabriel Zachmann", "Prof. Dr. Nico Hochgeschwender")
+  supervisors: ("Prof. Dr. Gabriel Zachmann", "Prof. Dr. Nico Hochgeschwender"),
 )
 
 
+#{
+  page(footer: none, header: none, [])
+}
+#counter(page).update(n => n - 1)
 
 = Einleitung
 
@@ -98,8 +102,6 @@ Dieser Bereinigungsschritt wird rekursiv auf alle betroffenen Nachbarzellen ausg
 Der Vorgang wiederholt sich, bis jede Zelle genau einen Wert enthält.
 Da das Vorsehen, bestehende Model Synthesis Ereignisse an geänderte Regeln anzupassen, bisher unerforscht ist, habe ich es gleich von Beginn meiner Arbeit als Kernthema in Betracht gezogen.
 In @layz-model-synthesis werde ich darauf eingehen, warum ich diesen Ansatz verworfen habe.
-
-#todo("Abschnitt zu Kapitel?")
 
 == Graph Grammatiken
 Eine Graph-Grammatik ist ein System aus Regeln, die beschreiben, wie ein Graph verändert werden kann. 

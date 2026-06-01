@@ -1,0 +1,297 @@
+
+
+extern crate self as dynamic_voxels;
+
+pub mod csg;
+pub mod model;
+pub mod scene;
+pub mod util;
+pub mod volume;
+pub mod voxel;
+pub mod bvh;
+pub mod mesh;
+pub mod marching_cubes;
+pub mod editor;
+pub mod gi;
+
+use model::composer::ModelComposer;
+use octa_force::engine::Engine;
+use scene::renderer::SceneRenderer;
+use octa_force::camera::Camera;
+use octa_force::egui_winit::winit::event::WindowEvent;
+use octa_force::glam::{vec3, UVec2, Vec3};
+use octa_force::log::{debug, info, trace, LevelFilter, Log};
+use octa_force::logger::setup_logger;
+use octa_force::puffin_egui::puffin;
+use octa_force::{egui, log, OctaResult};
+use voxel::palette::shared::SharedPalette;
+use std::time::{Duration, Instant};
+use crate::util::shader_constants::METERS_PER_SHADER_UNIT;
+
+#[cfg(any(feature="game"))]
+use crate::editor::Editor;
+#[cfg(any(feature="graph"))]
+use crate::mesh::scene::MeshScene;
+
+pub const USE_PROFILE: bool = false;
+pub const NUM_FRAMES_IN_FLIGHT: usize = 2;
+
+#[unsafe(no_mangle)]
+pub fn init_hot_reload(logger: &'static dyn Log, level: LevelFilter) -> OctaResult<()> {
+    setup_logger(logger, level)?;
+ 
+    Ok(())
+}
+
+#[derive(Debug)]
+pub struct LogicState {
+    pub camera: Camera,
+    pub start_time: Instant,
+}
+
+#[unsafe(no_mangle)]
+pub fn new_logic_state() -> OctaResult<LogicState> {
+    #[cfg(debug_assertions)]
+    puffin::profile_function!();
+
+    log::info!("Creating Camera");
+    let mut camera = Camera::default();
+ 
+    #[cfg(feature="game")]
+    {
+
+        camera.set_meter_per_unit(METERS_PER_SHADER_UNIT as f32);
+        camera.set_position_in_meters(Vec3::new(36.64, 0.07, 4.66)); 
+        camera.direction = Vec3::new(-0.78, -0.04, -0.62).normalize();
+        
+        camera.speed = 10.0;
+        camera.z_near = 0.001;
+    }
+    
+    #[cfg(feature="graph")]
+    {
+        camera.set_meter_per_unit(METERS_PER_SHADER_UNIT as f32);
+        camera.set_position_in_meters(Vec3::new(0.0, -10.0, 0.0)); 
+        camera.direction = Vec3::new(0.0, 1.0, 0.0).normalize();
+        
+        camera.speed = 50.0;
+        camera.z_near = 0.001;
+    }
+ 
+    camera.z_far = 100.0;
+    camera.up = vec3(0.0, 0.0, 1.0);
+
+    Ok(LogicState {
+        camera,
+        start_time: Instant::now(),
+    })
+}
+
+
+#[derive(Debug)]
+pub struct RenderState {   
+    #[cfg(any(feature="game"))]
+    pub editor: Editor,
+        
+    #[cfg(any(feature="graph", feature="game"))]
+    pub scene: SceneRenderer,
+    
+    #[cfg(any(feature="graph"))]
+    pub composer: ModelComposer, 
+    
+    #[cfg(any(feature="graph"))]
+    pub mesh_scene: MeshScene,
+}
+
+#[unsafe(no_mangle)]
+pub fn new_render_state(logic_state: &mut LogicState, engine: &mut Engine) -> OctaResult<RenderState> {
+    #[cfg(debug_assertions)]
+    puffin::profile_function!();
+
+    #[cfg(feature="game")]
+    {
+        use crate::{editor::Editor, mesh::scene::MeshScene};
+
+        let palette = SharedPalette::new();
+        let mesh_scene = MeshScene::new(&engine.context, &engine.swapchain);
+
+        let scene = SceneRenderer::new(
+            engine, 
+            &logic_state.camera,
+            palette.clone(),
+            false,
+        )?;
+
+        let editor = Editor::new(&logic_state.camera, scene.worker_ref.send.clone())?;
+
+        Ok(RenderState {
+            scene,
+            editor,
+        })
+    }
+    
+    #[cfg(feature="graph")]
+    {
+        use crate::mesh::scene::MeshScene;
+
+        let palette = SharedPalette::new();
+        let mesh_scene = MeshScene::new(&engine.context, &engine.swapchain);
+
+        let scene = SceneRenderer::new(
+            engine, 
+            &logic_state.camera,
+            palette.clone(),
+            false,
+        )?;
+
+        let composer = ModelComposer::new(
+            &logic_state.camera, 
+            palette, 
+            scene.worker_ref.send.clone(), 
+            mesh_scene.send.to_owned()); 
+
+
+        return Ok(RenderState {
+            scene,
+            composer,
+            mesh_scene,
+        })
+    }
+
+    #[cfg(not(any(feature="graph", feature="game")))]
+    {
+        Ok(RenderState { })
+    }
+   }
+
+#[unsafe(no_mangle)]
+pub fn update(
+    logic_state: &mut LogicState,
+    render_state: &mut RenderState,
+    engine: &mut Engine,
+    delta_time: Duration,
+) -> OctaResult<()> {
+    #[cfg(debug_assertions)]
+    puffin::profile_function!();
+
+    let time = logic_state.start_time.elapsed(); 
+
+    logic_state.camera.update(&engine.controls, delta_time);
+    
+    #[cfg(any(feature="game"))]
+    {
+        render_state.editor.update(time.as_secs_f32());
+        render_state.scene.update(engine, &logic_state.camera, engine.get_resolution())?;
+    }
+
+    #[cfg(feature="graph")]
+    {
+        render_state.composer.update(time, &logic_state.camera)?;
+
+
+        if render_state.composer.render_panel_changed {
+            render_state.composer.render_panel_changed = false;
+
+            debug!("Resize Render Panel");
+            logic_state.camera.set_screen_size(render_state.composer.render_panel_size.as_vec2());
+
+            render_state
+                .scene
+                .on_size_changed(
+                    render_state.composer.render_panel_size,
+                    &engine.context,
+                    &engine.swapchain,
+                )?;
+        }
+
+        render_state.mesh_scene.update(&engine.context);
+
+        render_state.scene.update(
+            engine,
+            &logic_state.camera, 
+            render_state.composer.render_panel_size)?;
+    }
+
+    Ok(())
+}
+
+#[unsafe(no_mangle)]
+pub fn record_render_commands(
+    logic_state: &mut LogicState,
+    render_state: &mut RenderState,
+    engine: &mut Engine,
+) -> OctaResult<()> {
+    #[cfg(debug_assertions)]
+    puffin::profile_function!();
+
+    let command_buffer = engine.get_current_command_buffer();
+    
+    #[cfg(any(feature="game"))]
+    { 
+        render_state.scene.render(UVec2::ZERO, command_buffer, &engine, &logic_state.camera)?;
+        command_buffer.swapchain_image_render_barrier(&engine.get_current_swapchain_image_and_view().image)?;
+    }
+
+    #[cfg(any(feature="graph"))]
+    {
+        render_state.scene.render(UVec2::ZERO, command_buffer, &engine, &logic_state.camera)?;
+
+        render_state.mesh_scene.render(
+            command_buffer, 
+            &logic_state.camera,
+            engine, 
+            render_state.composer.render_panel_size.as_vec2(),
+            &render_state.scene.renderer.palette_buffer,
+        );
+
+        command_buffer.swapchain_image_render_barrier(&engine.get_current_swapchain_image_and_view().image)?;
+    }
+   
+    Ok(())
+}
+
+#[unsafe(no_mangle)]
+pub fn record_ui_commands(
+    ctx: &egui::Context,
+    logic_state: &mut LogicState,
+    render_state: &mut RenderState,
+) -> OctaResult<()> {
+    #[cfg(any(feature="game"))]
+    {
+        render_state.scene.render_ui(ctx, &logic_state.camera);
+    }
+
+    #[cfg(any(feature="graph"))]
+    {
+        render_state.scene.render_ui(ctx, &logic_state.camera);
+
+        render_state.composer.render(ctx);
+    }
+
+    Ok(())
+}
+
+#[unsafe(no_mangle)]
+pub fn on_window_event(
+    _logic_state: &mut LogicState,
+    render_state: &mut RenderState,
+    engine: &mut Engine,
+    event: &WindowEvent,
+) -> OctaResult<()> {
+
+    Ok(())
+}
+
+#[unsafe(no_mangle)]
+pub fn on_recreate_swapchain(
+    logic_state: &mut LogicState,
+    render_state: &mut RenderState,
+    engine: &mut Engine,
+) -> OctaResult<()> {
+    logic_state.camera.set_screen_size(engine.get_resolution().as_vec2());
+
+    #[cfg(any(feature="game"))]
+    render_state.scene.on_size_changed(engine.get_resolution(), &engine.context, &engine.swapchain)?;
+
+    Ok(())
+}

@@ -1,0 +1,12 @@
+target/
+.idea
+*.spv
+*.log
+.direnv
+.envrc
+strace.out
+/result
+perf.data
+perf.data.old
+/proptest-regressions
+vgcore*

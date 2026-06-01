@@ -46,15 +46,14 @@
     #v(5%)
     #align(center)[
       #stack(dir: ttb, spacing: 3em)[
-        #line(angle: 0deg, length: 100%)
+        //#line(angle: 0deg, length: 100%)
       ][
         #set text(size: 2em)
         *#title*
       ][
         #set text(size: 1.5em)
-        Bachelorarbeit zur Erlangung des akademischen
-        Grades Bachelor of Science in Informatik ][
-        #line(angle: 0deg, length: 100%)
+        Bachelorarbeit Informatik ][
+        //#line(angle: 0deg, length: 100%)
       ]
     ]
     #v(5%)
