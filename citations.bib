@@ -54,12 +54,15 @@ keywords = {inverse procedural modeling, graph grammar, local similarity}
 
 ## AI
 @misc{terraindiffusion,
-  title={Terrain Diffusion: A Diffusion-Based Successor to Perlin Noise in Infinite, Real-Time Terrain Generation}, 
-  author={Alexander Goslin},
-  year={2025},
-  archivePrefix={arXiv},
-  primaryClass={cs.CV},
-  doi={10.48550/arXiv.2512.08309}
+      title={InfiniteDiffusion: Bridging Learned Fidelity and Procedural Utility for Open-World Terrain Generation}, 
+      author={Alexander Goslin},
+      year={2026},
+      month=may,
+      day={3},
+      eprint={2512.08309},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2512.08309}, 
 }
 
 @misc{evolvingmariolevels,
@@ -123,35 +126,62 @@ keywords = {inverse procedural modeling, graph grammar, local similarity}
 
 @software{houdini,
   author       = {{Side Effects Software Inc.}},
-  title        = {Houdini: 3D Procedural Software for Modeling, Animation, VFX, Look Development, Lighting and Rendering},
+  title        = {Houdini: 3D Procedural Software for Modeling,
+                  Animation, VFX, Look Development, Lighting
+                  and Rendering},
+  version      = {21.0.671},
   year         = {2026},
+  publisher    = {Side Effects Software Inc.},
+  address      = {Toronto, Ontario, Canada},
   url          = {https://www.sidefx.com/},
-  note         = {Abgerufen am 25. Mai 2026}
+  urldate      = {2026-05-25},
+  note         = {Propriet{\"a}re Software; verf{\"u}gbar als
+                  Houdini FX, Core, Indie und Apprentice
+                  (kostenlos f{\"u}r nicht-kommerzielle Nutzung)}
 }
 
 @software{blender,
-  author       = {{Blender Foundation}},
-  title        = {Blender: Open-source 3D creation suite; Geometry Nodes seit Version 2.92},
+  author       = {{Blender Foundation} and {Blender Institute}},
+  title        = {Blender: Free and Open Source 3D Creation Suite},
+  version      = {5.1},
   year         = {2026},
+  publisher    = {Blender Foundation},
+  address      = {Amsterdam, Niederlande},
   url          = {https://www.blender.org},
+  urldate      = {2026-05-25},
+  license      = {GPL-2.0-or-later},
+  note         = {Geometry Nodes erstmals in Version 2.92
+                  (Februar 2021) eingef{\"u}hrt}
 }
 
 # Theory
 @book{modern_graph_theory,
-  title     = "Modern Graph Theory",
-  author    = "Béla Bollobás",
-  year      = 2013,
-  publisher = "Springer New York",
-
-  doi       = "10.1007/978-1-4612-0619-4"
+  author    = {Bollobás, Béla},
+  title     = {Modern Graph Theory},
+  series    = {Graduate Texts in Mathematics},
+  volume    = {184},
+  edition   = {1},
+  publisher = {Springer},
+  address   = {New York, NY},
+  year      = {1998},
+  pages     = {XIV, 394},
+  isbn      = {978-0-387-98488-9},
+  doi       = {10.1007/978-1-4612-0619-4},
+  issn      = {0072-5285},
+  note      = {eBook published 2013}
 }
 
 @techreport{csg_original,
-  author       = {Aristides A. G. Requicha and Herbert B. Voelcker},
+  author       = {Requicha, Aristides A. G. and Voelcker, Herbert B.},
   title        = {Constructive Solid Geometry},
   institution  = {Production Automation Project, University of Rochester},
   year         = {1977},
-  address      = {Rochester, NY, USA}
+  month        = nov,
+  type         = {Technical Memorandum},
+  number       = {TM-25},
+  address      = {Rochester, NY, USA},
+  note         = {Reprints may be obtained from CPA, 304 Kimball Hall,
+                  Cornell University, Ithaca, NY 14853}
 }
 
 @article{csg_advanced,
@@ -190,63 +220,131 @@ keywords = {inverse procedural modeling, graph grammar, local similarity}
 }
 
 ## Slotmap
-@misc{slotmap_crate,
-  title        = {slotmap: A Rust library for stable keys and values},
-  author       = {Orson Peters},
-  year         = {2019},
+@software{slotmap_crate,
+  author       = {Peters, Orson},
+  title        = {{slotmap}: Slotmap Data Structure for {Rust}},
+  year         = {2024},
+  version      = {1.0.7},
   url          = {https://crates.io/crates/slotmap},
-  note         = {Abgerufen: 07.04.2026}
+  urldate      = {2026-04-07},
+  howpublished = {\url{https://crates.io/crates/slotmap}},
+  license      = {Zlib},
+  repository   = {https://github.com/orlp/slotmap},
+  note         = {Version~1.0.7. Rust-Bibliothek für persistente, typsichere Schlüssel
+                  (\texttt{SlotMap}, \texttt{HopSlotMap}, \texttt{DenseSlotMap}).
+                  Abgerufen am 07.04.2026}
 }
 
 ## SmallVec
 @software{smallvec_crate,
-  title        = {smallvec: A vector that can store a small number of elements inline},
-  author       = {{Servo Project developers}},
-  year         = {2018},
+  title        = {{smallvec}: {"}Small vector{"} optimization for {Rust}:
+                  store up to a small number of items on the stack},
+  author       = {{The Servo Project Developers}},
+  year         = {2024},
+  month        = {11},
+  version      = {1.15.1},
   url          = {https://crates.io/crates/smallvec},
-  note         = {Abgerufen: 07.04.2026}
+  urldate      = {2026-04-07},
+  repository   = {https://github.com/servo/rust-smallvec},
+  license      = {MIT OR Apache-2.0},
+  note         = {Rust crate, veröffentlicht auf crates.io}
 }
 
 ## Channels
 @article{channels_theory,
-  title   = {Communicating Sequential Processes},
-  author  = {Hoare, C. A. R.},
-  journal = {Communications of the ACM},
-  volume  = {21},
-  number  = {8},
-  pages   = {666--677},
-  year    = {1978},
-  doi     = {10.1145/359576.359585}
+  title     = {Communicating Sequential Processes},
+  author    = {Hoare, C. A. R.},
+  journal   = {Communications of the ACM},
+  volume    = {21},
+  number    = {8},
+  pages     = {666--677},
+  year      = {1978},
+  month     = aug,
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  doi       = {10.1145/359576.359585},
+  url       = {https://doi.org/10.1145/359576.359585},
+  issn      = {0001-0782},
+  abstract  = {This paper suggests that input and output are basic primitives of programming
+               and that parallel composition of communicating sequential processes is a
+               fundamental program structuring method. When combined with a development of
+               Dijkstra's guarded commands, these concepts are surprisingly versatile. Their
+               use is illustrated by sample solutions of a variety of a familiar programming
+               exercises.},
+  keywords  = {coroutines, data representations, guarded commands, input, iterative arrays,
+               monitors, nondeterminacy, output, parallel programming, procedures, program
+               structures, recursion, search, unbounded nondeterminism},
+  acmid     = {359585},
+  numpages  = {12}
 }
 
 @software{async_channel,
-  title        = {async-channel: Async multi-producer multi-consumer channel},
-  author       = {{smol-rs developers}},
-  year         = {2024},
+  title        = {async-channel: Async Multi-Producer Multi-Consumer Channel},
+  author       = {Glavina, Stjepan},
+  year         = {2025},
+  version      = {2.5.0},
+  license      = {Apache-2.0 OR MIT},
   url          = {https://crates.io/crates/async-channel},
-  note         = {Rust crate used by smol for fast message-passing channels}
+  repository   = {https://github.com/smol-rs/async-channel},
+  note         = {Rust crate; part of the smol-rs ecosystem.
+                  An async MPMC channel where each message is received
+                  by exactly one consumer. Supports bounded and unbounded
+                  variants. Used by smol for fast message-passing channels.
+                  Minimum Supported Rust Version (MSRV): 1.60},
+  keywords     = {async, channel, mpmc, mpsc, spmc, concurrency, Rust},
+  howpublished = {\url{https://crates.io/crates/async-channel}}
 }
 
 ## Voxel Rendering
-@article{dda,
-  author = {Amanatides, John and Woo, Andrew},
-  year = {1987},
-  month = {08},
-  pages = {},
-  title = {A Fast Voxel Traversal Algorithm for Ray Tracing},
-  volume = {87},
-  journal = {Proceedings of EuroGraphics}
+@inproceedings{dda,
+  title     = {A Fast Voxel Traversal Algorithm for Ray Tracing},
+  author    = {Amanatides, John and Woo, Andrew},
+  booktitle = {Eurographics},
+  volume    = {87},
+  number    = {3},
+  pages     = {3--10},
+  year      = {1987},
+  publisher = {Eurographics Association}
 }
 
 @article{nvidia_octree,
-  author  = {Samuli Laine and Tero Karras},
-  title   = {Efficient Sparse Voxel Octrees},
-  journal = {IEEE Transactions on Visualization and Computer Graphics},
-  volume  = {17},
-  number  = {8},
-  pages   = {1048--1059},
-  year    = {2011},
-  doi     = {10.1109/TVCG.2010.240}
+  author       = {Samuli Laine and Tero Karras},
+  title        = {Efficient Sparse Voxel Octrees},
+  journal      = {IEEE Transactions on Visualization and Computer Graphics},
+  volume       = {17},
+  number       = {8},
+  pages        = {1048--1059},
+  month        = aug,
+  year         = {2011},
+  doi          = {10.1109/TVCG.2010.240},
+  issn         = {1941-0506},
+  pmid         = {21041879},
+  publisher    = {IEEE},
+  address      = {Los Alamitos, CA, USA},
+  institution  = {NVIDIA Research},
+  note         = {Open-source implementation available at
+                  \url{http://code.google.com/p/efficient-sparse-voxel-octrees/}},
+  abstract     = {In this paper, we examine the possibilities of using voxel
+                  representations as a generic way for expressing complex and
+                  feature-rich geometry on current and future GPUs. We present
+                  in detail a compact data structure for storing voxels and an
+                  efficient algorithm for performing ray casts using this
+                  structure. We augment the voxel data with novel contour
+                  information that increases geometric resolution, allows more
+                  compact encoding of smooth surfaces, and accelerates ray casts.
+                  We also employ a novel normal compression format for storing
+                  high-precision object-space normals. Finally, we present a
+                  variable-radius postprocess filtering technique for smoothing
+                  out blockiness caused by discrete sampling of shading
+                  attributes. Based on benchmark results, we show that our voxel
+                  representation is competitive with triangle-based
+                  representations in terms of ray casting performance, while
+                  allowing tremendously greater geometric detail and unique
+                  shading information for every voxel.},
+  keywords     = {voxel octree, sparse voxel octrees, ray casting, GPU geometry,
+                  voxel representation, real-time rendering, contour information,
+                  normal compression},
+  url          = {https://doi.org/10.1109/TVCG.2010.240}
 }
 
 @misc{wierd_minecraft,
@@ -254,6 +352,9 @@ keywords = {inverse procedural modeling, graph grammar, local similarity}
   title        = {Weirdest Map Seeds In Minecraft},
   url          = {https://gamerant.com/minecraft-weirdest-seeds},
   year         = {2023},
+  month        = aug,
+  day          = {28},
+  publisher    = {Game Rant},
   note         = {Game Rant. Zuletzt aktualisiert: 26.03.2025, Abgerufen: 07.04.2026}
 }
 
@@ -269,10 +370,12 @@ keywords = {inverse procedural modeling, graph grammar, local similarity}
   author    = {Scott, David W.},
   title     = {Multivariate Density Estimation: Theory, Practice, and Visualization},
   year      = {1992},
+  edition   = {1},
   publisher = {John Wiley \& Sons},
-  address   = {New York},
+  address   = {New York, NY},
   series    = {Wiley Series in Probability and Mathematical Statistics},
-  isbn      = {978-0-471-54770-9}
+  isbn      = {978-0-471-54770-9},
+  doi       = {10.1002/9780470316849}
 }
 
 @misc{shadergraph_exmaple,
@@ -283,4 +386,5 @@ keywords = {inverse procedural modeling, graph grammar, local similarity}
   day          = {7},
   url          = {https://timcoster.com/2020/09/07/unity-shader-graph-custom-function-nodes-collection/},
   note         = {Abgerufen: 29.05.2026},
+  publisher    = {Coster-Graphics},
 }

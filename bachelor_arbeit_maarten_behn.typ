@@ -1168,23 +1168,3 @@ Es wurden folgende Prompts genutzt:
 - Textinhalte: KI wurde nicht verwendet, um inhaltliche Aussagen, Argumentationen oder Ergebnisse der Arbeit zu generieren.
 
 
-#context {
-  set page(footer: none)
-  set figure(placement: top)
-
-
-  figure({
-    v(18.5%)
-    block(width: 195%, {
-      rotate(90deg, trimmed-image("../assets/full_graph.png", trim: (right: 50%)))
-    })
-  })
-  
-  figure({
-    v(18.5%)
-    block(width: 195%, {
-      rotate(90deg, trimmed-image("../assets/full_graph.png", trim: (left: 50%)))
-    })
-  })
-}
-
