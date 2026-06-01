@@ -46,14 +46,16 @@
     #v(5%)
     #align(center)[
       #stack(dir: ttb, spacing: 3em)[
-        //#line(angle: 0deg, length: 100%)
+        #line(angle: 0deg, length: 100%)
       ][
         #set text(size: 2em)
         *#title*
       ][
         #set text(size: 1.5em)
-        Bachelorarbeit Informatik ][
-        //#line(angle: 0deg, length: 100%)
+        Bachelorarbeit zur Erlangung des akademischen
+        Grades Bachelor of Science (B.Sc) in Informatik 
+      ][
+        #line(angle: 0deg, length: 100%)
       ]
     ]
     #v(5%)
@@ -61,32 +63,27 @@
       #stack(spacing: 1em)[
         *Eingereicht von*
       ][
-        #authors.name
-      ][
-        #if (type(authors) == array) {
-          authors
-            .map(author => {
-              link("mailto:" + str(author.email))
-            })
-            .join([, ])
-        } else {
-          link("mailto:" + str(authors.email))
-        }
+        #authors.name \
+        #authors.adress \
+        Matrikelnummer: #authors.matrikelnummer \ 
       ][][][
-        *Prüfer*
+        *Erstgutachter:* Prof. Dr. Gabriel Zachmann
       ][
-        #supervisors.join("\n")
+        *Zweitgutachter:* Prof. Dr. Nico Hochgeschwender 
       ]
     ]
     #align(center + horizon)[
       #stack(spacing: 1em)[
+        AG CGVR
+      ][
         Fachbereich 3
       ][
         Universität Bremen
       ][
+      ][][
         Sommersemester 2026
       ][
-        #date
+        Abgabetermin: 03.06.2026
       ]
     ]
   ]

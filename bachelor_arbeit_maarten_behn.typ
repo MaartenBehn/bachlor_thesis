@@ -7,10 +7,11 @@
   authors: (
     (
       name: "Maarten Behn",
-      email: "behn@uni-bremen.de"
+      adress: "Fritz-Gansberg Str. 1, 28213 Bremen",
+      matrikelnummer: "6189259"
     )
   ),
-  supervisors: ("Prof. Dr. Gabriel Zachmann", "Prof. Dr. Nico Hochgeschwender"),
+  supervisors: ("", ""),
 )
 
 
@@ -1131,6 +1132,8 @@ Für einen realen Einsatz in einem Spiel oder einer Simulation wäre mein Ansatz
 
 #show bibliography: set heading(numbering: "1")
 #bibliography("citations.bib", style: "mla")
+
+Alle Web-Verweise wurden am 01.06.2026 zuletzt aufgerufen.
 
 #context {
   show heading: none
