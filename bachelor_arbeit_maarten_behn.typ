@@ -22,7 +22,7 @@
 
 = Einleitung
 
-Prozedurale Generierung ist ein etabliertes Verfahren zur automatischen Erstellung komplexer virtueller Welten, das insbesondere in der Spieleentwicklung, Simulation und Computergrafik Anwendung findet.
+Prozedurale Generierung ist ein etabliertes Verfahren zur automatischen Erstellung komplexer virtueller Welten, dass insbesondere in der Spieleentwicklung, Simulation und Computergrafik Anwendung findet.
 Dabei werden zunächst grobe Strukturen erzeugt, die anschließend schrittweise durch immer feinere Details ergänzt werden. 
 Wird der Generationsalgorithmus in irgendeiner Form angepasst, kann es vorkommen, dass eine bereits erzeugte Welt nicht mehr dem aktuellen Stand des Algorithmus entspricht.
 
@@ -96,7 +96,7 @@ Dieser Bereinigungsschritt wird rekursiv auf alle betroffenen Nachbarzellen ausg
 
 #figure(
   image("assets/example_based_model_synthesis.png", width: 80%),
-  caption: [(a) A model composed of four model pieces, (b) An Inconsistent Model, (c) A Consistent Model @model_synthesis],
+  caption: [(a) A model composed of four model pieces, (b) An Inconsistent Model, (c) A Consistent Model (Abbildung aus #cite(<model_synthesis>, form: "author") "Example-based model synthesis")],
   placement: auto,
 ) <fig-example_based_model_synthesis>
 
@@ -372,7 +372,7 @@ Zur Veranschaulichung betrachte @fig-overview und @fig-cache_graph.
 
 
 #figure(
-  image("assets/cache_graph.svg", width: 50%),
+  image("assets/cache_graph.svg", width: 60%),
   caption: [Beispiel eines Abhängigkeites-Graphen und dessen Cache-Knoten zur Generierung einer Menge an Bäumen],
 ) <fig-cache_graph>
 
@@ -1135,10 +1135,6 @@ Für einen realen Einsatz in einem Spiel oder einer Simulation wäre mein Ansatz
 
 Alle Web-Verweise wurden am 01.06.2026 zuletzt aufgerufen.
 
-#context {
-  show heading: none
-  heading[Anhang]
-}
 
 #include "./layout/eigenständigkeit.typ"
 
